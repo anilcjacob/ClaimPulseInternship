@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClaimPulse — Summer Week 1</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{
+  --cream:#f7f3ee;--paper:#faf8f5;--warm-white:#fffefb;
+  --ink:#1a1812;--ink-2:#2e2a22;--muted:#7a7060;--muted-2:#b0a898;
+  --border:#e2ddd6;--border-2:#cdc7bc;
+  --navy:#1b2a4a;--navy-light:rgba(27,42,74,0.08);--navy-border:rgba(27,42,74,0.2);
+  --amber:#d97706;--amber-bg:rgba(217,119,6,0.07);--amber-border:rgba(217,119,6,0.22);
+  --teal:#0d7c6e;--teal-bg:rgba(13,124,110,0.07);--teal-border:rgba(13,124,110,0.2);
+  --rose:#b5413a;--rose-bg:rgba(181,65,58,0.06);--rose-border:rgba(181,65,58,0.2);
+  --chrome:#4285f4;--chrome-bg:rgba(66,133,244,0.07);--chrome-border:rgba(66,133,244,0.22);
+  --xp:#f59e0b;--xp-bg:rgba(245,158,11,0.08);--xp-border:rgba(245,158,11,0.25);
+  --shadow-sm:0 1px 4px rgba(26,24,18,0.06),0 0 0 1px rgba(26,24,18,0.04);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.65;min-height:100vh;}
+
+/* NAV STRIP */
+.prog-nav{background:var(--paper);border-bottom:1px solid var(--border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:40px;position:sticky;top:0;z-index:200;}
+.pn-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;padding:3px 8px;border-radius:5px;transition:all 0.15s;}
+.pn-link:hover{color:var(--navy);background:var(--navy-light);}
+.pn-home{font-weight:600;color:var(--navy);}
+.pn-right{display:flex;gap:4px;}
+.pn-center{font-size:11px;color:var(--muted-2);font-family:'IBM Plex Mono',monospace;}
+
+/* XP TOAST */
+.xp-toast{position:fixed;top:60px;right:24px;background:var(--navy);color:white;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;z-index:300;transform:translateY(-80px);opacity:0;transition:all 0.35s;box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+.xp-toast.show{transform:translateY(0);opacity:1;}
+
+/* HEADER */
+.header{background:var(--navy);color:white;padding:0 40px;display:flex;align-items:stretch;border-bottom:3px solid var(--amber);}
+.header-left{padding:22px 32px 22px 0;border-right:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;justify-content:center;min-width:200px;}
+.header-left .eyebrow{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:5px;}
+.header-left h1{font-family:'Lora',serif;font-size:22px;font-weight:700;color:white;}
+.header-left h1 span{color:#fbbf24;}
+.header-center{flex:1;padding:22px 32px;display:flex;flex-direction:column;justify-content:center;}
+.week-title{font-family:'Lora',serif;font-size:18px;font-weight:600;color:white;margin-bottom:4px;}
+.week-sub{font-size:12px;color:rgba(255,255,255,0.5);}
+.header-right{padding:22px 0 22px 32px;border-left:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:20px;}
+.hstat{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.hstat-val{font-family:'Lora',serif;font-size:20px;font-weight:700;color:white;}
+.hstat-label{font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;}
+.hstat-div{width:1px;height:32px;background:rgba(255,255,255,0.1);}
+
+/* XP BANNER */
+.xp-banner{background:var(--xp-bg);border-bottom:1px solid var(--xp-border);padding:8px 40px;display:flex;align-items:center;gap:16px;}
+.xb-label{font-size:11px;font-weight:600;color:var(--xp);}
+.xb-tasks{font-size:11px;color:var(--muted);}
+.xb-badges{display:flex;gap:6px;margin-left:auto;}
+.xb-badge{font-size:12px;padding:2px 8px;border-radius:4px;background:white;border:1px solid var(--border);font-weight:600;color:var(--muted-2);}
+.xb-badge.unlockable{border-color:var(--xp-border);color:var(--xp);background:white;}
+
+/* DAY STRIP */
+.progress-bar{background:var(--navy);padding:0 40px 14px;display:flex;}
+.day-pip{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:8px 6px 0;border-top:2px solid transparent;transition:all 0.2s;}
+.day-pip.active{border-top-color:var(--amber);}
+.day-pip.done{border-top-color:#34d399;}
+.pip-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all 0.2s;}
+.day-pip.active .pip-dot{background:var(--amber);}
+.day-pip.done .pip-dot{background:#34d399;}
+.pip-label{font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.07em;font-weight:500;}
+.day-pip.active .pip-label{color:rgba(255,255,255,0.8);}
+.day-pip.done .pip-label{color:rgba(52,211,153,0.7);}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 180px);}
+.main{padding:32px 36px;border-right:1px solid var(--border);overflow-y:auto;}
+.day-view{display:none;}
+.day-view.active{display:block;}
+
+/* DAY HEADER */
+.day-header{display:flex;align-items:flex-start;gap:18px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.day-number-badge{flex-shrink:0;width:52px;height:52px;background:var(--amber);color:white;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.day-of-week{font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.6);font-weight:600;}
+.day-num{font-family:'Lora',serif;font-size:20px;font-weight:700;line-height:1;color:white;}
+.day-header-text{flex:1;}
+.day-heading{font-family:'Lora',serif;font-size:22px;font-weight:700;color:var(--ink);margin-bottom:5px;line-height:1.25;}
+.day-goal{font-size:13px;color:var(--muted);margin-bottom:8px;font-style:italic;}
+.day-meta{display:flex;gap:12px;flex-wrap:wrap;}
+.meta-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;border:1px solid;}
+.meta-pill.time{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber);}
+.meta-pill.type{background:var(--navy-light);border-color:var(--navy-border);color:var(--navy);}
+.meta-pill.chrome{background:var(--chrome-bg);border-color:var(--chrome-border);color:var(--chrome);}
+.meta-pill.collab{background:var(--teal-bg);border-color:var(--teal-border);color:var(--teal);}
+
+/* COURSE STRIP */
+.cs{background:var(--navy-light);border:1px solid var(--navy-border);border-radius:9px;padding:12px 14px;margin-bottom:18px;}
+.cs-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--navy);margin-bottom:8px;}
+.cs-links{display:flex;flex-wrap:wrap;gap:6px;}
+.cc{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;text-decoration:none;border:1px solid var(--border-2);background:white;color:var(--ink-2);transition:all 0.15s;white-space:nowrap;}
+.cc:hover{background:var(--paper);border-color:var(--navy-border);color:var(--navy);}
+.cb{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;padding:1px 5px;border-radius:3px;background:rgba(13,124,110,0.1);color:var(--teal);}
+
+/* CHROME PROMPT BOX */
+.chrome-box{background:var(--chrome-bg);border:1px solid var(--chrome-border);border-radius:10px;padding:14px 16px;margin:10px 0 12px;}
+.chrome-box .cb-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:var(--chrome);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.chrome-prompt{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-2);background:white;border:1px solid var(--border-2);border-radius:6px;padding:10px 12px;margin-bottom:6px;line-height:1.6;}
+.chrome-tip{font-size:11px;color:var(--muted);font-style:italic;}
+
+/* BLOCKS */
+.block{background:var(--warm-white);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow-sm);}
+.block-header{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;user-select:none;transition:background 0.15s;}
+.block-header:hover{background:var(--paper);}
+.bico{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.bico.learn{background:var(--navy-light);}
+.bico.task{background:var(--amber-bg);}
+.bico.chrome{background:var(--chrome-bg);}
+.bico.collab{background:var(--teal-bg);}
+.bico.check{background:var(--rose-bg);}
+.bico.quest{background:rgba(245,158,11,0.1);}
+.btg{flex:1;}
+.bt{font-weight:600;font-size:13px;color:var(--ink);}
+.bm{font-size:11px;color:var(--muted);margin-top:1px;}
+.bdur{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-2);background:var(--cream);border:1px solid var(--border);border-radius:5px;padding:3px 8px;white-space:nowrap;}
+.chev{color:var(--muted-2);font-size:10px;transition:transform 0.2s;margin-left:4px;}
+.block.open .chev{transform:rotate(180deg);}
+.block-body{display:none;padding:4px 16px 16px;border-top:1px solid var(--border);}
+.block.open .block-body{display:block;}
+
+/* DAILY QUEST */
+.daily-quest{background:linear-gradient(135deg,var(--xp-bg),rgba(245,158,11,0.04));border:1px solid var(--xp-border);border-radius:10px;padding:14px 16px;margin:10px 0 12px;}
+.dq-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.dq-badge{background:var(--xp);color:white;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:2px 8px;border-radius:4px;}
+.dq-xp{font-size:11px;font-weight:600;color:var(--xp);}
+.dq-text{font-size:13px;color:var(--ink-2);line-height:1.6;}
+.dq-complete{margin-top:10px;display:flex;align-items:center;gap:8px;}
+.dq-complete input{width:15px;height:15px;accent-color:var(--xp);cursor:pointer;}
+.dq-complete label{font-size:12px;color:var(--muted);cursor:pointer;}
+
+/* RESOURCE LIST */
+.rl{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.ri{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;background:var(--cream);border:1px solid var(--border);border-radius:7px;text-decoration:none;transition:all 0.15s;}
+.ri:hover{background:var(--paper);border-color:var(--border-2);}
+.ri .ico{font-size:18px;flex-shrink:0;margin-top:1px;}
+.ri .rb{flex:1;}
+.ri .rn{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+.ri .rd{font-size:11px;color:var(--muted);line-height:1.4;}
+.ri .rbg{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:var(--navy-light);color:var(--navy);margin-top:4px;border:1px solid var(--navy-border);}
+
+/* TASK LIST */
+.tl{display:flex;flex-direction:column;gap:8px;}
+.ti{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--cream);border:1px solid var(--border);border-radius:7px;transition:all 0.2s;}
+.ti input[type="checkbox"]{margin-top:2px;width:15px;height:15px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;}
+.ti label{font-size:13px;color:var(--ink-2);cursor:pointer;line-height:1.5;}
+.ti.chk{background:var(--paper);}
+.ti.chk label{text-decoration:line-through;color:var(--muted-2);}
+.ti.xp-task{border-left:3px solid var(--xp);}
+.tn{margin-top:6px;padding:8px 10px;background:var(--amber-bg);border-left:2px solid var(--amber);border-radius:0 5px 5px 0;font-size:12px;color:#92400e;font-style:italic;line-height:1.5;}
+
+/* BILLING GLOSSARY */
+.glossary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 12px;}
+.gloss-item{background:var(--cream);border:1px solid var(--border);border-radius:7px;padding:10px 12px;}
+.gloss-term{font-size:11px;font-weight:600;color:var(--navy);margin-bottom:3px;font-family:'IBM Plex Mono',monospace;}
+.gloss-def{font-size:11px;color:var(--muted);line-height:1.4;}
+.gloss-item.key{border-color:var(--amber-border);background:var(--amber-bg);}
+.gloss-item.key .gloss-term{color:var(--amber);}
+
+/* SHADOW SESSION PLANNER */
+.shadow-plan{background:var(--teal-bg);border:1px solid var(--teal-border);border-radius:10px;padding:14px 16px;margin:10px 0 12px;}
+.sp-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:var(--teal);margin-bottom:10px;}
+.sp-row{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}
+.sp-time{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal);min-width:60px;padding-top:1px;}
+.sp-task{font-size:12px;color:var(--ink-2);line-height:1.5;flex:1;}
+
+/* CHECK-IN */
+.ci-box{padding-top:10px;}
+.ci-prompt{font-size:13px;color:var(--ink-2);font-family:'Lora',serif;font-style:italic;margin-bottom:10px;line-height:1.6;padding:10px 14px;background:var(--rose-bg);border-left:3px solid var(--rose);border-radius:0 6px 6px 0;}
+.ci-ta{width:100%;min-height:90px;padding:10px 12px;background:var(--cream);border:1px solid var(--border-2);border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink);resize:vertical;outline:none;transition:border-color 0.15s;margin-bottom:8px;}
+.ci-ta:focus{border-color:var(--navy);}
+.ci-ta::placeholder{color:var(--muted-2);}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;border:none;}
+.btn-navy{background:var(--navy);color:white;}.btn-navy:hover{background:#243a62;}
+.btn-outline{background:transparent;color:var(--navy);border:1px solid var(--navy-border);}.btn-outline:hover{background:var(--navy-light);}
+.btn-amber{background:var(--amber);color:white;}.btn-amber:hover{background:#b45309;}
+.btn-sm{padding:5px 12px;font-size:12px;}
+
+/* DAY SUMMARY */
+.ds{margin-top:20px;padding:14px 16px;background:var(--navy);border-radius:10px;display:flex;align-items:center;gap:16px;}
+.ds p{font-size:12px;color:rgba(255,255,255,0.65);flex:1;line-height:1.5;}
+.ds p strong{color:white;}
+.ds-nav{display:flex;gap:8px;}
+
+/* SIDEBAR */
+.sidebar{background:var(--warm-white);display:flex;flex-direction:column;height:calc(100vh - 180px);position:sticky;top:0;}
+.stabs{display:flex;border-bottom:1px solid var(--border);}
+.stab{flex:1;padding:12px 8px;border:none;background:none;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;}
+.stab.active{color:var(--navy);border-bottom-color:var(--amber);}
+.sp{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.sp.active{display:flex;}
+.sc{padding:10px 14px;background:var(--amber-bg);border-bottom:1px solid var(--amber-border);font-size:11px;color:var(--amber);}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;}
+.msg{display:flex;gap:9px;align-items:flex-start;}
+.ma{width:26px;height:26px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;margin-top:1px;}
+.msg.sys .ma{background:var(--navy);}
+.msg.usr .ma{background:var(--amber-bg);border:1px solid var(--amber-border);}
+.mb{flex:1;padding:9px 11px;border-radius:8px;font-size:12.5px;line-height:1.6;}
+.msg.sys .mb{background:var(--paper);border:1px solid var(--border);color:var(--ink-2);}
+.msg.usr .mb{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--ink-2);}
+.msg.load .mb{background:var(--paper);border:1px solid var(--border);color:var(--muted);font-style:italic;}
+.td{display:inline-flex;gap:3px;align-items:center;}
+.td span{width:5px;height:5px;background:var(--muted-2);border-radius:50%;animation:boun 1.2s infinite;}
+.td span:nth-child(2){animation-delay:0.2s;}
+.td span:nth-child(3){animation-delay:0.4s;}
+@keyframes boun{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.cia{padding:12px 14px;border-top:1px solid var(--border);background:var(--warm-white);}
+.qps{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.qp{font-size:11px;padding:3px 9px;border-radius:12px;background:var(--cream);border:1px solid var(--border-2);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.qp:hover{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber);}
+.ci-row{display:flex;gap:7px;align-items:flex-end;}
+.ci-inp{flex:1;padding:8px 11px;background:var(--cream);border:1px solid var(--border-2);border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;color:var(--ink);resize:none;outline:none;min-height:38px;max-height:120px;}
+.ci-inp::placeholder{color:var(--muted-2);}
+.sb-btn{width:36px;height:36px;border-radius:7px;background:var(--amber);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.sb-btn:hover{background:#b45309;}
+.sb-btn:disabled{background:var(--border-2);cursor:not-allowed;}
+/* REVIEW PANEL */
+.rev-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;}
+.rev-intro{padding:10px 12px;background:var(--navy-light);border:1px solid var(--navy-border);border-radius:7px;font-size:12px;color:var(--navy);line-height:1.6;}
+.rev-sec{display:flex;flex-direction:column;gap:6px;}
+.rev-sec label{font-size:12px;font-weight:600;color:var(--ink-2);}
+.rev-ta{width:100%;padding:10px 12px;background:var(--cream);border:1px solid var(--border-2);border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;color:var(--ink);resize:vertical;outline:none;min-height:100px;}
+.rev-ta::placeholder{color:var(--muted-2);}
+.rev-res{display:none;padding:12px;background:var(--paper);border:1px solid var(--border);border-radius:7px;font-size:12.5px;color:var(--ink-2);line-height:1.7;white-space:pre-wrap;}
+.rev-res.vis{display:block;}
+/* PROGRESS PANEL */
+.prg-body{flex:1;overflow-y:auto;padding:14px;}
+.prg-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:7px;margin-bottom:6px;border:1px solid var(--border);background:var(--cream);cursor:pointer;transition:all 0.15s;}
+.prg-row.act{background:var(--amber-bg);border-color:var(--amber-border);}
+.prg-icon{font-size:16px;}
+.prg-text{flex:1;}
+.prg-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:1px;}
+.prg-status{font-size:11px;color:var(--muted);}
+.prg-pct{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-2);}
+.prg-track{height:3px;background:var(--border);border-radius:2px;margin:14px 0 8px;overflow:hidden;}
+.prg-fill{height:100%;background:linear-gradient(90deg,var(--amber),#fbbf24);border-radius:2px;transition:width 0.5s ease;}
+.wgb{padding:12px 14px;background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:8px;margin-bottom:14px;}
+.wgb h4{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--amber);margin-bottom:5px;}
+.wgb p{font-size:12px;color:var(--ink-2);line-height:1.6;}
+.xp-summary{padding:10px 12px;background:var(--xp-bg);border:1px solid var(--xp-border);border-radius:7px;margin-top:12px;}
+.xp-summary h5{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--xp);margin-bottom:6px;}
+.xp-summary .xp-val{font-family:'Lora',serif;font-size:22px;font-weight:700;color:var(--xp);}
+.xp-summary .xp-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+</style>
+</head>
+<body>
+
+<!-- XP TOAST -->
+<div class="xp-toast" id="xp-toast">+10 XP ⚡</div>
+
+<!-- NAV -->
+<div class="prog-nav">
+  <a class="pn-link pn-home" href="index.html">🏠 Program Home</a>
+  <span class="pn-center">Summer Week 1 · Days 1–5 · Domain Immersion + Claude in Chrome</span>
+  <div class="pn-right"><a class="pn-link" href="s_week2_daily_guide.html">Week 2 →</a></div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left"><div class="eyebrow">ClaimPulse AI · Summer Arc</div><h1>Claim<span>Pulse</span></h1></div>
+  <div class="header-center"><div class="week-title">Week 1 — Domain Immersion &amp; Claude in Chrome</div><div class="week-sub">Learn the billing domain like a professional — with AI as your research partner from Day 1</div></div>
+  <div class="header-right">
+    <div class="hstat"><span class="hstat-val">5</span><span class="hstat-label">Days</span></div>
+    <div class="hstat-div"></div>
+    <div class="hstat"><span class="hstat-val">150</span><span class="hstat-label">XP Available</span></div>
+    <div class="hstat-div"></div>
+    <div class="hstat"><span class="hstat-val">W1</span><span class="hstat-label">Summer</span></div>
+  </div>
+</div>
+
+<!-- XP BANNER -->
+<div class="xp-banner">
+  <span class="xb-label">⚡ Week 1 XP: 150</span>
+  <span class="xb-tasks">Every checked task earns 10 XP · Daily quests earn bonus XP</span>
+  <div class="xb-badges">
+    <span class="xb-badge unlockable">🩺 Billing Fluent — unlockable this week</span>
+    <span class="xb-badge unlockable">🔍 Chrome Researcher — unlockable this week</span>
+  </div>
+</div>
+
+<!-- DAY STRIP -->
+<div class="progress-bar">
+  <div class="day-pip active" onclick="showDay(1)" id="pip1"><div class="pip-dot"></div><div class="pip-label">Mon</div></div>
+  <div class="day-pip" onclick="showDay(2)" id="pip2"><div class="pip-dot"></div><div class="pip-label">Tue</div></div>
+  <div class="day-pip" onclick="showDay(3)" id="pip3"><div class="pip-dot"></div><div class="pip-label">Wed</div></div>
+  <div class="day-pip" onclick="showDay(4)" id="pip4"><div class="pip-dot"></div><div class="pip-label">Thu</div></div>
+  <div class="day-pip" onclick="showDay(5)" id="pip5"><div class="pip-dot"></div><div class="pip-label">Fri</div></div>
+</div>
+
+<div class="layout">
+<main class="main">
+
+<!-- ════════ DAY 1 ════════ -->
+<div class="day-view active" id="day1">
+  <div class="day-header">
+    <div class="day-number-badge"><span class="day-of-week">Mon</span><span class="day-num">1</span></div>
+    <div class="day-header-text">
+      <div class="day-heading">First Day — Orientation, Billing Basics &amp; Claude in Chrome</div>
+      <div class="day-goal">Goal: Learn what medical claim billing actually is — the full lifecycle from patient visit to payment. Use Claude in Chrome as your research partner throughout. By end of day, you can explain the claim lifecycle in your own words.</div>
+      <div class="day-meta"><span class="meta-pill time">⏱ ~4 hours</span><span class="meta-pill type">🏥 Domain</span><span class="meta-pill chrome">🔵 Claude in Chrome</span></div>
+    </div>
+  </div>
+  <div class="cs"><div class="cs-label">📚 Install First</div>
+    <div class="cs-links">
+      <a class="cc" href="https://www.anthropic.com/claude" target="_blank">🔵 Claude in Chrome — Install Extension <span class="cb">Free with Claude.ai</span></a>
+      <a class="cc" href="https://www.cms.gov/medicare/coding-billing" target="_blank">🏥 CMS.gov — Medicare Billing Reference <span class="cb">Free</span></a>
+      <a class="cc" href="https://www.aapc.com/resources/medical-coding-articles/medical-billing-overview.aspx" target="_blank">🏥 AAPC — Medical Billing Overview <span class="cb">Free</span></a>
+    </div>
+  </div>
+
+  <div class="block open" id="b1a">
+    <div class="block-header" onclick="tog('b1a')"><div class="bico chrome">🔵</div><div class="btg"><div class="bt">Morning: Install Claude in Chrome + First Research Session</div><div class="bm">Set up the tool you'll use throughout domain immersion week — then put it to work immediately</div></div><span class="bdur">~1.5 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="chrome-box">
+        <div class="cb-label">🔵 Claude in Chrome — What It Is</div>
+        <p style="font-size:12px;color:var(--ink-2);line-height:1.7;margin-bottom:10px;">Claude in Chrome is a browser extension that puts Claude directly in your browser. You can highlight text on any webpage and ask Claude to explain it, summarize it, or connect it to something else. This week you'll use it to turn dense medical billing documentation into plain English.</p>
+        <p style="font-size:11px;color:var(--muted);font-style:italic;">Install it from the Chrome Web Store — you need a Claude.ai account. Once installed, a Claude icon appears in your browser toolbar.</p>
+      </div>
+      <div class="chrome-box">
+        <div class="cb-label">🔵 Today's Chrome Prompts — Try These</div>
+        <div class="chrome-prompt">"I'm learning medical billing for the first time. Explain the claim lifecycle — what happens from when a patient sees a doctor to when the practice gets paid — in plain English with no jargon."</div>
+        <div class="chrome-prompt">"What is the difference between a CPT code and an ICD-10 code? Give me one example of each from a primary care context."</div>
+        <div class="chrome-prompt">"What does it mean when a claim is 'denied' vs 'rejected'? Why does this distinction matter for a billing manager?"</div>
+        <div class="chrome-tip">💡 Tip: Navigate to cms.gov/medicare/coding-billing, highlight any confusing paragraph, and use Claude in Chrome to explain it in plain language.</div>
+      </div>
+      <div class="tl">
+        <div class="ti xp-task" id="t1a1"><input type="checkbox" id="c1a1" onchange="chk('t1a1','c1a1')"><label for="c1a1">Install Claude in Chrome and confirm it appears in your browser toolbar — open claude.ai in a new tab to verify the extension is connected to your account</label></div>
+        <div class="ti xp-task" id="t1a2"><input type="checkbox" id="c1a2" onchange="chk('t1a2','c1a2')"><label for="c1a2">Use Claude in Chrome to get a plain-English explanation of the claim lifecycle — write down the 5 key steps in your own words in a notebook or doc</label></div>
+        <div class="ti xp-task" id="t1a3"><input type="checkbox" id="c1a3" onchange="chk('t1a3','c1a3')"><label for="c1a3">Ask Claude in Chrome: "What are the 5 most common reasons medical claims get denied?" — screenshot the answer, you'll verify it against real data later this week</label></div>
+        <div class="ti xp-task" id="t1a4"><input type="checkbox" id="c1a4" onchange="chk('t1a4','c1a4')"><label for="c1a4">Read the AAPC medical billing overview — use Claude in Chrome to explain any section you find confusing</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b1b">
+    <div class="block-header" onclick="tog('b1b')"><div class="bico learn">🏥</div><div class="btg"><div class="bt">Afternoon: Core Billing Vocabulary — The Language of the Job</div><div class="bm">You can't shadow billing staff or read denial reports without knowing these terms cold</div></div><span class="bdur">~2 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="glossary-grid">
+        <div class="gloss-item key"><div class="gloss-term">CPT Code</div><div class="gloss-def">5-digit procedure code — describes what was done. Example: 99213 = office visit, established patient, moderate complexity.</div></div>
+        <div class="gloss-item key"><div class="gloss-term">ICD-10 Code</div><div class="gloss-def">Diagnosis code — describes why it was done. Example: J06.9 = acute upper respiratory infection.</div></div>
+        <div class="gloss-item key"><div class="gloss-term">CARC Code</div><div class="gloss-def">Claim Adjustment Reason Code — explains why a claim was denied. CO-97 = "bundled service." These are the codes the dashboard will track.</div></div>
+        <div class="gloss-item key"><div class="gloss-term">Denial Rate</div><div class="gloss-def">% of submitted claims that were denied. The #1 metric for billing health. Industry average: 5–10%. Anything over 15% is a red flag.</div></div>
+        <div class="gloss-item"><div class="gloss-term">Clean Claim Rate</div><div class="gloss-def">% of claims accepted on first submission without errors. Higher = more efficient billing.</div></div>
+        <div class="gloss-item"><div class="gloss-term">Days in A/R</div><div class="gloss-def">Average days a claim sits unpaid. Target: under 40 days. Over 60 days = significant cash flow risk.</div></div>
+        <div class="gloss-item"><div class="gloss-term">EOB</div><div class="gloss-def">Explanation of Benefits — the payer's response to a claim showing what was paid, denied, or adjusted.</div></div>
+        <div class="gloss-item"><div class="gloss-term">Prior Authorization</div><div class="gloss-def">Pre-approval required from the payer before certain procedures. Missing it is one of the most common denial causes.</div></div>
+      </div>
+      <div class="tl">
+        <div class="ti xp-task" id="t1b1"><input type="checkbox" id="c1b1" onchange="chk('t1b1','c1b1')"><label for="c1b1">For each of the 8 terms above — write your own definition in plain language without looking. Use Claude in Chrome to check your definition: "Is my understanding of [term] correct?"</label></div>
+        <div class="ti xp-task" id="t1b2"><input type="checkbox" id="c1b2" onchange="chk('t1b2','c1b2')"><label for="c1b2">Ask Claude in Chrome: "What are CARC codes CO-4, CO-18, CO-22, CO-97, and PR-1? Give a one-sentence plain-English explanation for each." These are the denial codes you'll see most in the real data.</label></div>
+      </div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Ask Claude in Chrome to explain the claim lifecycle using an analogy — "explain how a medical claim works like [something non-medical]." What analogy did it use? Was it accurate? Write your own better analogy if you can.</div>
+        <div class="dq-complete"><input type="checkbox" id="dq1" onchange="chk('dq1','dq1',25)"><label for="dq1">Quest complete — write the analogy in your notes</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b1c"><div class="block-header" onclick="tog('b1c')"><div class="bico check">✏️</div><div class="btg"><div class="bt">End-of-Day Check-in</div></div><span class="bdur">~30 min</span><span class="chev">▼</span></div>
+    <div class="block-body"><div class="ci-box">
+      <div class="ci-prompt">"In your own words, explain what happens when a medical claim gets denied — from the moment the denial comes back to the moment it's either resolved or written off. Where does money get lost in this process? Where does time get lost? Use Claude in Chrome if you want to check anything, but write the answer yourself."</div>
+      <textarea class="ci-ta" id="ci1" placeholder="Explain the denied claim lifecycle and where value gets lost..."></textarea>
+      <button class="btn btn-navy btn-sm" onclick="sendCI(1)">📤 Send to Tutor for Feedback</button>
+    </div></div>
+  </div>
+  <div class="ds"><p><strong>Day 1 done?</strong> Billing vocabulary solid, claim lifecycle understood, Claude in Chrome installed and working. Tomorrow: shadow the billing team and see all of this in practice.</p><div class="ds-nav"><button class="btn btn-amber btn-sm" onclick="showDay(2)">Day 2 →</button></div></div>
+</div>
+
+<!-- ════════ DAY 2 ════════ -->
+<div class="day-view" id="day2">
+  <div class="day-header">
+    <div class="day-number-badge"><span class="day-of-week">Tue</span><span class="day-num">2</span></div>
+    <div class="day-header-text">
+      <div class="day-heading">Shadow the Billing Team — Watch Real Claims Flow</div>
+      <div class="day-goal">Goal: Spend the day observing billing staff at work. Watch real claims get submitted, denied, and appealed. Use Claude in Chrome in real time to look up any code or concept you encounter that you don't understand yet.</div>
+      <div class="day-meta"><span class="meta-pill time">⏱ ~4 hours</span><span class="meta-pill collab">🤝 Shadow Session</span><span class="meta-pill chrome">🔵 Claude in Chrome</span></div>
+    </div>
+  </div>
+  <div class="cs"><div class="cs-links">
+    <a class="cc" href="https://www.nucc.org/index.php/code-sets-mainmenu-41/claim-adjustment-reason-codes-mainmenu-42" target="_blank">📋 NUCC — Full CARC Code List <span class="cb">Free · Reference</span></a>
+    <a class="cc" href="https://www.cms.gov/medicare/coding-billing/icd-10-codes" target="_blank">🏥 CMS — ICD-10 Code Lookup <span class="cb">Free · Reference</span></a>
+  </div></div>
+
+  <div class="block open" id="b2a">
+    <div class="block-header" onclick="tog('b2a')"><div class="bico collab">🤝</div><div class="btg"><div class="bt">Full Day: Structured Shadow Session with Billing Staff</div><div class="bm">Observe and ask questions — Claude in Chrome handles every code lookup in real time</div></div><span class="bdur">~3.5 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="shadow-plan">
+        <div class="sp-label">Shadow Session Structure</div>
+        <div class="sp-row"><span class="sp-time">9:00–10:00</span><span class="sp-task">Watch the billing manager's morning review — what does the first hour of a billing day look like? What reports do they open first?</span></div>
+        <div class="sp-row"><span class="sp-time">10:00–11:30</span><span class="sp-task">Observe claim submission: watch at least 3 claims go from "ready to submit" to "submitted" — note the CPT and ICD-10 codes used</span></div>
+        <div class="sp-row"><span class="sp-time">11:30–12:30</span><span class="sp-task">Watch denial management: observe how a recent denial is reviewed and appealed — note the CARC code and the resolution approach</span></div>
+        <div class="sp-row"><span class="sp-time">1:30–3:00</span><span class="sp-task">Interview the billing manager with the questions below — take notes on exact quotes</span></div>
+      </div>
+      <p style="font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:8px;margin-top:12px;">Interview Questions for the Billing Manager:</p>
+      <div class="tl">
+        <div class="ti xp-task" id="t2a1"><input type="checkbox" id="c2a1" onchange="chk('t2a1','c2a1')"><label for="c2a1">Ask: "What is your current overall denial rate, and which payer gives you the most trouble?" — write down the exact numbers they give you</label></div>
+        <div class="ti xp-task" id="t2a2"><input type="checkbox" id="c2a2" onchange="chk('t2a2','c2a2')"><label for="c2a2">Ask: "How long does it currently take to pull a denial report? Walk me through the exact steps." — this is the pain point the dashboard will solve</label></div>
+        <div class="ti xp-task" id="t2a3"><input type="checkbox" id="c2a3" onchange="chk('t2a3','c2a3')"><label for="c2a3">Ask: "If you could see one piece of information every morning without having to look it up, what would it be?" — this is your most important dashboard design question</label></div>
+        <div class="ti xp-task" id="t2a4"><input type="checkbox" id="c2a4" onchange="chk('t2a4','c2a4')"><label for="c2a4">Use Claude in Chrome on the spot: whenever you see a CARC code or procedure code you don't recognize, look it up immediately using Claude rather than letting it slide</label></div>
+        <div class="ti xp-task" id="t2a5"><input type="checkbox" id="c2a5" onchange="chk('t2a5','c2a5')"><label for="c2a5">After the session: write 5 specific observations about how billing staff currently access, analyse, and act on denial data — these become the "problem statement" in the final presentation</label></div>
+      </div>
+      <div class="tn">💡 The most important thing to notice: every time the billing manager has to manually pull a report, switch between screens, or look up a code — that's a problem the dashboard can solve. Count those moments.</div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Count how many times the billing manager opens a new tab, switches screens, or manually looks something up during the shadow session. At the end of the day, use Claude in Chrome to estimate the time cost: "If a billing manager switches context 20 times per day and each switch takes 2 minutes, what is the annual time cost assuming 250 working days?"</div>
+        <div class="dq-complete"><input type="checkbox" id="dq2" onchange="chk('dq2','dq2',25)"><label for="dq2">Quest complete — record your count and Claude's time estimate</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b2c"><div class="block-header" onclick="tog('b2c')"><div class="bico check">✏️</div><div class="btg"><div class="bt">End-of-Day Check-in</div></div><span class="bdur">~30 min</span><span class="chev">▼</span></div>
+    <div class="block-body"><div class="ci-box">
+      <div class="ci-prompt">"What was the most surprising thing you observed in the shadow session — something that didn't match what you expected from yesterday's reading? And: what is the single most painful manual step in the billing workflow that a dashboard would eliminate entirely?"</div>
+      <textarea class="ci-ta" id="ci2" placeholder="Most surprising observation + the most painful manual step..."></textarea>
+      <button class="btn btn-navy btn-sm" onclick="sendCI(2)">📤 Send to Tutor for Feedback</button>
+    </div></div>
+  </div>
+  <div class="ds"><p><strong>Day 2 done?</strong> Real workflow observed, key pain points documented. Tomorrow: the data — pull the actual denial report and examine real claim records.</p><div class="ds-nav"><button class="btn btn-outline btn-sm" onclick="showDay(1)">← Day 1</button><button class="btn btn-amber btn-sm" onclick="showDay(3)">Day 3 →</button></div></div>
+</div>
+
+<!-- ════════ DAY 3 ════════ -->
+<div class="day-view" id="day3">
+  <div class="day-header">
+    <div class="day-number-badge"><span class="day-of-week">Wed</span><span class="day-num">3</span></div>
+    <div class="day-header-text">
+      <div class="day-heading">Pull the Real Data — Examine 3 Months of Claims</div>
+      <div class="day-goal">Goal: Get a real export of at least 3 months of anonymized claim data. Understand its structure, find the denial patterns manually, and use Claude in Chrome to look up every CARC code you encounter. This data is what the entire program is built on.</div>
+      <div class="day-meta"><span class="meta-pill time">⏱ ~4 hours</span><span class="meta-pill type">📊 Data Analysis</span><span class="meta-pill chrome">🔵 Claude in Chrome</span></div>
+    </div>
+  </div>
+  <div class="cs"><div class="cs-links">
+    <a class="cc" href="https://www.cms.gov/medicare/coding-billing/place-of-service-codes/code-sets" target="_blank">🏥 CMS — Place of Service Codes <span class="cb">Free</span></a>
+    <a class="cc" href="https://x12.org/codes/claim-adjustment-reason-codes" target="_blank">📋 X12 — CARC Code Lookup <span class="cb">Free</span></a>
+  </div></div>
+
+  <div class="block open" id="b3a">
+    <div class="block-header" onclick="tog('b3a')"><div class="bico task">📊</div><div class="btg"><div class="bt">Morning: Request and Receive the Data Export</div><div class="bm">Work with billing staff to export a safe, anonymized claim dataset — HIPAA pre-flight checklist first</div></div><span class="bdur">~1.5 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <p style="font-size:12px;font-weight:600;color:var(--rose);margin-bottom:8px;">🔒 HIPAA Pre-Flight — Complete Before Receiving Any Data</p>
+      <div class="tl">
+        <div class="ti xp-task" id="t3a1"><input type="checkbox" id="c3a1" onchange="chk('t3a1','c3a1')"><label for="c3a1">Confirm with the billing manager that the export will contain NO patient names, dates of birth, Social Security numbers, or addresses — only claim IDs, service dates, procedure codes, diagnosis codes, payer names, billed amounts, and claim status</label></div>
+        <div class="ti xp-task" id="t3a2"><input type="checkbox" id="c3a2" onchange="chk('t3a2','c3a2')"><label for="c3a2">Request a minimum 3-month export in CSV format — confirm it will be stored only on the practice's systems, not personal devices or cloud accounts</label></div>
+        <div class="ti xp-task" id="t3a3"><input type="checkbox" id="c3a3" onchange="chk('t3a3','c3a3')"><label for="c3a3">Once received: open the CSV in Excel and confirm you can see these columns — claim_id, service_date, payer_name, cpt_code, icd_code, billed_amount, status, denial_reason (where applicable)</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b3b">
+    <div class="block-header" onclick="tog('b3b')"><div class="bico chrome">🔵</div><div class="btg"><div class="bt">Afternoon: Manual Data Exploration with Claude in Chrome</div><div class="bm">Browse the real data in Excel, look up every unfamiliar code with Claude in Chrome, find 3 denial patterns</div></div><span class="bdur">~2 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="chrome-box">
+        <div class="cb-label">🔵 Use Claude in Chrome While Browsing the Data</div>
+        <div class="chrome-prompt">"I'm looking at a claim with CPT code 99214 denied with CARC code CO-4. In plain English: what procedure was performed, what does the denial code mean, and what should the biller do to fix it?"</div>
+        <div class="chrome-prompt">"I'm seeing the same denial reason code on 40% of claims from one payer. What might cause a systematic pattern like this rather than random individual errors?"</div>
+        <div class="chrome-tip">💡 Keep Claude in Chrome open in a side panel. Every time you see a code you don't recognize in Excel, switch to the browser, type the code, and ask Claude to explain it in the billing context you're working in.</div>
+      </div>
+      <div class="tl">
+        <div class="ti xp-task" id="t3b1"><input type="checkbox" id="c3b1" onchange="chk('t3b1','c3b1')"><label for="c3b1">Calculate manually in Excel: what is the overall denial rate in the dataset? (denied claims / total claims × 100)</label></div>
+        <div class="ti xp-task" id="t3b2"><input type="checkbox" id="c3b2" onchange="chk('t3b2','c3b2')"><label for="c3b2">Use an Excel PivotTable to find: which payer has the highest denial rate? Which CPT code has the most denials?</label></div>
+        <div class="ti xp-task" id="t3b3"><input type="checkbox" id="c3b3" onchange="chk('t3b3','c3b3')"><label for="c3b3">Use Claude in Chrome to look up the top 5 denial reason codes you find in the data — write a one-sentence plain-English explanation for each</label></div>
+        <div class="ti xp-task" id="t3b4"><input type="checkbox" id="c3b4" onchange="chk('t3b4','c3b4')"><label for="c3b4">Document 3 specific findings: "(1) [Payer X] has a [Y]% denial rate, [Z] points above the overall average. (2) CPT [code] accounts for [N]% of all denials. (3) CARC [code] is the most common denial reason." Write these down — they become the dashboard's test cases.</label></div>
+      </div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Find the oldest unpaid claim in the dataset. How many days old is it? What is its denial reason? Use Claude in Chrome to look up the appeal deadline for that denial type: "What is the typical timely filing deadline for appealing a [CARC code] denial from [payer type]?"</div>
+        <div class="dq-complete"><input type="checkbox" id="dq3" onchange="chk('dq3','dq3',25)"><label for="dq3">Quest complete — record the oldest claim and the appeal deadline</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b3c"><div class="block-header" onclick="tog('b3c')"><div class="bico check">✏️</div><div class="btg"><div class="bt">End-of-Day Check-in</div></div><span class="bdur">~30 min</span><span class="chev">▼</span></div>
+    <div class="block-body"><div class="ci-box">
+      <div class="ci-prompt">"State your 3 most important findings from the real claim data. For each one: what is the number, what does it mean clinically or financially, and what action would a billing manager take if they saw this finding in real time every morning?"</div>
+      <textarea class="ci-ta" id="ci3" placeholder="3 findings, their meaning, and the action each enables..."></textarea>
+      <button class="btn btn-navy btn-sm" onclick="sendCI(3)">📤 Send to Tutor for Feedback</button>
+    </div></div>
+  </div>
+  <div class="ds"><p><strong>Day 3 done?</strong> Real data in hand, first patterns found. Tomorrow: research payer-specific rules and define the 7 dashboard metrics precisely.</p><div class="ds-nav"><button class="btn btn-outline btn-sm" onclick="showDay(2)">← Day 2</button><button class="btn btn-amber btn-sm" onclick="showDay(4)">Day 4 →</button></div></div>
+</div>
+
+<!-- ════════ DAY 4 ════════ -->
+<div class="day-view" id="day4">
+  <div class="day-header">
+    <div class="day-number-badge"><span class="day-of-week">Thu</span><span class="day-num">4</span></div>
+    <div class="day-header-text">
+      <div class="day-heading">Payer Research &amp; Define the 7 Dashboard Metrics</div>
+      <div class="day-goal">Goal: Research the specific payers in the practice's data — their denial patterns, timely filing rules, and prior auth requirements. Then define the 7 KPIs the dashboard will track, with exact formulas. Claude in Chrome is the research tool throughout.</div>
+      <div class="day-meta"><span class="meta-pill time">⏱ ~4 hours</span><span class="meta-pill chrome">🔵 Claude in Chrome</span><span class="meta-pill type">📋 Design</span></div>
+    </div>
+  </div>
+  <div class="cs"><div class="cs-links">
+    <a class="cc" href="https://www.cms.gov/medicare/billing/medicareprovidersupplyenrollment/downloads/medicaredenialreasons.pdf" target="_blank">🏥 CMS — Medicare Denial Reasons Reference <span class="cb">Free</span></a>
+    <a class="cc" href="https://www.mgma.com/benchmarking-data/key-data-for-practices/benchmarking-data/key-data-for-practices/key-billing-and-collection-metrics" target="_blank">📊 MGMA — Billing Benchmark Metrics <span class="cb">Free</span></a>
+  </div></div>
+
+  <div class="block open" id="b4a">
+    <div class="block-header" onclick="tog('b4a')"><div class="bico chrome">🔵</div><div class="btg"><div class="bt">Morning: Payer Research with Claude in Chrome</div><div class="bm">Research each major payer in the data — use Claude in Chrome to pull context about their specific denial patterns</div></div><span class="bdur">~1.5 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="chrome-box">
+        <div class="cb-label">🔵 Payer Research Prompts</div>
+        <div class="chrome-prompt">"What are the most common reasons Medicare denies claims, and what are the most effective strategies for appealing each one?"</div>
+        <div class="chrome-prompt">"What is [Payer Name]'s timely filing deadline for initial claims and for appeals? What happens if you miss it?"</div>
+        <div class="chrome-prompt">"What is the industry average denial rate for [specialty type] practices, and what percentage is considered 'best in class'? I want to know how to set a realistic dashboard target."</div>
+      </div>
+      <div class="tl">
+        <div class="ti xp-task" id="t4a1"><input type="checkbox" id="c4a1" onchange="chk('t4a1','c4a1')"><label for="c4a1">For the top 3 payers in the practice's data — use Claude in Chrome to document: their timely filing deadline, their most common denial reasons, and the industry benchmark denial rate for this specialty</label></div>
+        <div class="ti xp-task" id="t4a2"><input type="checkbox" id="c4a2" onchange="chk('t4a2','c4a2')"><label for="c4a2">Use Claude in Chrome to look up: "What does MGMA say is the benchmark denial rate for primary care practices?" Save the specific number — this becomes the dashboard's alert threshold.</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b4b">
+    <div class="block-header" onclick="tog('b4b')"><div class="bico task">📐</div><div class="btg"><div class="bt">Afternoon: Define the 7 Dashboard KPIs with Exact Formulas</div><div class="bm">Every metric must have a name, formula, unit, benchmark, and "what action does this enable?"</div></div><span class="bdur">~2 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">For each KPI: write the formula precisely enough that a Python function could compute it from the CSV columns. Include the benchmark and what alert condition should trigger.</p>
+      <div class="tl">
+        <div class="ti xp-task" id="t4b1"><input type="checkbox" id="c4b1" onchange="chk('t4b1','c4b1')"><label for="c4b1"><strong>KPI 1 — Denial Rate:</strong> denied claims / total submitted claims × 100. Benchmark: &lt;10%. Alert: &gt;15%. ✓ Document this in your requirements doc</label></div>
+        <div class="ti xp-task" id="t4b2"><input type="checkbox" id="c4b2" onchange="chk('t4b2','c4b2')"><label for="c4b2"><strong>KPI 2 — Days in A/R:</strong> average days from service date to payment date for paid claims. Benchmark: &lt;40 days. Alert: &gt;60 days. ✓ Document</label></div>
+        <div class="ti xp-task" id="t4b3"><input type="checkbox" id="c4b3" onchange="chk('t4b3','c4b3')"><label for="c4b3"><strong>KPI 3 — $ at Risk:</strong> total billed amount of all currently denied or pending claims. No benchmark — raw dollar value. ✓ Document</label></div>
+        <div class="ti xp-task" id="t4b4"><input type="checkbox" id="c4b4" onchange="chk('t4b4','c4b4')"><label for="c4b4"><strong>KPI 4 — Clean Claim Rate:</strong> claims accepted on first submission / total submitted × 100. Benchmark: &gt;95%. ✓ Document</label></div>
+        <div class="ti xp-task" id="t4b5"><input type="checkbox" id="c4b5" onchange="chk('t4b5','c4b5')"><label for="c4b5"><strong>KPIs 5–7:</strong> work with the billing manager to define 3 more metrics specific to this practice's pain points. Use Claude in Chrome to check whether each is computable from the columns in the CSV.</label></div>
+      </div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Use Claude in Chrome to find: "What is the average cost of a denied claim when you factor in the staff time to rework it, the delayed payment, and the cases that are written off entirely?" Find an industry study or MGMA source. What is the dollar figure? Multiply it by the number of denials in the practice's dataset to estimate total annual denial cost.</div>
+        <div class="dq-complete"><input type="checkbox" id="dq4" onchange="chk('dq4','dq4',25)"><label for="dq4">Quest complete — record the per-denial cost and the total estimate</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b4c"><div class="block-header" onclick="tog('b4c')"><div class="bico check">✏️</div><div class="btg"><div class="bt">End-of-Day Check-in</div></div><span class="bdur">~30 min</span><span class="chev">▼</span></div>
+    <div class="block-body"><div class="ci-box">
+      <div class="ci-prompt">"For KPI 1 (Denial Rate): what is the current value in the practice's actual data? How does it compare to the industry benchmark you found? If you were the billing manager reading this number on a dashboard every morning, what would you do differently this week?"</div>
+      <textarea class="ci-ta" id="ci4" placeholder="Current denial rate vs benchmark — and the action it should trigger..."></textarea>
+      <button class="btn btn-navy btn-sm" onclick="sendCI(4)">📤 Send to Tutor for Feedback</button>
+    </div></div>
+  </div>
+  <div class="ds"><p><strong>Day 4 done?</strong> 7 KPIs defined with formulas and benchmarks. Tomorrow: the wireframe, sign-off session with billing staff, and the Week 1 deliverable.</p><div class="ds-nav"><button class="btn btn-outline btn-sm" onclick="showDay(3)">← Day 3</button><button class="btn btn-amber btn-sm" onclick="showDay(5)">Day 5 →</button></div></div>
+</div>
+
+<!-- ════════ DAY 5 ════════ -->
+<div class="day-view" id="day5">
+  <div class="day-header">
+    <div class="day-number-badge"><span class="day-of-week">Fri</span><span class="day-num">5</span></div>
+    <div class="day-header-text">
+      <div class="day-heading">Wireframe the Dashboard &amp; Get Billing Staff Sign-Off</div>
+      <div class="day-goal">Goal: Sketch the dashboard layout on paper, use Claude in Chrome to stress-test the design, then walk the billing manager through it and get explicit sign-off. The Requirements Document is the Week 1 deliverable — it needs a real signature before Week 2 begins.</div>
+      <div class="day-meta"><span class="meta-pill time">⏱ ~4 hours</span><span class="meta-pill chrome">🔵 Claude in Chrome</span><span class="meta-pill collab">✅ Sign-Off Required</span></div>
+    </div>
+  </div>
+
+  <div class="block open" id="b5a">
+    <div class="block-header" onclick="tog('b5a')"><div class="bico task">📐</div><div class="btg"><div class="bt">Morning: Sketch the Dashboard Wireframe</div><div class="bm">Paper sketches first — no tools, no screens. Then use Claude in Chrome to critique the design decisions.</div></div><span class="bdur">~1.5 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Sketch the full dashboard layout on paper. Place each of the 7 KPIs, decide on chart types for each, and determine what filter controls the user needs. No tools — pencil and paper only at this stage.</p>
+      <div class="chrome-box">
+        <div class="cb-label">🔵 Use Claude in Chrome to Critique Your Wireframe</div>
+        <div class="chrome-prompt">"I've sketched a dashboard showing denial rate, days in A/R, $ at risk, and clean claim rate as KPI tiles at the top, then a line chart for denial rate over time, a bar chart for denial rate by payer, a donut chart for denial reasons, and a table for top denied CPT codes. What usability problems might a busy billing manager encounter with this layout?"</div>
+        <div class="chrome-prompt">"Should I show the denial rate trend as a line chart or a bar chart? What are the tradeoffs for a medical billing audience?"</div>
+      </div>
+      <div class="tl">
+        <div class="ti xp-task" id="t5a1"><input type="checkbox" id="c5a1" onchange="chk('t5a1','c5a1')"><label for="c5a1">Sketch the dashboard layout — place all 7 KPIs, decide chart types for each, note filter controls (date range, payer, provider)</label></div>
+        <div class="ti xp-task" id="t5a2"><input type="checkbox" id="c5a2" onchange="chk('t5a2','c5a2')"><label for="c5a2">Use Claude in Chrome to critique the wireframe — note 2 improvements Claude suggests that you hadn't considered</label></div>
+        <div class="ti xp-task" id="t5a3"><input type="checkbox" id="c5a3" onchange="chk('t5a3','c5a3')"><label for="c5a3">Revise the wireframe based on Claude's feedback — make a clean second version to show billing staff</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b5b">
+    <div class="block-header" onclick="tog('b5b')"><div class="bico collab">✅</div><div class="btg"><div class="bt">Afternoon: Sign-Off Session + Write the Requirements Document</div><div class="bm">Walk the billing manager through the wireframe — get explicit yes/no on each element before writing a line of code</div></div><span class="bdur">~2 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="tl">
+        <div class="ti xp-task" id="t5b1"><input type="checkbox" id="c5b1" onchange="chk('t5b1','c5b1')"><label for="c5b1">Walk the billing manager through the wireframe — for each element, ask "Is this the right metric?" and "Would you check this every morning?"</label></div>
+        <div class="ti xp-task" id="t5b2"><input type="checkbox" id="c5b2" onchange="chk('t5b2','c5b2')"><label for="c5b2">Document any changes they request — add them to the wireframe before writing the Requirements Doc</label></div>
+        <div class="ti xp-task" id="t5b3"><input type="checkbox" id="c5b3" onchange="chk('t5b3','c5b3')"><label for="c5b3">Write the Requirements Document: title, date, 7 KPIs with formulas and benchmarks, wireframe sketch, data source description, and a "Signed off by:" line with the billing manager's name and today's date</label></div>
+        <div class="ti xp-task" id="t5b4"><input type="checkbox" id="c5b4" onchange="chk('t5b4','c5b4')"><label for="c5b4">Get explicit verbal sign-off from the billing manager: "Are you happy for me to build this dashboard based on this spec?" — write their response verbatim in the document</label></div>
+        <div class="ti xp-task" id="t5b5"><input type="checkbox" id="c5b5" onchange="chk('t5b5','c5b5')"><label for="c5b5">Save the Requirements Document as <code>docs/requirements.md</code> — this will go into the GitHub repo next week</label></div>
+      </div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Use Claude in Chrome to research: "What features do the most successful medical billing dashboards have that distinguish them from basic reporting tools?" Find one feature the billing manager didn't mention that you think would genuinely add value — add it as a "stretch goal" section to the Requirements Document.</div>
+        <div class="dq-complete"><input type="checkbox" id="dq5" onchange="chk('dq5','dq5',25)"><label for="dq5">Quest complete — stretch goal added to requirements doc</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b5c">
+    <div class="block-header" onclick="tog('b5c')"><div class="bico review">🎓</div><div class="btg"><div class="bt">Week 1 Final Deliverable Review</div><div class="bm">Submit your Requirements Document for structured feedback</div></div><span class="bdur">Use sidebar →</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Use the <strong>Submit Work</strong> tab to paste your Requirements Document. Your tutor will evaluate: are all 7 KPIs precisely defined? Is the wireframe backed by user research? Is the sign-off real and explicit?</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-amber" onclick="switchTab('review')">📋 Submit Requirements Doc →</button>
+        <button class="btn btn-outline" onclick="qp('I just got sign-off on my requirements doc. What questions should I have asked that I might have forgotten?')">💬 Sanity Check</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ds"><p>🎉 <strong>Week 1 complete — 🩺 Billing Fluent badge unlocked!</strong> Domain mastered, data in hand, requirements signed off. Week 2 starts with Claude in Excel on Monday.</p><div class="ds-nav"><button class="btn btn-outline btn-sm" onclick="showDay(4)">← Day 4</button></div></div>
+</div>
+
+</main>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="stabs">
+    <button class="stab active" id="stab-tutor" onclick="switchTab('tutor')">💬 Ask Tutor</button>
+    <button class="stab" id="stab-review" onclick="switchTab('review')">📋 Submit Work</button>
+    <button class="stab" id="stab-progress" onclick="switchTab('progress')">📍 Progress</button>
+  </div>
+  <div class="sp active" id="panel-tutor">
+    <div class="sc"><strong>Week 1 AI Tutor</strong> — Domain + Claude in Chrome. Ask about billing concepts, what you saw in the shadow session, or how to use Chrome.</div>
+    <div class="msgs" id="msgs">
+      <div class="msg sys"><div class="ma">🎓</div><div class="mb">Welcome to Week 1! You're starting as a complete domain beginner — that's exactly where you should be. Ask me anything about medical billing terminology, what you observed in the shadow session, how to use Claude in Chrome most effectively, or how to interpret a specific CARC code you encountered in the real data.</div></div>
+    </div>
+    <div class="cia">
+      <div class="qps">
+        <span class="qp" onclick="qp('What is the difference between a claim denial and a claim rejection, and why does it matter?')">Denial vs rejection?</span>
+        <span class="qp" onclick="qp('How do I use Claude in Chrome most effectively when reviewing billing documentation?')">Best use of Chrome?</span>
+        <span class="qp" onclick="qp('The denial rate in our data is higher than the industry benchmark. What are the most likely causes?')">High denial rate causes?</span>
+        <span class="qp" onclick="qp('What makes a good dashboard wireframe for a medical billing audience? What do they need to see immediately?')">Wireframe best practices?</span>
+        <span class="qp" onclick="qp('How do I write a requirements document that a developer could actually build from?')">Requirements doc format?</span>
+      </div>
+      <div class="ci-row"><textarea class="ci-inp" id="inp" placeholder="Ask about billing, Claude in Chrome, or the shadow session..." rows="1" onkeydown="hk(event)"></textarea><button class="sb-btn" id="sbtn" onclick="sendMsg()">➤</button></div>
+    </div>
+  </div>
+  <div class="sp" id="panel-review">
+    <div class="rev-body">
+      <div class="rev-intro">Submit your Requirements Document or daily check-in for structured feedback. Your tutor will evaluate the quality of domain research, clarity of KPI definitions, and whether the sign-off is genuine and specific.</div>
+      <div class="rev-sec"><label>What are you submitting?</label>
+        <select id="rev-type" style="padding:8px 10px;border:1px solid var(--border-2);border-radius:7px;background:var(--cream);font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;">
+          <option value="requirements">Requirements Document</option>
+          <option value="wireframe">Wireframe Description</option>
+          <option value="observations">Shadow Session Observations</option>
+          <option value="kpis">KPI Definitions</option>
+          <option value="checkin">Daily Check-In</option>
+        </select>
+      </div>
+      <div class="rev-sec"><label>Paste your work</label><textarea class="rev-ta" id="rev-text" placeholder="Paste your requirements doc, wireframe description, or observations..."></textarea></div>
+      <button class="btn btn-navy" onclick="submitRev()" style="width:100%;justify-content:center;">📤 Submit for Review</button>
+      <div class="divider"></div><div id="rev-res" class="rev-res"></div>
+    </div>
+  </div>
+  <div class="sp" id="panel-progress">
+    <div class="prg-body">
+      <div class="wgb"><h4>Week 1 Goal</h4><p>Leave with: billing vocabulary solid, shadow session notes, 3 findings from real data, 7 KPIs defined with exact formulas, dashboard wireframe, and billing staff sign-off on the Requirements Document.</p></div>
+      <div class="prg-track"><div class="prg-fill" id="prg-bar" style="width:0%"></div></div>
+      <p style="font-size:11px;color:var(--muted);text-align:right;margin-bottom:14px;" id="prg-label">0% complete</p>
+      <div class="prg-row act" onclick="showDay(1)" id="pr1"><span class="prg-icon">🔵</span><div class="prg-text"><div class="prg-name">Day 1 — Billing Basics + Chrome Setup</div><div class="prg-status" id="ps1">Not started</div></div><span class="prg-pct" id="pp1">0%</span></div>
+      <div class="prg-row" onclick="showDay(2)" id="pr2"><span class="prg-icon">🤝</span><div class="prg-text"><div class="prg-name">Day 2 — Shadow Session</div><div class="prg-status" id="ps2">Not started</div></div><span class="prg-pct" id="pp2">0%</span></div>
+      <div class="prg-row" onclick="showDay(3)" id="pr3"><span class="prg-icon">📊</span><div class="prg-text"><div class="prg-name">Day 3 — Pull and Explore Real Data</div><div class="prg-status" id="ps3">Not started</div></div><span class="prg-pct" id="pp3">0%</span></div>
+      <div class="prg-row" onclick="showDay(4)" id="pr4"><span class="prg-icon">🔢</span><div class="prg-text"><div class="prg-name">Day 4 — Define 7 KPIs</div><div class="prg-status" id="ps4">Not started</div></div><span class="prg-pct" id="pp4">0%</span></div>
+      <div class="prg-row" onclick="showDay(5)" id="pr5"><span class="prg-icon">✅</span><div class="prg-text"><div class="prg-name">Day 5 — Wireframe + Sign-Off</div><div class="prg-status" id="ps5">Not started</div></div><span class="prg-pct" id="pp5">0%</span></div>
+      <div class="divider"></div>
+      <div class="xp-summary">
+        <h5>Week 1 XP Earned</h5>
+        <div class="xp-val" id="xp-total">0</div>
+        <div class="xp-sub">/ 275 available (150 tasks + 100 quests + 25 bonus)</div>
+      </div>
+    </div>
+  </div>
+</aside>
+</div>
+
+<script>
+const S = JSON.parse(localStorage.getItem('sw1_tasks')||'{}');
+const SYSTEM_PROMPT=`You are a dedicated tutor for an intern starting a 16-week AI internship at a medical practice. This is Week 1 of the Summer Arc: Domain Immersion and Claude in Chrome.
+
+The intern is a college freshman (Management/CS) who has zero medical billing knowledge and basic Python skills. This week is deliberately pre-code — it's about learning the domain and using AI tools as a power user before writing any code.
+
+Week 1 goals:
+- Learn medical billing: claim lifecycle, CPT/ICD-10/CARC codes, denial vs rejection, common denial reasons
+- Use Claude in Chrome actively as a research tool throughout the week
+- Shadow billing staff and observe real workflows
+- Access 3+ months of anonymized real claim data (HIPAA pre-flight first)
+- Find denial patterns manually using Excel pivot tables
+- Define 7 KPIs with exact formulas, benchmarks, and alert conditions
+- Sketch a dashboard wireframe informed by user research
+- Get explicit billing staff sign-off on a Requirements Document
+
+Key tools introduced this week:
+- Claude in Chrome: browser extension for real-time research while browsing billing documentation
+- Excel: manual data exploration via pivot tables before any custom code
+
+Key technical constraint: NO code this week. This week is pure domain learning and product design. Code starts in Week 3 with Claude Code.
+
+Key content to know:
+- Denial rate = denied claims / total submitted × 100. Industry average 5-10%, red flag at 15%
+- Days in A/R = average days service date to payment date. Target <40, red flag >60
+- CARC codes: CO-4 (bundling), CO-18 (duplicate), CO-22 (coordination of benefits), CO-97 (bundled service), PR-1 (patient deductible)
+- Clean claim rate = claims accepted first submission / total submitted. Target >95%
+
+Tutoring style for Week 1:
+- Encourage curiosity — "ask more about that" when they share observations
+- Connect everything back to "how would a dashboard help with this?"
+- Validate domain confusion as normal — billing is genuinely complex
+- When they share KPI definitions, push for precision: exact formulas, clear benchmarks
+- For requirements doc feedback: evaluate whether it's specific enough to build from
+- Use Strengths → Improvements → Next Step for formal submissions`;
+
+const DAY_TASKS = {
+  1:['c1a1','c1a2','c1a3','c1a4','c1b1','c1b2','dq1'],
+  2:['c2a1','c2a2','c2a3','c2a4','c2a5','dq2'],
+  3:['c3a1','c3a2','c3a3','c3b1','c3b2','c3b3','c3b4','dq3'],
+  4:['c4a1','c4a2','c4b1','c4b2','c4b3','c4b4','c4b5','dq4'],
+  5:['c5a1','c5a2','c5a3','c5b1','c5b2','c5b3','c5b4','c5b5','dq5']
+};
+const chatHistory=[];
+let toastTimer;
+
+function showXP(amount){
+  const toast=document.getElementById('xp-toast');
+  toast.textContent='+'+amount+' XP ⚡';
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>toast.classList.remove('show'),2000);
+}
+
+function chk(rowId,cbId,xpOverride){
+  const row=document.getElementById(rowId);
+  const cb=document.getElementById(cbId);
+  if(!cb)return;
+  cb.checked?row.classList.add('chk'):row.classList.remove('chk');
+  S[cbId]=cb.checked;
+  localStorage.setItem('sw1_tasks',JSON.stringify(S));
+  if(cb.checked) showXP(xpOverride||10);
+  updateProgress();
+}
+
+function restore(){
+  Object.entries(S).forEach(([id,v])=>{
+    const cb=document.getElementById(id);
+    if(!cb)return;
+    cb.checked=v;
+    const row=cb.closest('.ti,.dq-complete');
+    if(row&&v)row.classList.add('chk');
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  let total=0,done=0;
+  [1,2,3,4,5].forEach(d=>{
+    const tasks=DAY_TASKS[d];
+    const dayDone=tasks.filter(id=>S[id]).length;
+    total+=tasks.length;done+=dayDone;
+    const pct=Math.round((dayDone/tasks.length)*100);
+    const pp=document.getElementById('pp'+d);
+    const ps=document.getElementById('ps'+d);
+    const pip=document.getElementById('pip'+d);
+    if(pp)pp.textContent=pct+'%';
+    if(ps){
+      if(dayDone===0){ps.textContent='Not started';ps.style.color='var(--muted)';if(pip)pip.classList.remove('done');}
+      else if(dayDone===tasks.length){ps.textContent='✓ Complete';ps.style.color='var(--teal)';if(pip)pip.classList.add('done');}
+      else{ps.textContent=dayDone+'/'+tasks.length+' done';ps.style.color='var(--amber)';if(pip)pip.classList.remove('done');}
+    }
+  });
+  const weekPct=Math.round((done/total)*100);
+  const bar=document.getElementById('prg-bar');
+  const lbl=document.getElementById('prg-label');
+  const xpt=document.getElementById('xp-total');
+  if(bar)bar.style.width=weekPct+'%';
+  if(lbl)lbl.textContent=weekPct+'% complete — '+done+'/'+total+' tasks';
+  if(xpt)xpt.textContent=(done*10).toLocaleString();
+}
+
+function showDay(d){
+  document.querySelectorAll('.day-view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.day-pip').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.prg-row').forEach(el=>el.classList.remove('act'));
+  document.getElementById('day'+d).classList.add('active');
+  document.getElementById('pip'+d).classList.add('active');
+  const pr=document.getElementById('pr'+d);
+  if(pr)pr.classList.add('act');
+}
+
+function tog(id){document.getElementById(id).classList.toggle('open');}
+
+function switchTab(t){
+  ['tutor','review','progress'].forEach(tab=>{
+    const stab=document.getElementById('stab-'+tab);
+    const panel=document.getElementById('panel-'+tab);
+    if(stab)t===tab?stab.classList.add('active'):stab.classList.remove('active');
+    if(panel)t===tab?panel.classList.add('active'):panel.classList.remove('active');
+  });
+}
+
+function qp(text){document.getElementById('inp').value=text;sendMsg();}
+function hk(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+
+function addMsg(role,text){
+  const c=document.getElementById('msgs');
+  const div=document.createElement('div');div.className='msg '+(role==='assistant'?'sys':'usr');
+  const av=document.createElement('div');av.className='ma';av.textContent=role==='assistant'?'🎓':'👤';
+  const bub=document.createElement('div');bub.className='mb';bub.textContent=text;
+  div.appendChild(av);div.appendChild(bub);c.appendChild(div);c.scrollTop=c.scrollHeight;
+}
+
+function addLoad(){
+  const c=document.getElementById('msgs');
+  const div=document.createElement('div');div.className='msg load';div.id='loading';
+  const av=document.createElement('div');av.className='ma';av.textContent='🎓';
+  const bub=document.createElement('div');bub.className='mb';
+  bub.innerHTML='<div class="td"><span></span><span></span><span></span></div>';
+  div.appendChild(av);div.appendChild(bub);c.appendChild(div);c.scrollTop=c.scrollHeight;
+}
+
+function remLoad(){const el=document.getElementById('loading');if(el)el.remove();}
+
+async function sendMsg(){
+  const inp=document.getElementById('inp');
+  const btn=document.getElementById('sbtn');
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';btn.disabled=true;
+  addMsg('user',text);chatHistory.push({role:'user',content:text});addLoad();
+  switchTab('tutor');
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'YOUR_API_KEY_HERE','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT,messages:chatHistory})});
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'Sorry, try again.';
+    remLoad();addMsg('assistant',reply);chatHistory.push({role:'assistant',content:reply});
+  }catch(e){remLoad();addMsg('assistant','Connection issue — please try again.');}
+  btn.disabled=false;
+}
+
+async function sendCI(day){
+  const ta=document.getElementById('ci'+day);
+  const text=ta.value.trim();if(!text){alert('Write your reflection first.');return;}
+  switchTab('tutor');
+  const msg=`[Day ${day} Check-In — Summer Week 1]\n\n${text}`;
+  chatHistory.push({role:'user',content:msg});addMsg('user',msg);addLoad();
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'YOUR_API_KEY_HERE','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT,messages:chatHistory})});
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'Error.';
+    remLoad();addMsg('assistant',reply);chatHistory.push({role:'assistant',content:reply});
+  }catch(e){remLoad();addMsg('assistant','Connection error.');}
+}
+
+async function submitRev(){
+  const text=document.getElementById('rev-text').value.trim();
+  const type=document.getElementById('rev-type').value;
+  if(!text){alert('Paste your work first.');return;}
+  const labels={requirements:'Requirements Document',wireframe:'Wireframe Description',observations:'Shadow Session Observations',kpis:'KPI Definitions',checkin:'Check-In'};
+  const res_el=document.getElementById('rev-res');res_el.className='rev-res vis';res_el.textContent='⏳ Reviewing...';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'YOUR_API_KEY_HERE','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT,messages:[{role:'user',content:`Review this ${labels[type]} for Week 1.\n\nFeedback format:\n**Strengths**\n**Improvements** (2-3 specific)\n**Next Step**\n\nSubmission:\n\n${text}`}]})});
+    const data=await res.json();res_el.textContent=data.content?.[0]?.text||'Failed.';
+  }catch(e){res_el.textContent='Error.';}
+}
+
+restore();
+</script>
+</body>
+</html>

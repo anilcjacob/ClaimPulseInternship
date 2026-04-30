@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClaimPulse — Week 8 Daily Guide</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{--cream:#f7f3ee;--paper:#faf8f5;--warm-white:#fffefb;--ink:#1a1812;--ink-2:#2e2a22;--muted:#7a7060;--muted-2:#b0a898;--border:#e2ddd6;--border-2:#cdc7bc;--navy:#1b2a4a;--navy-light:rgba(27,42,74,0.08);--navy-border:rgba(27,42,74,0.2);--amber:#d97706;--amber-bg:rgba(217,119,6,0.07);--amber-border:rgba(217,119,6,0.22);--teal:#0d7c6e;--teal-bg:rgba(13,124,110,0.07);--teal-border:rgba(13,124,110,0.2);--rose:#b5413a;--rose-bg:rgba(181,65,58,0.06);--rose-border:rgba(181,65,58,0.2);--purple:#6b4fa0;--purple-bg:rgba(107,79,160,0.07);--m2:#8b5cf6;--m2-bg:rgba(139,92,246,0.07);--m2-border:rgba(139,92,246,0.22);--code-bg:#1e1e2e;--code-text:#cdd6f4;--shadow-sm:0 1px 4px rgba(26,24,18,0.06),0 0 0 1px rgba(26,24,18,0.04);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.65;min-height:100vh;}
+.header{background:var(--navy);color:white;padding:0 40px;display:flex;align-items:stretch;border-bottom:3px solid var(--m2);}
+.header-left{padding:22px 32px 22px 0;border-right:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;justify-content:center;min-width:200px;}
+.header-left .eyebrow{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:5px;}
+.header-left h1{font-family:'Lora',serif;font-size:22px;font-weight:700;color:white;}
+.header-left h1 span{color:#a78bfa;}
+.header-center{flex:1;padding:22px 32px;display:flex;flex-direction:column;justify-content:center;}
+.week-title-header{font-family:'Lora',serif;font-size:18px;font-weight:600;color:white;margin-bottom:4px;}
+.week-subtitle-header{font-size:12px;color:rgba(255,255,255,0.5);}
+.header-right{padding:22px 0 22px 32px;border-left:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:20px;}
+.hstat{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.hstat-val{font-family:'Lora',serif;font-size:20px;font-weight:700;color:white;}
+.hstat-label{font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;}
+.hstat-div{width:1px;height:32px;background:rgba(255,255,255,0.1);}
+.progress-bar{background:var(--navy);padding:0 40px 14px;display:flex;}
+.day-pip{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:8px 6px 0;border-top:2px solid transparent;transition:all 0.2s;}
+.day-pip.active{border-top-color:var(--m2);}
+.day-pip.done{border-top-color:#34d399;}
+.pip-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all 0.2s;}
+.day-pip.active .pip-dot{background:var(--m2);}
+.day-pip.done .pip-dot{background:#34d399;}
+.pip-label{font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.07em;font-weight:500;}
+.day-pip.active .pip-label{color:rgba(255,255,255,0.8);}
+.day-pip.done .pip-label{color:rgba(52,211,153,0.7);}
+.layout{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 120px);}
+.main{padding:32px 36px;border-right:1px solid var(--border);overflow-y:auto;}
+.day-view{display:none;}
+.day-view.active{display:block;}
+.day-header{display:flex;align-items:flex-start;gap:18px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.day-number-badge{flex-shrink:0;width:52px;height:52px;background:var(--m2);color:white;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.day-of-week{font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.6);font-weight:600;}
+.day-num{font-family:'Lora',serif;font-size:20px;font-weight:700;line-height:1;color:white;}
+.day-header-text{flex:1;}
+.day-heading{font-family:'Lora',serif;font-size:22px;font-weight:700;color:var(--ink);margin-bottom:5px;line-height:1.25;}
+.day-goal{font-size:13px;color:var(--muted);margin-bottom:8px;font-style:italic;}
+.day-meta{display:flex;gap:12px;flex-wrap:wrap;}
+.meta-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;border:1px solid;}
+.meta-pill.time{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber);}
+.meta-pill.type{background:var(--navy-light);border-color:var(--navy-border);color:var(--navy);}
+.meta-pill.ai{background:var(--m2-bg);border-color:var(--m2-border);color:var(--m2);}
+.meta-pill.hands{background:var(--teal-bg);border-color:var(--teal-border);color:var(--teal);}
+.course-strip{background:var(--navy-light);border:1px solid var(--navy-border);border-radius:9px;padding:12px 14px;margin-bottom:18px;}
+.course-strip-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--navy);margin-bottom:8px;}
+.course-links-row{display:flex;flex-wrap:wrap;gap:6px;}
+.course-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;text-decoration:none;border:1px solid var(--border-2);background:white;color:var(--ink-2);transition:all 0.15s;white-space:nowrap;}
+.course-chip:hover{background:var(--paper);border-color:var(--navy-border);color:var(--navy);box-shadow:var(--shadow-sm);}
+.chip-badge{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;padding:1px 5px;border-radius:3px;background:rgba(13,124,110,0.1);color:var(--teal);}
+.block{background:var(--warm-white);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow-sm);}
+.block-header{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;user-select:none;transition:background 0.15s;}
+.block-header:hover{background:var(--paper);}
+.block-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.block-icon.learn{background:var(--navy-light);}
+.block-icon.task{background:var(--amber-bg);}
+.block-icon.ai{background:var(--m2-bg);}
+.block-icon.code{background:rgba(30,30,46,0.08);}
+.block-icon.check{background:var(--rose-bg);}
+.block-icon.review{background:var(--purple-bg);}
+.block-title-group{flex:1;}
+.block-title{font-weight:600;font-size:13px;color:var(--ink);}
+.block-meta{font-size:11px;color:var(--muted);margin-top:1px;}
+.block-duration{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-2);background:var(--cream);border:1px solid var(--border);border-radius:5px;padding:3px 8px;white-space:nowrap;}
+.chev{color:var(--muted-2);font-size:10px;transition:transform 0.2s;margin-left:4px;}
+.block.open .chev{transform:rotate(180deg);}
+.block-body{display:none;padding:4px 16px 16px;border-top:1px solid var(--border);}
+.block.open .block-body{display:block;}
+.resource-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.resource-item{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;background:var(--cream);border:1px solid var(--border);border-radius:7px;text-decoration:none;transition:all 0.15s;}
+.resource-item:hover{background:var(--paper);border-color:var(--border-2);box-shadow:var(--shadow-sm);}
+.ri-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.ri-body{flex:1;}
+.ri-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+.ri-desc{font-size:11px;color:var(--muted);line-height:1.4;}
+.ri-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:var(--navy-light);color:var(--navy);margin-top:4px;border:1px solid var(--navy-border);}
+.task-list{display:flex;flex-direction:column;gap:8px;}
+.task-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--cream);border:1px solid var(--border);border-radius:7px;}
+.task-item input[type="checkbox"]{margin-top:2px;width:15px;height:15px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;}
+.task-item label{font-size:13px;color:var(--ink-2);cursor:pointer;line-height:1.5;}
+.task-item.checked label{text-decoration:line-through;color:var(--muted-2);}
+.task-note{margin-top:6px;padding:8px 10px;background:var(--amber-bg);border-left:2px solid var(--amber);border-radius:0 5px 5px 0;font-size:12px;color:#92400e;font-style:italic;line-height:1.5;}
+.code-block{background:var(--code-bg);border-radius:8px;padding:14px 16px;margin:10px 0 12px;overflow-x:auto;}
+.code-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:rgba(205,214,244,0.4);margin-bottom:8px;}
+.code-block pre{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--code-text);line-height:1.75;white-space:pre;margin:0;}
+.kw{color:#cba6f7;}.fn{color:#89b4fa;}.st{color:#a6e3a1;}.cm{color:rgba(205,214,244,0.35);font-style:italic;}.nm{color:#fab387;}
+.ai-box{background:linear-gradient(135deg,var(--m2-bg),rgba(27,42,74,0.04));border:1px solid var(--m2-border);border-radius:10px;padding:16px 18px;margin:10px 0 12px;}
+.ai-box h5{font-size:12px;font-weight:600;color:var(--m2);margin-bottom:8px;}
+.ai-box p{font-size:12px;color:var(--ink-2);line-height:1.7;}
+.checkin-box{padding-top:10px;}
+.checkin-prompt{font-size:13px;color:var(--ink-2);font-family:'Lora',serif;font-style:italic;margin-bottom:10px;line-height:1.6;padding:10px 14px;background:var(--rose-bg);border-left:3px solid var(--rose);border-radius:0 6px 6px 0;}
+.checkin-textarea{width:100%;min-height:90px;padding:10px 12px;background:var(--cream);border:1px solid var(--border-2);border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink);resize:vertical;outline:none;transition:border-color 0.15s;margin-bottom:8px;}
+.checkin-textarea:focus{border-color:var(--navy);box-shadow:0 0 0 3px var(--navy-light);}
+.checkin-textarea::placeholder{color:var(--muted-2);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;border:none;}
+.btn-navy{background:var(--navy);color:white;}.btn-navy:hover{background:#243a62;}
+.btn-outline{background:transparent;color:var(--navy);border:1px solid var(--navy-border);}.btn-outline:hover{background:var(--navy-light);}
+.btn-m2{background:var(--m2);color:white;}.btn-m2:hover{background:#7c3aed;}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.day-summary{margin-top:20px;padding:14px 16px;background:var(--navy);border-radius:10px;display:flex;align-items:center;gap:16px;}
+.day-summary p{font-size:12px;color:rgba(255,255,255,0.65);flex:1;line-height:1.5;}
+.day-summary p strong{color:white;}
+.day-nav{display:flex;gap:8px;}
+.sidebar{background:var(--warm-white);display:flex;flex-direction:column;height:calc(100vh - 120px);position:sticky;top:0;}
+.sidebar-tabs{display:flex;border-bottom:1px solid var(--border);}
+.stab{flex:1;padding:12px 8px;border:none;background:none;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;}
+.stab.active{color:var(--navy);border-bottom-color:var(--navy);}
+.sidebar-panel{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.sidebar-panel.active{display:flex;}
+.chat-context{padding:10px 14px;background:var(--m2-bg);border-bottom:1px solid var(--m2-border);font-size:11px;color:var(--m2);}
+.chat-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;}
+.msg{display:flex;gap:9px;align-items:flex-start;}
+.msg-avatar{width:26px;height:26px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;margin-top:1px;}
+.msg.system .msg-avatar{background:var(--m2);}
+.msg.user .msg-avatar{background:var(--amber-bg);border:1px solid var(--amber-border);}
+.msg-bubble{flex:1;padding:9px 11px;border-radius:8px;font-size:12.5px;line-height:1.6;}
+.msg.system .msg-bubble{background:var(--paper);border:1px solid var(--border);color:var(--ink-2);}
+.msg.user .msg-bubble{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--ink-2);}
+.msg.loading .msg-bubble{background:var(--paper);border:1px solid var(--border);color:var(--muted);font-style:italic;}
+.typing-dots{display:inline-flex;gap:3px;align-items:center;}
+.typing-dots span{width:5px;height:5px;background:var(--muted-2);border-radius:50%;animation:bounce 1.2s infinite;}
+.typing-dots span:nth-child(2){animation-delay:0.2s;}
+.typing-dots span:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.chat-input-area{padding:12px 14px;border-top:1px solid var(--border);background:var(--warm-white);}
+.chat-quick-prompts{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.qprompt{font-size:11px;padding:3px 9px;border-radius:12px;background:var(--cream);border:1px solid var(--border-2);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.qprompt:hover{background:var(--m2-bg);border-color:var(--m2-border);color:var(--m2);}
+.chat-input-row{display:flex;gap:7px;align-items:flex-end;}
+.chat-input{flex:1;padding:8px 11px;background:var(--cream);border:1px solid var(--border-2);border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;color:var(--ink);resize:none;outline:none;min-height:38px;max-height:120px;transition:border-color 0.15s;}
+.chat-input:focus{border-color:var(--m2);box-shadow:0 0 0 2px var(--m2-bg);}
+.chat-input::placeholder{color:var(--muted-2);}
+.send-btn{width:36px;height:36px;border-radius:7px;background:var(--m2);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:background 0.15s;flex-shrink:0;}
+.send-btn:hover{background:#7c3aed;}
+.send-btn:disabled{background:var(--border-2);cursor:not-allowed;}
+.review-panel-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;}
+.review-intro{padding:10px 12px;background:var(--m2-bg);border:1px solid var(--m2-border);border-radius:7px;font-size:12px;color:var(--m2);line-height:1.6;}
+.review-section{display:flex;flex-direction:column;gap:6px;}
+.review-section label{font-size:12px;font-weight:600;color:var(--ink-2);}
+.review-textarea{width:100%;padding:10px 12px;background:var(--cream);border:1px solid var(--border-2);border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;color:var(--ink);resize:vertical;outline:none;min-height:100px;}
+.review-textarea::placeholder{color:var(--muted-2);}
+.review-result{display:none;padding:12px;background:var(--paper);border:1px solid var(--border);border-radius:7px;font-size:12.5px;color:var(--ink-2);line-height:1.7;white-space:pre-wrap;}
+.review-result.visible{display:block;}
+.progress-panel-body{flex:1;overflow-y:auto;padding:14px;}
+.progress-day-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:7px;margin-bottom:6px;border:1px solid var(--border);background:var(--cream);cursor:pointer;transition:all 0.15s;}
+.progress-day-row.active-day{background:var(--m2-bg);border-color:var(--m2-border);}
+.progress-day-icon{font-size:16px;}
+.progress-day-text{flex:1;}
+.progress-day-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:1px;}
+.progress-day-status{font-size:11px;color:var(--muted);}
+.progress-pct{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-2);}
+.progress-track{height:3px;background:var(--border);border-radius:2px;margin:14px 0 8px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--m2),#a78bfa);border-radius:2px;transition:width 0.5s ease;}
+.week-goal-box{padding:12px 14px;background:var(--m2-bg);border:1px solid var(--m2-border);border-radius:8px;margin-bottom:14px;}
+.week-goal-box h4{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--m2);margin-bottom:5px;}
+.week-goal-box p{font-size:12px;color:var(--ink-2);line-height:1.6;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.section-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted-2);margin-bottom:8px;margin-top:14px;}
+
+/* ── PROGRAM NAV STRIP ───────────────────────────────────── */
+.prog-nav{background:var(--paper);border-bottom:1px solid var(--border);
+  padding:0 40px;display:flex;align-items:center;justify-content:space-between;
+  height:40px;position:sticky;top:0;z-index:200;}
+.pn-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;
+  font-weight:500;color:var(--muted);text-decoration:none;padding:3px 8px;
+  border-radius:5px;transition:all 0.15s;}
+.pn-link:hover{color:var(--navy);background:var(--navy-light);}
+.pn-home{font-weight:600;color:var(--navy);}
+.pn-right{display:flex;gap:4px;}
+.pn-center{font-size:11px;color:var(--muted-2);font-family:'IBM Plex Mono',monospace;}
+
+</style>
+</head>
+<body>
+<div class="prog-nav"><a class="pn-link pn-home" href="index.html">🏠 Program Home</a><span class="pn-center">Summer Week 8 · Days 36–40 · AI Briefings</span><div class="pn-right"><a class="pn-link" href="s_week7_daily_guide.html">← Week 7</a><a class="pn-link" href="s_week9_daily_guide.html">Week 9 →</a></div></div>
+
+<div class="header">
+  <div class="header-left"><div class="eyebrow">ClaimPulse AI · Module 2</div><h1>Claim<span>Pulse</span></h1></div>
+  <div class="header-center"><div class="week-title-header">Week 8 — AI Daily Briefings with the Claude API</div><div class="week-subtitle-header">Connect ClaimPulse to Claude — the dashboard now writes its own morning summary from live data</div></div>
+  <div class="header-right"><div class="hstat"><span class="hstat-val">5</span><span class="hstat-label">Days</span></div><div class="hstat-div"></div><div class="hstat"><span class="hstat-val">20</span><span class="hstat-label">Hours</span></div><div class="hstat-div"></div><div class="hstat"><span class="hstat-val">M2·W8</span><span class="hstat-label">Progress</span></div></div>
+</div>
+<div class="progress-bar">
+  <div class="day-pip active" onclick="showDay(1)" id="pip1"><div class="pip-dot"></div><div class="pip-label">Mon</div></div>
+  <div class="day-pip" onclick="showDay(2)" id="pip2"><div class="pip-dot"></div><div class="pip-label">Tue</div></div>
+  <div class="day-pip" onclick="showDay(3)" id="pip3"><div class="pip-dot"></div><div class="pip-label">Wed</div></div>
+  <div class="day-pip" onclick="showDay(4)" id="pip4"><div class="pip-dot"></div><div class="pip-label">Thu</div></div>
+  <div class="day-pip" onclick="showDay(5)" id="pip5"><div class="pip-dot"></div><div class="pip-label">Fri</div></div>
+</div>
+
+
+<div class="layout">
+<main class="main">
+
+<!-- DAY 1 -->
+<div class="day-view active" id="day1">
+  <div class="day-header">
+    <div class="day-number-badge"><span class="day-of-week">Mon</span><span class="day-num">36</span></div>
+    <div class="day-header-text">
+      <div class="day-heading">The Claude API — SDK Setup &amp; First Programmatic Call</div>
+      <div class="day-goal">Goal: Install the Anthropic Python SDK, set up API key management safely, and make your first programmatic Claude call from Python code — not Claude.ai. This is a fundamentally different integration from anything in Module 1.</div>
+      <div class="day-meta"><span class="meta-pill time">⏱ ~4 hours</span><span class="meta-pill type">📚 Course + Setup</span><span class="meta-pill ai">🤖 API</span></div>
+    </div>
+  </div>
+  <div class="course-strip">
+    <div class="course-strip-label">📚 Today's Required Resources</div>
+    <div class="course-links-row">
+      <a class="course-chip" href="https://www.anthropic.com/education" target="_blank">🟠 Anthropic Academy — Building with Claude API <span class="chip-badge">Free</span></a>
+      <a class="course-chip" href="https://docs.anthropic.com/en/api/getting-started" target="_blank">🟠 Anthropic API Quickstart <span class="chip-badge">Free</span></a>
+      <a class="course-chip" href="https://www.deeplearning.ai/short-courses/building-systems-with-chatgpt/" target="_blank">🔵 DeepLearning.AI — Building Systems with LLMs <span class="chip-badge">Free</span></a>
+      <a class="course-chip" href="https://pypi.org/project/python-dotenv/" target="_blank">🟤 python-dotenv — Secure API Key Handling <span class="chip-badge">Free</span></a>
+    </div>
+  </div>
+
+  <div class="block open" id="b1_1">
+    <div class="block-header" onclick="togBlock('b1_1')">
+      <div class="block-icon learn">📚</div>
+      <div class="block-title-group"><div class="block-title">Morning: Anthropic Academy — Building with Claude API</div><div class="block-meta">Complete the full API module before writing any integration code</div></div>
+      <span class="block-duration">~2 hrs</span><span class="chev">▼</span>
+    </div>
+    <div class="block-body">
+      <div class="resource-list">
+        <a class="resource-item" href="https://www.anthropic.com/education" target="_blank">
+          <span class="ri-icon">🟠</span>
+          <div class="ri-body"><div class="ri-name">Anthropic Academy — Building with the Claude API</div><div class="ri-desc">The official course on programmatic Claude integration. Covers authentication, message structure, streaming, error handling, and rate limiting. Complete the full module — this is the foundation for everything in Week 8.</div><span class="ri-badge">Free · anthropic.com/education</span></div>
+        </a>
+        <a class="resource-item" href="https://www.deeplearning.ai/short-courses/building-systems-with-chatgpt/" target="_blank">
+          <span class="ri-icon">🔵</span>
+          <div class="ri-body"><div class="ri-name">DeepLearning.AI — Building Systems with LLMs</div><div class="ri-desc">Covers chaining LLM calls, structured output, and building multi-step pipelines. Particularly useful for understanding how to inject real data into prompts safely. Free short course.</div><span class="ri-badge">Free · deeplearning.ai</span></div>
+        </a>
+      </div>
+      <div class="task-list">
+        
+        <div style="background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(139,92,246,0.06));border:1px solid rgba(139,92,246,0.25);border-radius:10px;padding:14px 16px;margin:12px 0;">
+          <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#7c3aed;margin-bottom:8px;">🎓 Anthropic Academy — API Certificate</div>
+          <a href="https://anthropic.skilljar.com/claude-with-the-anthropic-api" target="_blank" style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:white;border:1px solid rgba(139,92,246,0.2);border-radius:7px;text-decoration:none;">
+            <span style="font-size:18px;flex-shrink:0;margin-top:1px;">🟠</span>
+            <div><div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px;">Building with the Claude API</div><div style="font-size:11px;color:var(--muted);line-height:1.4;">Full official API course — authentication, messages format, streaming, error handling, prompt caching. Covers exactly what you're building this week. Complete it alongside the Week 8 build sessions.</div><span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;margin-top:4px;background:rgba(13,124,110,0.1);color:var(--teal);border:1px solid var(--teal-border);">✓ Free · Completion Certificate</span></div>
+          </a>
+        </div>
+<div class="task-item" id="t_1_1_1"><input type="checkbox" id="cb_1_1_1" onchange="toggleTask('t_1_1_1','cb_1_1_1')"><label for="cb_1_1_1">Complete the Anthropic Academy API module — take notes on: authentication, max_tokens, the messages array format, and error types</label></div>
+        <div class="task-item" id="t_1_1_2"><input type="checkbox" id="cb_1_1_2" onchange="toggleTask('t_1_1_2','cb_1_1_2')"><label for="cb_1_1_2">Complete at least the first 4 lessons of the DeepLearning.AI course — focus on the "structured output" and "evaluation" lessons</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b1_2">
+    <div class="block-header" onclick="togBlock('b1_2')">
+      <div class="block-icon code">🔑</div>
+      <div class="block-title-group"><div class="block-title">Afternoon: SDK Install, .env Key Management &amp; First API Call</div><div class="block-meta">Never hardcode an API key — learn secure key handling before you touch the SDK</div></div>
+      <span class="block-duration">~1.5 hrs</span><span class="chev">▼</span>
+    </div>
+    <div class="block-body">
+      <div class="code-block">
+        <div class="code-label">Terminal + .env setup</div>
+        <pre><span class="cm"># Install the SDK and dotenv</span>
+pip install anthropic python-dotenv
+
+<span class="cm"># Create .env file in project root (NEVER commit this)</span>
+<span class="cm"># Add to .gitignore: .env</span>
+<span class="cm"># .env contents:</span>
+ANTHROPIC_API_KEY=sk-ant-your-key-here</pre>
+      </div>
+      <div class="code-block">
+        <div class="code-label">test_api.py — verify the SDK works before touching app.py</div>
+        <pre><span class="kw">import</span> anthropic
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+<span class="kw">import</span> os
+
+load_dotenv()  <span class="cm"># loads .env into environment</span>
+
+client = anthropic.Anthropic(
+    api_key=os.getenv(<span class="st">"ANTHROPIC_API_KEY"</span>)
+)
+
+message = client.messages.create(
+    model=<span class="st">"claude-sonnet-4-20250514"</span>,
+    max_tokens=<span class="nm">200</span>,
+    messages=[{
+        <span class="st">"role"</span>: <span class="st">"user"</span>,
+        <span class="st">"content"</span>: <span class="st">"In one sentence, what is a medical claim denial rate?"</span>
+    }]
+)
+<span class="fn">print</span>(message.content[<span class="nm">0</span>].text)</pre>
+      </div>
+      <div class="task-list">
+                <div class="task-item" id="t_1_1_cert1"><input type="checkbox" id="cb_1_1_cert1" onchange="toggleTask('t_1_1_cert1','cb_1_1_cert1')"><label for="cb_1_1_cert1">Complete <strong>Building with the Claude API</strong> on Anthropic Academy (anthropic.skilljar.com/claude-with-the-anthropic-api) — covers authentication, streaming, and error handling you're implementing this week. Add the certificate to LinkedIn.</label></div>
+        <div class="task-item" id="t_1_2_1"><input type="checkbox" id="cb_1_2_1" onchange="toggleTask('t_1_2_1','cb_1_2_1')"><label for="cb_1_2_1">Get your Anthropic API key from console.anthropic.com — store it ONLY in .env, add .env to .gitignore immediately</label></div>
+        <div class="task-item" id="t_1_2_2"><input type="checkbox" id="cb_1_2_2" onchange="toggleTask('t_1_2_2','cb_1_2_2')"><label for="cb_1_2_2">Run test_api.py — confirm Claude responds with a sensible answer. If you get an auth error, check the key format.</label></div>
+        <div class="task-item" id="t_1_2_3"><input type="checkbox" id="cb_1_2_3" onchange="toggleTask('t_1_2_3','cb_1_2_3')"><label for="cb_1_2_3">Run <code>git status</code> — confirm .env does NOT appear in the list of untracked files (if it does, fix .gitignore immediately before committing anything)</label></div>
+      </div>
+      <div class="task-note">🔒 Critical: an API key committed to GitHub can be found by bots within minutes and drained. The .env + .gitignore pattern is non-negotiable before any other work this week.</div>
+    </div>
+  </div>
+
+  <div class="block open" id="b1_3">
+    <div class="block-header" onclick="togBlock('b1_3')">
+      <div class="block-icon check">✏️</div>
+      <div class="block-title-group"><div class="block-title">End-of-Day Check-in</div></div>
+      <span class="block-duration">~30 min</span><span class="chev">▼</span>
+    </div>
+    <div class="block-body">
+      <div class="checkin-box">
+        <div class="checkin-prompt">"Explain the difference between using Claude through Claude.ai (what you did in Weeks 2–3) and calling Claude through the API (what you're doing now). What new capabilities does the API unlock that Claude.ai doesn't offer? What new responsibilities does it create?"</div>
+        <textarea class="checkin-textarea" id="checkin_day1" placeholder="Explain the difference between Claude.ai and the API — new capabilities and new responsibilities..."></textarea>
+        <button class="btn btn-navy btn-sm" onclick="sendCheckin(1)">📤 Send to Tutor for Feedback</button>
+      </div>
+    </div>
+  </div>
+  <div class="day-summary"><p><strong>Day 36 done?</strong> SDK installed, key secured, first API call successful. Tomorrow you build the briefing function that injects real dashboard metrics into Claude.</p><div class="day-nav"><button class="btn btn-m2 btn-sm" onclick="showDay(2)">Day 2 →</button></div></div>
+</div>
+
+<!-- DAY 2 -->
+<div class="day-view" id="day2">
+  <div class="day-header">
+    <div class="day-number-badge"><span class="day-of-week">Tue</span><span class="day-num">37</span></div>
+    <div class="day-header-text">
+      <div class="day-heading">Build ai_summary.py — Injecting Live Metrics into Claude</div>
+      <div class="day-goal">Goal: Write the ai_summary.py module that takes today's computed metrics dictionary, injects them into the system prompt from Week 2, and returns a Claude-generated briefing. Use the prompt you already wrote — this is the payoff of Week 2's work.</div>
+      <div class="day-meta"><span class="meta-pill time">⏱ ~4 hours</span><span class="meta-pill ai">🤖 Build</span><span class="meta-pill hands">⌨️ Coding</span></div>
+    </div>
+  </div>
+  <div class="course-strip">
+    <div class="course-strip-label">📚 Today's Reference Docs</div>
+    <div class="course-links-row">
+      <a class="course-chip" href="https://docs.anthropic.com/en/api/messages" target="_blank">🟠 Anthropic — Messages API Reference <span class="chip-badge">Free</span></a>
+      <a class="course-chip" href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/reduce-hallucinations" target="_blank">🟠 Anthropic — Reducing Hallucinations <span class="chip-badge">Free</span></a>
+    </div>
+  </div>
+
+  <div class="block open" id="b2_1">
+    <div class="block-header" onclick="togBlock('b2_1')">
+      <div class="block-icon code">🤖</div>
+      <div class="block-title-group"><div class="block-title">Morning + Afternoon: Build ai_summary.py</div><div class="block-meta">The complete briefing module — metrics in, 5-sentence briefing out</div></div>
+      <span class="block-duration">~3.5 hrs</span><span class="chev">▼</span>
+    </div>
+    <div class="block-body">
+      <div class="code-block">
+        <div class="code-label">ai_summary.py — full module to build today</div>
+        <pre><span class="kw">import</span> anthropic
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+<span class="kw">import</span> os
+
+load_dotenv()
+
+<span class="kw">def</span> <span class="fn">_build_prompt</span>(metrics: dict, date_range: tuple) -> str:
+    <span class="st">"""Inject real metric values into the user prompt."""</span>
+    start, end = date_range
+    <span class="kw">return</span> f<span class="st">"""
+&lt;date_range&gt;{start} to {end}&lt;/date_range&gt;
+
+&lt;metrics&gt;
+- Overall denial rate: {metrics['denial_rate']:.1f}%
+- Days in A/R (average): {metrics['days_in_ar']:.0f} days
+- Total $ at risk (denied claims): ${metrics['dollars_at_risk']:,.0f}
+- Clean claim rate: {metrics['clean_claim_rate']:.1f}%
+- First-pass rate: {metrics.get('first_pass_rate', 'N/A')}
+- Top denial reason: {metrics.get('top_denial_reason', 'N/A')}
+- Highest-denial payer: {metrics.get('top_denial_payer', 'N/A')}
+&lt;/metrics&gt;
+
+&lt;task&gt;
+Write a 4-6 sentence daily briefing for the billing manager.
+Start with the single most important finding.
+Mention any metric that exceeds a concerning threshold.
+End with one specific, actionable recommendation.
+Do not invent any numbers — use only the values above.
+&lt;/task&gt;
+"""</span>
+
+<span class="kw">def</span> <span class="fn">generate_briefing</span>(metrics: dict, date_range: tuple) -> str:
+    <span class="st">"""Call Claude API and return the generated briefing text."""</span>
+    <span class="cm"># Load system prompt from file (written in Week 2)</span>
+    prompt_path = <span class="st">"src/prompts/briefing_system_prompt.txt"</span>
+    <span class="kw">with</span> <span class="fn">open</span>(prompt_path) <span class="kw">as</span> f:
+        system_prompt = f.read()
+
+    client = anthropic.Anthropic(
+        api_key=os.getenv(<span class="st">"ANTHROPIC_API_KEY"</span>)
+    )
+    message = client.messages.create(
+        model=<span class="st">"claude-haiku-4-5-20251001"</span>,  <span class="cm"># fast + cheap for daily summaries</span>
+        max_tokens=<span class="nm">400</span>,
+        system=system_prompt,
+        messages=[{
+            <span class="st">"role"</span>: <span class="st">"user"</span>,
+            <span class="st">"content"</span>: <span class="fn">_build_prompt</span>(metrics, date_range)
+        }]
+    )
+    <span class="kw">return</span> message.content[<span class="nm">0</span>].text
+
+<span class="kw">def</span> <span class="fn">generate_briefing_safe</span>(metrics: dict, date_range: tuple) -> str:
+    <span class="st">"""Wrapper with error handling — returns fallback message on API failure."""</span>
+    <span class="kw">try</span>:
+        <span class="kw">return</span> <span class="fn">generate_briefing</span>(metrics, date_range)
+    <span class="kw">except</span> Exception <span class="kw">as</span> e:
+        <span class="kw">return</span> f<span class="st">"AI briefing unavailable ({type(e).__name__}). Review metrics manually."</span></pre>
+      </div>
+      <div class="ai-box">
+        <h5>🎯 Why claude-haiku for daily summaries?</h5>
+        <p>Haiku is Anthropic's fastest and most cost-efficient model. For a 4-6 sentence briefing from structured data, it performs identically to Sonnet at a fraction of the cost. Use Sonnet for complex reasoning tasks. Use Haiku for fast, repetitive, structured outputs. This is a real cost-optimization decision that matters at scale.</p>
+      </div>
+      <div class="task-list">
+        <div class="task-item" id="t_2_1_1"><input type="checkbox" id="cb_2_1_1" onchange="toggleTask('t_2_1_1','cb_2_1_1')"><label for="cb_2_1_1">Build ai_summary.py with all three functions — test generate_briefing_safe() from a Python script using mock metric values</label></div>
+        <div class="task-item" id="t_2_1_2"><input type="checkbox" id="cb_2_1_2" onchange="toggleTask('t_2_1_2','cb_2_1_2')"><label for="cb_2_1_2">Test with real computed metrics from the claim data — compare the briefing to what you'd write manually. Does it get the right numbers?</label></div>
+        <div class="task-item" id="t_2_1_3"><input type="checkbox" id="cb_2_1_3" onchange="toggleTask('t_2_1_3','cb_2_1_3')"><label for="cb_2_1_3">Test hallucination prevention: remove the top_denial_payer from the metrics dict — does Claude avoid mentioning it? Or does it invent a payer name?</label></div>
+        <div class="task-item" id="t_2_1_4"><input type="checkbox" id="cb_2_1_4" onchange="toggleTask('t_2_1_4','cb_2_1_4')"><label for="cb_2_1_4">Update the system prompt file if needed based on today's real test results — commit both the updated prompt and ai_summary.py</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b2_2">
+    <div class="block-header" onclick="togBlock('b2_2')">
+      <div class="block-icon check">✏️</div>
+      <div class="block-title-group"><div class="block-title">End-of-Day Check-in</div></div>
+      <span class="block-duration">~30 min</span><span class="chev">▼</span>
+    </div>
+    <div class="block-body">
+      <div class="checkin-box">
+        <div class="checkin-prompt">"Paste the actual briefing Claude generated from your real claim data. Then rate it: (1) Is every number it mentions correct? (2) Did it identify the most important issue? (3) Is the recommended action specific and useful? What would you change in the prompt to improve the weakest dimension?"</div>
+        <textarea class="checkin-textarea" id="checkin_day2" placeholder="Paste the generated briefing and rate it on accuracy, insight, and actionability..."></textarea>
+        <button class="btn btn-navy btn-sm" onclick="sendCheckin(2)">📤 Send to Tutor for Feedback</button>
+      </div>
+    </div>
+  </div>
+  <div class="day-summary"><p><strong>Day 37 done?</strong> ai_summary.py built and tested on real data. Tomorrow you wire it into the Streamlit dashboard so it renders every morning automatically.</p><div class="day-nav"><button class="btn btn-outline btn-sm" onclick="showDay(1)">← Day 1</button><button class="btn btn-m2 btn-sm" onclick="showDay(3)">Day 3 →</button></div></div>
+</div>
+
+<!-- DAY 3 -->
+<div class="day-view" id="day3">
+  <div class="day-header">
+    <div class="day-number-badge"><span class="day-of-week">Wed</span><span class="day-num">38</span></div>
+    <div class="day-header-text">
+      <div class="day-heading">Wire the AI Briefing into the Streamlit Dashboard</div>
+      <div class="day-goal">Goal: Add the "📋 Today's AI Briefing" section to app.py — it renders Claude's summary at the top of the dashboard with a Regenerate button and styled presentation. ClaimPulse v2.1 is an intelligent dashboard.</div>
+      <div class="day-meta"><span class="meta-pill time">⏱ ~4 hours</span><span class="meta-pill hands">⌨️ Integration</span></div>
+    </div>
+  </div>
+  <div class="course-strip">
+    <div class="course-links-row">
+      <a class="course-chip" href="https://docs.streamlit.io/library/api-reference/status/st.spinner" target="_blank">🔴 st.spinner (loading state) <span class="chip-badge">Free</span></a>
+      <a class="course-chip" href="https://docs.streamlit.io/library/api-reference/layout/st.expander" target="_blank">🔴 st.expander <span class="chip-badge">Free</span></a>
+      <a class="course-chip" href="https://docs.anthropic.com/en/api/messages-streaming" target="_blank">🟠 Anthropic — Streaming API <span class="chip-badge">Free</span></a>
+    </div>
+  </div>
+
+  <div class="block open" id="b3_1">
+    <div class="block-header" onclick="togBlock('b3_1')">
+      <div class="block-icon code">📋</div>
+      <div class="block-title-group"><div class="block-title">Full Day: Add the AI Briefing Section to app.py</div><div class="block-meta">Styled AI briefing card with regenerate button, spinner, and "Powered by Claude" attribution</div></div>
+      <span class="block-duration">~3.5 hrs</span><span class="chev">▼</span>
+    </div>
+    <div class="block-body">
+      <div class="code-block">
+        <div class="code-label">app.py — AI briefing section (add between header and KPI tiles)</div>
+        <pre><span class="kw">from</span> ai_summary <span class="kw">import</span> generate_briefing_safe
+
+<span class="cm"># ── AI Briefing Section ───────────────────────</span>
+st.markdown(<span class="st">"""
+&lt;div style="background:white;border:1px solid #e2ddd6;border-radius:10px;
+     padding:16px 20px;margin-bottom:20px;"&gt;
+  &lt;div style="font-size:10px;font-weight:600;text-transform:uppercase;
+       letter-spacing:0.08em;color:#7a7060;margin-bottom:6px;"&gt;
+    🤖 TODAY'S AI BRIEFING
+  &lt;/div&gt;
+"""</span>, unsafe_allow_html=<span class="kw">True</span>)
+
+<span class="cm"># Generate button + spinner</span>
+col_brief, col_btn = st.columns([<span class="nm">5</span>, <span class="nm">1</span>])
+<span class="kw">with</span> col_btn:
+    regenerate = st.button(<span class="st">"↻ Refresh"</span>, key=<span class="st">"regen_briefing"</span>)
+
+<span class="cm"># Cache briefing in session state so it doesn't</span>
+<span class="cm"># regenerate on every filter change</span>
+cache_key = f<span class="st">"briefing_{str(date_range)}_{str(selected_payers)}"</span>
+<span class="kw">if</span> regenerate <span class="kw">or</span> cache_key <span class="kw">not in</span> st.session_state:
+    <span class="kw">with</span> st.spinner(<span class="st">"Generating AI briefing…"</span>):
+        st.session_state[cache_key] = <span class="fn">generate_briefing_safe</span>(
+            metrics, date_range
+        )
+
+<span class="kw">with</span> col_brief:
+    st.markdown(st.session_state.get(cache_key, <span class="st">""</span>))
+
+st.markdown(
+    <span class="st">'&lt;p style="font-size:10px;color:#b0a898;margin-top:8px;"&gt;'</span>
+    <span class="st">'Powered by Claude · Haiku · Values grounded in live dashboard data'</span>
+    <span class="st">'&lt;/p&gt;&lt;/div&gt;'</span>,
+    unsafe_allow_html=<span class="kw">True</span>
+)</pre>
+      </div>
+      <div class="task-list">
+        <div class="task-item" id="t_3_1_1"><input type="checkbox" id="cb_3_1_1" onchange="toggleTask('t_3_1_1','cb_3_1_1')"><label for="cb_3_1_1">Add the AI briefing section to app.py between the header and KPI tiles — confirm it renders with a card border and attribution line</label></div>
+        <div class="task-item" id="t_3_1_2"><input type="checkbox" id="cb_3_1_2" onchange="toggleTask('t_3_1_2','cb_3_1_2')"><label for="cb_3_1_2">Implement the session_state caching — confirm the briefing does NOT regenerate (and charge the API) when you change a sidebar filter</label></div>
+        <div class="task-item" id="t_3_1_3"><input type="checkbox" id="cb_3_1_3" onchange="toggleTask('t_3_1_3','cb_3_1_3')"><label for="cb_3_1_3">Test the Refresh button — confirm it generates a new briefing when clicked</label></div>
+        <div class="task-item" id="t_3_1_4"><input type="checkbox" id="cb_3_1_4" onchange="toggleTask('t_3_1_4','cb_3_1_4')"><label for="cb_3_1_4">Show the briefing to a billing staff member — read it out loud. Does it sound like something a senior analyst would actually write?</label></div>
+        <div class="task-item" id="t_3_1_5"><input type="checkbox" id="cb_3_1_5" onchange="toggleTask('t_3_1_5','cb_3_1_5')"><label for="cb_3_1_5">Commit as ClaimPulse v2.1 with the AI briefing feature</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b3_2">
+    <div class="block-header" onclick="togBlock('b3_2')"><div class="block-icon check">✏️</div><div class="block-title-group"><div class="block-title">End-of-Day Check-in</div></div><span class="block-duration">~30 min</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="checkin-box">
+        <div class="checkin-prompt">"The AI briefing is live in the dashboard. What is the most impressive thing it correctly identified from the data? What is one thing it got wrong or that felt generic rather than specific? How did the billing staff member react when they read it?"</div>
+        <textarea class="checkin-textarea" id="checkin_day3" placeholder="Report what the briefing got right, what it got wrong, and the staff reaction..."></textarea>
+        <button class="btn btn-navy btn-sm" onclick="sendCheckin(3)">📤 Send to Tutor for Feedback</button>
+      </div>
+    </div>
+  </div>
+  <div class="day-summary"><p><strong>Day 38 done?</strong> Live AI briefings running on the dashboard. Tomorrow: prompt iteration to improve quality, then exploring streaming responses for a live typing effect.</p><div class="day-nav"><button class="btn btn-outline btn-sm" onclick="showDay(2)">← Day 2</button><button class="btn btn-m2 btn-sm" onclick="showDay(4)">Day 4 →</button></div></div>
+</div>
+
+<!-- DAY 4 -->
+<div class="day-view" id="day4">
+  <div class="day-header">
+    <div class="day-number-badge"><span class="day-of-week">Thu</span><span class="day-num">39</span></div>
+    <div class="day-header-text">
+      <div class="day-heading">Prompt Iteration &amp; Streaming Responses</div>
+      <div class="day-goal">Goal: Improve the briefing quality through systematic prompt iteration, then add streaming so users see the text appear word-by-word — a much more engaging user experience that signals the AI is working in real time.</div>
+      <div class="day-meta"><span class="meta-pill time">⏱ ~4 hours</span><span class="meta-pill ai">🤖 Iteration</span></div>
+    </div>
+  </div>
+  <div class="course-strip">
+    <div class="course-links-row">
+      <a class="course-chip" href="https://docs.anthropic.com/en/api/messages-streaming" target="_blank">🟠 Anthropic — Streaming API Reference <span class="chip-badge">Free</span></a>
+      <a class="course-chip" href="https://docs.streamlit.io/library/api-reference/write-magic/st.write_stream" target="_blank">🔴 Streamlit — st.write_stream <span class="chip-badge">Free</span></a>
+    </div>
+  </div>
+
+  <div class="block open" id="b4_1">
+    <div class="block-header" onclick="togBlock('b4_1')">
+      <div class="block-icon ai">🔄</div>
+      <div class="block-title-group"><div class="block-title">Morning: Systematic Prompt Iteration</div><div class="block-meta">Run 3 prompt variants against the same real data — pick the winner with evidence</div></div>
+      <span class="block-duration">~1.5 hrs</span><span class="chev">▼</span>
+    </div>
+    <div class="block-body">
+      <div class="task-note" style="margin-bottom:12px;">📋 Build a test script that runs all 3 prompt variants against the same fixed metrics and prints outputs side by side. Evaluate each on: accuracy (are numbers correct?), specificity (does it name specific payers/CPTs?), actionability (does the recommendation require thought or is it obvious?).</div>
+      <div class="task-list">
+        <div class="task-item" id="t_4_1_1"><input type="checkbox" id="cb_4_1_1" onchange="toggleTask('t_4_1_1','cb_4_1_1')"><label for="cb_4_1_1"><strong>Variant A (current):</strong> run existing prompt, document its strengths and weaknesses</label></div>
+        <div class="task-item" id="t_4_1_2"><input type="checkbox" id="cb_4_1_2" onchange="toggleTask('t_4_1_2','cb_4_1_2')"><label for="cb_4_1_2"><strong>Variant B:</strong> add chain-of-thought — instruct Claude to "think through which metric most urgently needs attention before writing the briefing." Compare to Variant A.</label></div>
+        <div class="task-item" id="t_4_1_3"><input type="checkbox" id="cb_4_1_3" onchange="toggleTask('t_4_1_3','cb_4_1_3')"><label for="cb_4_1_3"><strong>Variant C:</strong> add a few-shot example — show Claude one example of an excellent briefing for different made-up metrics before asking for the real one</label></div>
+        <div class="task-item" id="t_4_1_4"><input type="checkbox" id="cb_4_1_4" onchange="toggleTask('t_4_1_4','cb_4_1_4')"><label for="cb_4_1_4">Pick the best variant, update briefing_system_prompt.txt, document the decision in a comment at the top of the file</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b4_2">
+    <div class="block-header" onclick="togBlock('b4_2')">
+      <div class="block-icon code">⚡</div>
+      <div class="block-title-group"><div class="block-title">Afternoon: Add Streaming with st.write_stream</div><div class="block-meta">The text types out in real time — far better UX than waiting for the full response</div></div>
+      <span class="block-duration">~2 hrs</span><span class="chev">▼</span>
+    </div>
+    <div class="block-body">
+      <div class="code-block">
+        <div class="code-label">ai_summary.py — add a streaming generator function</div>
+        <pre><span class="kw">def</span> <span class="fn">stream_briefing</span>(metrics: dict, date_range: tuple):
+    <span class="st">"""Generator that yields text chunks for st.write_stream."""</span>
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="st">"src/prompts/briefing_system_prompt.txt"</span>) <span class="kw">as</span> f:
+        system = f.read()
+    client = anthropic.Anthropic(api_key=os.getenv(<span class="st">"ANTHROPIC_API_KEY"</span>))
+    <span class="kw">with</span> client.messages.stream(
+        model=<span class="st">"claude-haiku-4-5-20251001"</span>,
+        max_tokens=<span class="nm">400</span>,
+        system=system,
+        messages=[{<span class="st">"role"</span>:<span class="st">"user"</span>,<span class="st">"content"</span>:<span class="fn">_build_prompt</span>(metrics,date_range)}]
+    ) <span class="kw">as</span> stream:
+        <span class="kw">for</span> text <span class="kw">in</span> stream.text_stream:
+            <span class="kw">yield</span> text
+
+<span class="cm"># In app.py replace the spinner with:</span>
+<span class="cm"># briefing_text = st.write_stream(stream_briefing(metrics, date_range))</span>
+<span class="cm"># st.session_state[cache_key] = briefing_text</span></pre>
+      </div>
+      <div class="task-list">
+        <div class="task-item" id="t_4_2_1"><input type="checkbox" id="cb_4_2_1" onchange="toggleTask('t_4_2_1','cb_4_2_1')"><label for="cb_4_2_1">Add stream_briefing() to ai_summary.py and update app.py to use st.write_stream() — confirm text streams word by word in the browser</label></div>
+        <div class="task-item" id="t_4_2_2"><input type="checkbox" id="cb_4_2_2" onchange="toggleTask('t_4_2_2','cb_4_2_2')"><label for="cb_4_2_2">Implement the cache: after streaming completes, save the full text to session_state so the Refresh button doesn't stream again unless explicitly clicked</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b4_3"><div class="block-header" onclick="togBlock('b4_3')"><div class="block-icon check">✏️</div><div class="block-title-group"><div class="block-title">End-of-Day Check-in</div></div><span class="block-duration">~30 min</span><span class="chev">▼</span></div>
+    <div class="block-body"><div class="checkin-box"><div class="checkin-prompt">"Which of the 3 prompt variants won your evaluation, and what specifically made it better? Was it the chain-of-thought, the example, or something else? What does this tell you about what the briefing task actually requires from Claude?"</div><textarea class="checkin-textarea" id="checkin_day4" placeholder="Name the winning variant and explain what made it better with evidence..."></textarea><button class="btn btn-navy btn-sm" onclick="sendCheckin(4)">📤 Send to Tutor for Feedback</button></div></div>
+  </div>
+  <div class="day-summary"><p><strong>Day 39 done?</strong> Streaming live, best prompt selected. Tomorrow polish and ship Week 8 — the dashboard now has genuine intelligence baked in.</p><div class="day-nav"><button class="btn btn-outline btn-sm" onclick="showDay(3)">← Day 3</button><button class="btn btn-m2 btn-sm" onclick="showDay(5)">Day 5 →</button></div></div>
+</div>
+
+<!-- DAY 5 -->
+<div class="day-view" id="day5">
+  <div class="day-header">
+    <div class="day-number-badge"><span class="day-of-week">Fri</span><span class="day-num">40</span></div>
+    <div class="day-header-text">
+      <div class="day-heading">Polish, HIPAA Review &amp; Week 8 Deliverable</div>
+      <div class="day-goal">Goal: Finalize the AI integration, conduct a data-privacy review of exactly what is and isn't sent to the API, write the Week 8 documentation, and commit the complete v2.1 deliverable.</div>
+      <div class="day-meta"><span class="meta-pill time">⏱ ~4 hours</span><span class="meta-pill type">✍️ Polish + Docs</span></div>
+    </div>
+  </div>
+  <div class="course-strip">
+    <div class="course-links-row">
+      <a class="course-chip" href="https://www.anthropic.com/privacy" target="_blank">🟠 Anthropic Privacy Policy <span class="chip-badge">Free</span></a>
+      <a class="course-chip" href="https://docs.anthropic.com/en/api/errors" target="_blank">🟠 Anthropic — Error Handling Reference <span class="chip-badge">Free</span></a>
+    </div>
+  </div>
+
+  <div class="block open" id="b5_1">
+    <div class="block-header" onclick="togBlock('b5_1')"><div class="block-icon task">🔒</div><div class="block-title-group"><div class="block-title">Morning: HIPAA Data Review — What Goes to the API?</div><div class="block-meta">This review is mandatory — document exactly what data leaves the practice</div></div><span class="block-duration">~1.5 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="task-list">
+        <div class="task-item" id="t_5_1_1"><input type="checkbox" id="cb_5_1_1" onchange="toggleTask('t_5_1_1','cb_5_1_1')"><label for="cb_5_1_1">Review every value sent in _build_prompt() — confirm it contains ONLY computed aggregate statistics (rates, counts, dollar totals) and NO individual claim records, patient info, or claim IDs</label></div>
+        <div class="task-item" id="t_5_1_2"><input type="checkbox" id="cb_5_1_2" onchange="toggleTask('t_5_1_2','cb_5_1_2')"><label for="cb_5_1_2">Write a "Data Sent to Claude API" section in docs/hipaa_notes.md — list every field that appears in the API call payload and confirm each is aggregate-only</label></div>
+        <div class="task-item" id="t_5_1_3"><input type="checkbox" id="cb_5_1_3" onchange="toggleTask('t_5_1_3','cb_5_1_3')"><label for="cb_5_1_3">Add robust error handling: rate limit errors (429), authentication errors (401), and network timeouts should show a user-friendly st.warning() — not a Python traceback</label></div>
+        <div class="task-item" id="t_5_1_4"><input type="checkbox" id="cb_5_1_4" onchange="toggleTask('t_5_1_4','cb_5_1_4')"><label for="cb_5_1_4">Test the error path: temporarily set an invalid API key and confirm the app shows a warning message rather than crashing</label></div>
+        <div class="task-item" id="t_5_1_5"><input type="checkbox" id="cb_5_1_5" onchange="toggleTask('t_5_1_5','cb_5_1_5')"><label for="cb_5_1_5">Tag v2.1 in Git and push: <code>git tag v2.1 -m "Week 8: AI daily briefing with Claude API"</code></label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b5_2">
+    <div class="block-header" onclick="togBlock('b5_2')"><div class="block-icon review">🎓</div><div class="block-title-group"><div class="block-title">Week 8 Final Deliverable Review</div></div><span class="block-duration">Use sidebar →</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Submit your ai_summary.py module or a sample AI-generated briefing for structured feedback. Your tutor will evaluate prompt quality, grounding, error handling, and HIPAA compliance of the data flow.</p>
+      <button class="btn btn-m2" onclick="switchSidebarTab('review')">📋 Submit ai_summary.py →</button>
+    </div>
+  </div>
+  <div class="day-summary"><p>🎉 <strong>Week 8 complete — ClaimPulse v2.1!</strong> The dashboard now writes its own daily intelligence briefing. Week 9 adds drill-down, threshold alerts, and trend indicators — the advanced features billing staff asked for.</p><div class="day-nav"><button class="btn btn-outline btn-sm" onclick="showDay(4)">← Day 4</button></div></div>
+</div>
+
+</main>
+<aside class="sidebar">
+  <div class="sidebar-tabs">
+    <button class="stab active" id="stab-tutor" onclick="switchSidebarTab('tutor')">💬 Ask Tutor</button>
+    <button class="stab" id="stab-review" onclick="switchSidebarTab('review')">📋 Submit Work</button>
+    <button class="stab" id="stab-progress" onclick="switchSidebarTab('progress')">📍 Progress</button>
+  </div>
+  <div class="sidebar-panel active" id="panel-tutor">
+    <div class="chat-context"><strong>Week 8 AI Tutor</strong> — Claude API integration, prompt grounding, streaming, HIPAA data flow.</div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg system"><div class="msg-avatar">🎓</div><div class="msg-bubble">Welcome to Week 8! This is the week where the AI you've been learning about for 7 weeks gets wired directly into the product you built.<br><br>Ask me anything about the Anthropic API, how to prevent Claude from hallucinating numbers in a briefing, what data is safe to send to the API, or how streaming works in Streamlit.</div></div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-quick-prompts">
+        <span class="qprompt" onclick="quickPrompt('What is the difference between claude-haiku and claude-sonnet and when should I use each?')">Haiku vs Sonnet?</span>
+        <span class="qprompt" onclick="quickPrompt('How do I prevent Claude from making up numbers in a briefing when I only give it aggregated data?')">Prevent hallucination?</span>
+        <span class="qprompt" onclick="quickPrompt('How does st.write_stream work with the Anthropic streaming API in Streamlit?')">Streaming in Streamlit?</span>
+        <span class="qprompt" onclick="quickPrompt('What HIPAA considerations apply to sending claim metrics to an external AI API?')">HIPAA + API?</span>
+        <span class="qprompt" onclick="quickPrompt('How do I use st.session_state to cache the AI briefing so it does not regenerate on every filter change?')">Cache briefing?</span>
+      </div>
+      <div class="chat-input-row">
+        <textarea class="chat-input" id="chat-input" placeholder="Ask about the Claude API, prompts, or HIPAA..." rows="1" onkeydown="handleKey(event)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+  <div class="sidebar-panel" id="panel-review">
+    <div class="review-panel-body">
+      <div class="review-intro">Submit your API integration code or briefing outputs for feedback. Your tutor evaluates: prompt grounding (no hallucinated numbers), error handling, caching strategy, and HIPAA data flow compliance.</div>
+      <div class="review-section"><label>What are you submitting?</label>
+        <select id="review-type" style="padding:8px 10px;border:1px solid var(--border-2);border-radius:7px;background:var(--cream);font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;">
+          <option value="ai_summary">ai_summary.py module</option>
+          <option value="briefing_output">Sample briefing output</option>
+          <option value="system_prompt">Updated system prompt</option>
+          <option value="hipaa_review">HIPAA data flow review</option>
+          <option value="checkin">Daily check-in</option>
+        </select>
+      </div>
+      <div class="review-section"><label>Paste your work below</label><textarea class="review-textarea" id="review-text" placeholder="Paste code, briefing, or description..."></textarea></div>
+      <button class="btn btn-navy" onclick="submitForReview()" style="width:100%;justify-content:center;">📤 Submit for Review</button>
+      <div class="divider"></div>
+      <div id="review-result" class="review-result"></div>
+    </div>
+  </div>
+  <div class="sidebar-panel" id="panel-progress">
+    <div class="progress-panel-body">
+      <div class="week-goal-box"><h4>Week 8 Goal</h4><p>A working AI briefing feature: ai_summary.py with generate_briefing_safe() and stream_briefing(), integrated in app.py with session_state caching, best-performing prompt in src/prompts/, HIPAA data flow documented, error handling for API failures, v2.1 tagged.</p></div>
+      <div class="progress-track"><div class="progress-fill" id="week-progress-bar" style="width:0%"></div></div>
+      <p style="font-size:11px;color:var(--muted);text-align:right;margin-bottom:14px;" id="progress-pct-label">0% complete</p>
+      <div class="progress-day-row active-day" onclick="showDay(1)" id="prow1"><span class="progress-day-icon">🔑</span><div class="progress-day-text"><div class="progress-day-name">Day 36 — SDK Setup</div><div class="progress-day-status" id="pstatus1">Not started</div></div><span class="progress-pct" id="ppct1">0%</span></div>
+      <div class="progress-day-row" onclick="showDay(2)" id="prow2"><span class="progress-day-icon">🤖</span><div class="progress-day-text"><div class="progress-day-name">Day 37 — Build ai_summary.py</div><div class="progress-day-status" id="pstatus2">Not started</div></div><span class="progress-pct" id="ppct2">0%</span></div>
+      <div class="progress-day-row" onclick="showDay(3)" id="prow3"><span class="progress-day-icon">📋</span><div class="progress-day-text"><div class="progress-day-name">Day 38 — Wire into Dashboard</div><div class="progress-day-status" id="pstatus3">Not started</div></div><span class="progress-pct" id="ppct3">0%</span></div>
+      <div class="progress-day-row" onclick="showDay(4)" id="prow4"><span class="progress-day-icon">⚡</span><div class="progress-day-text"><div class="progress-day-name">Day 39 — Iteration + Streaming</div><div class="progress-day-status" id="pstatus4">Not started</div></div><span class="progress-pct" id="ppct4">0%</span></div>
+      <div class="progress-day-row" onclick="showDay(5)" id="prow5"><span class="progress-day-icon">🔒</span><div class="progress-day-text"><div class="progress-day-name">Day 40 — HIPAA Review + v2.1</div><div class="progress-day-status" id="pstatus5">Not started</div></div><span class="progress-pct" id="ppct5">0%</span></div>
+      <div class="divider"></div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.6;">✅ Check off tasks — progress saves in your browser.</p>
+    </div>
+  </div>
+</aside>
+</div>
+<script>
+const taskState=JSON.parse(localStorage.getItem('sw8_tasks')||'{}');
+const SYSTEM_PROMPT=`You are a dedicated tutor for an intern completing ClaimPulse AI at a medical practice. Week 8 of Module 2: AI Daily Briefings with Claude API. Prior work: ClaimPulse v2.0 is a styled Streamlit dashboard with 6 Plotly charts, filters, and custom CSS design system.
+
+Week 8 goals: Install anthropic SDK + python-dotenv. Secure API key in .env (gitignored). Build ai_summary.py with: _build_prompt(metrics, date_range) that injects aggregate metrics via XML tags, generate_briefing_safe() with error handling, stream_briefing() generator for streaming. Integrate in app.py with st.write_stream() and st.session_state caching. Run 3 prompt variants and pick the best with evidence. Document HIPAA data flow (only aggregates sent, no PHI). Add error handling for 401/429/timeout. Tag v2.1.
+
+Key technical details: Use claude-haiku-4-5-20251001 (fast, cheap for summaries). Only aggregate metrics go to API — no individual claims, no claim IDs, no patient info. st.session_state caching prevents regeneration on every filter change. stream_briefing() is a generator yielding text chunks for st.write_stream().
+
+Tutoring: When reviewing prompts, focus on grounding (does it prevent hallucination?), specificity (does it force Claude to name specific payers/CPTs?), and actionability (does it require a real recommendation?). For HIPAA questions, confirm only aggregate statistics are in the API payload. Use Strengths → Improvements → Next Step for formal reviews.`;
+const dayTasks={1:['cb_1_1_1','cb_1_1_2','cb_1_2_1','cb_1_2_2','cb_1_2_3'],2:['cb_2_1_1','cb_2_1_2','cb_2_1_3','cb_2_1_4'],3:['cb_3_1_1','cb_3_1_2','cb_3_1_3','cb_3_1_4','cb_3_1_5'],4:['cb_4_1_1','cb_4_1_2','cb_4_1_3','cb_4_1_4','cb_4_2_1','cb_4_2_2'],5:['cb_5_1_1','cb_5_1_2','cb_5_1_3','cb_5_1_4','cb_5_1_5']};
+let currentDay=1;const chatHistory=[];
+function showDay(d){document.querySelectorAll('.day-view').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.day-pip').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.progress-day-row').forEach(el=>el.classList.remove('active-day'));document.getElementById('day'+d).classList.add('active');document.getElementById('pip'+d).classList.add('active');document.getElementById('prow'+d).classList.add('active-day');currentDay=d;}
+function togBlock(id){document.getElementById(id).classList.toggle('open');}
+function toggleTask(rowId,cbId){const row=document.getElementById(rowId);const cb=document.getElementById(cbId);cb.checked?row.classList.add('checked'):row.classList.remove('checked');taskState[cbId]=cb.checked;localStorage.setItem('sw8_tasks',JSON.stringify(taskState));updateProgress();}
+function restoreTaskState(){Object.entries(taskState).forEach(([cbId,checked])=>{const cb=document.getElementById(cbId);if(!cb)return;cb.checked=checked;const row=cb.closest('.task-item');if(row){checked?row.classList.add('checked'):row.classList.remove('checked');}});updateProgress();}
+function updateProgress(){let total=0,done=0;[1,2,3,4,5].forEach(d=>{const tasks=dayTasks[d];const dayDone=tasks.filter(id=>taskState[id]).length;total+=tasks.length;done+=dayDone;const pct=Math.round((dayDone/tasks.length)*100);document.getElementById('ppct'+d).textContent=pct+'%';const statusEl=document.getElementById('pstatus'+d);const pip=document.getElementById('pip'+d);if(dayDone===0){statusEl.textContent='Not started';statusEl.style.color='var(--muted)';pip.classList.remove('done');}else if(dayDone===tasks.length){statusEl.textContent='✓ Complete';statusEl.style.color='var(--teal)';pip.classList.add('done');}else{statusEl.textContent=dayDone+'/'+tasks.length+' tasks done';statusEl.style.color='var(--amber)';pip.classList.remove('done');}});const weekPct=Math.round((done/total)*100);document.getElementById('week-progress-bar').style.width=weekPct+'%';document.getElementById('progress-pct-label').textContent=weekPct+'% complete — '+done+'/'+total+' tasks';}
+function switchSidebarTab(tab){document.querySelectorAll('.stab').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.sidebar-panel').forEach(el=>el.classList.remove('active'));document.getElementById('stab-'+tab).classList.add('active');document.getElementById('panel-'+tab).classList.add('active');}
+function quickPrompt(text){document.getElementById('chat-input').value=text;sendMessage();}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function addMsg(role,text){const container=document.getElementById('chat-messages');const div=document.createElement('div');div.className='msg '+role;const avatar=document.createElement('div');avatar.className='msg-avatar';avatar.textContent=role==='system'?'🎓':'👤';const bubble=document.createElement('div');bubble.className='msg-bubble';bubble.textContent=text;div.appendChild(avatar);div.appendChild(bubble);container.appendChild(div);container.scrollTop=container.scrollHeight;}
+function addLoading(){const container=document.getElementById('chat-messages');const div=document.createElement('div');div.className='msg loading';div.id='loading-msg';const avatar=document.createElement('div');avatar.className='msg-avatar';avatar.textContent='🎓';const bubble=document.createElement('div');bubble.className='msg-bubble';bubble.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';div.appendChild(avatar);div.appendChild(bubble);container.appendChild(div);container.scrollTop=container.scrollHeight;}
+function removeLoading(){const el=document.getElementById('loading-msg');if(el)el.remove();}
+async function sendMessage(){const input=document.getElementById('chat-input');const text=input.value.trim();if(!text)return;input.value='';document.getElementById('send-btn').disabled=true;addMsg('user',text);chatHistory.push({role:'user',content:text});addLoading();switchSidebarTab('tutor');try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'YOUR_API_KEY_HERE','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT,messages:chatHistory})});const data=await res.json();const reply=data.content?.[0]?.text||'Sorry, try again.';removeLoading();addMsg('system',reply);chatHistory.push({role:'assistant',content:reply});}catch(e){removeLoading();addMsg('system','Connection issue.');}document.getElementById('send-btn').disabled=false;}
+async function sendCheckin(day){const textarea=document.getElementById('checkin_day'+day);const text=textarea.value.trim();if(!text){alert('Write first.');return;}switchSidebarTab('tutor');const dayNames={1:'Day 36',2:'Day 37',3:'Day 38',4:'Day 39',5:'Day 40'};const userMsg=`[${dayNames[day]} Check-In — Week 8]\n\n${text}`;chatHistory.push({role:'user',content:userMsg});addMsg('user',userMsg);addLoading();try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'YOUR_API_KEY_HERE','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT,messages:chatHistory})});const data=await res.json();const reply=data.content?.[0]?.text||'Error.';removeLoading();addMsg('system',reply);chatHistory.push({role:'assistant',content:reply});}catch(e){removeLoading();addMsg('system','Connection error.');}}
+async function submitForReview(){const text=document.getElementById('review-text').value.trim();const type=document.getElementById('review-type').value;if(!text){alert('Paste work first.');return;}const typeLabels={ai_summary:'ai_summary.py Module',briefing_output:'Sample Briefing Output',system_prompt:'Updated System Prompt',hipaa_review:'HIPAA Data Flow Review',checkin:'Check-In'};const resultEl=document.getElementById('review-result');resultEl.className='review-result visible';resultEl.textContent='⏳ Reviewing...';try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'YOUR_API_KEY_HERE','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM_PROMPT,messages:[{role:'user',content:`Review this ${typeLabels[type]} for Week 8.\n\nFeedback:\n**Strengths**\n**Improvements** (2-3 specific)\n**Next Step**\n\nFor briefings: check that every number is grounded in the provided metrics and not invented. For code: evaluate error handling, caching, and data privacy.\n\nSubmission:\n\n${text}`}]})});const data=await res.json();resultEl.textContent=data.content?.[0]?.text||'Failed.';}catch(e){resultEl.textContent='Error.';}}
+restoreTaskState();
+</script>
+</body>
+</html>

@@ -4,16 +4,22 @@ const ALLOWED_ORIGINS = [
   'http://127.0.0.1',
 ];
 
-const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
+const MODELS = [
+  'gemini-2.5-flash',
+  'gemini-2.5-pro',
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-lite',
+];
+
+const BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '';
     const url = new URL(request.url);
 
-    // Temporary: list available models at /models
     if (url.pathname === '/models') {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${env.GEMINI_API_KEY}`);
+      const res = await fetch(`${BASE}?key=${env.GEMINI_API_KEY}`);
       const data = await res.text();
       return new Response(data, { status: res.status, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
     }
@@ -25,9 +31,19 @@ export default {
     let body;
     try { body = await request.text(); } catch { return corsResponse(JSON.stringify({ error: 'Bad request body' }), 400, origin); }
 
-    const geminiRes = await fetch(`${GEMINI_BASE}?key=${env.GEMINI_API_KEY}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
-    const data = await geminiRes.text();
-    return corsResponse(data, geminiRes.status, origin, geminiRes.headers.get('Content-Type'));
+    for (const model of MODELS) {
+      const res = await fetch(`${BASE}/${model}:generateContent?key=${env.GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+      });
+      if (res.status !== 404) {
+        const data = await res.text();
+        return corsResponse(data, res.status, origin, res.headers.get('Content-Type'));
+      }
+    }
+
+    return corsResponse(JSON.stringify({ error: 'No available models found.' }), 503, origin);
   },
 };
 

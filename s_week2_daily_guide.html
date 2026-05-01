@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClaimPulse — Summer Week 2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{
+  --cream:#f7f3ee;--paper:#faf8f5;--warm-white:#fffefb;
+  --ink:#1a1812;--ink-2:#2e2a22;--muted:#7a7060;--muted-2:#b0a898;
+  --border:#e2ddd6;--border-2:#cdc7bc;
+  --navy:#1b2a4a;--navy-light:rgba(27,42,74,0.08);--navy-border:rgba(27,42,74,0.2);
+  --amber:#d97706;--amber-bg:rgba(217,119,6,0.07);--amber-border:rgba(217,119,6,0.22);
+  --teal:#0d7c6e;--teal-bg:rgba(13,124,110,0.07);--teal-border:rgba(13,124,110,0.2);
+  --rose:#b5413a;--rose-bg:rgba(181,65,58,0.06);--rose-border:rgba(181,65,58,0.2);
+  --excel:#217346;--excel-bg:rgba(33,115,70,0.07);--excel-border:rgba(33,115,70,0.22);
+  --cowork:#7c3aed;--cowork-bg:rgba(124,58,237,0.07);--cowork-border:rgba(124,58,237,0.22);
+  --xp:#f59e0b;--xp-bg:rgba(245,158,11,0.08);--xp-border:rgba(245,158,11,0.25);
+  --shadow-sm:0 1px 4px rgba(26,24,18,0.06),0 0 0 1px rgba(26,24,18,0.04);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.65;min-height:100vh;}
+.prog-nav{background:var(--paper);border-bottom:1px solid var(--border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:40px;position:sticky;top:0;z-index:200;}
+.pn-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;padding:3px 8px;border-radius:5px;transition:all 0.15s;}
+.pn-link:hover{color:var(--navy);background:var(--navy-light);}
+.pn-home{font-weight:600;color:var(--navy);}
+.pn-right{display:flex;gap:4px;}
+.pn-center{font-size:11px;color:var(--muted-2);font-family:'IBM Plex Mono',monospace;}
+.xp-toast{position:fixed;top:60px;right:24px;background:var(--navy);color:white;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;z-index:300;transform:translateY(-80px);opacity:0;transition:all 0.35s;box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+.xp-toast.show{transform:translateY(0);opacity:1;}
+.header{background:var(--navy);color:white;padding:0 40px;display:flex;align-items:stretch;border-bottom:3px solid var(--amber);}
+.hl{padding:22px 32px 22px 0;border-right:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;justify-content:center;min-width:200px;}
+.hl .eyebrow{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:5px;}
+.hl h1{font-family:'Lora',serif;font-size:22px;font-weight:700;color:white;}
+.hl h1 span{color:#fbbf24;}
+.hc{flex:1;padding:22px 32px;display:flex;flex-direction:column;justify-content:center;}
+.wt{font-family:'Lora',serif;font-size:18px;font-weight:600;color:white;margin-bottom:4px;}
+.ws{font-size:12px;color:rgba(255,255,255,0.5);}
+.hr{padding:22px 0 22px 32px;border-left:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:20px;}
+.hstat{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.hstat-val{font-family:'Lora',serif;font-size:20px;font-weight:700;color:white;}
+.hstat-label{font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;}
+.hstat-div{width:1px;height:32px;background:rgba(255,255,255,0.1);}
+.xp-banner{background:var(--xp-bg);border-bottom:1px solid var(--xp-border);padding:8px 40px;display:flex;align-items:center;gap:16px;}
+.xb-label{font-size:11px;font-weight:600;color:var(--xp);}
+.xb-tasks{font-size:11px;color:var(--muted);}
+.xb-badges{display:flex;gap:6px;margin-left:auto;}
+.xb-badge{font-size:12px;padding:2px 8px;border-radius:4px;background:white;border:1px solid var(--xp-border);font-weight:600;color:var(--xp);}
+.progress-bar{background:var(--navy);padding:0 40px 14px;display:flex;}
+.day-pip{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:8px 6px 0;border-top:2px solid transparent;transition:all 0.2s;}
+.day-pip.active{border-top-color:var(--amber);}
+.day-pip.done{border-top-color:#34d399;}
+.pip-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);}
+.day-pip.active .pip-dot{background:var(--amber);}
+.day-pip.done .pip-dot{background:#34d399;}
+.pip-label{font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.07em;font-weight:500;}
+.day-pip.active .pip-label{color:rgba(255,255,255,0.8);}
+.day-pip.done .pip-label{color:rgba(52,211,153,0.7);}
+.layout{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 185px);}
+.main{padding:32px 36px;border-right:1px solid var(--border);}
+.day-view{display:none;}
+.day-view.active{display:block;}
+.day-header{display:flex;align-items:flex-start;gap:18px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.dnb{flex-shrink:0;width:52px;height:52px;background:var(--amber);color:white;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.dow{font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.6);font-weight:600;}
+.dn{font-family:'Lora',serif;font-size:20px;font-weight:700;line-height:1;color:white;}
+.dht{flex:1;}
+.dh-heading{font-family:'Lora',serif;font-size:22px;font-weight:700;color:var(--ink);margin-bottom:5px;line-height:1.25;}
+.dh-goal{font-size:13px;color:var(--muted);margin-bottom:8px;font-style:italic;}
+.dh-meta{display:flex;gap:12px;flex-wrap:wrap;}
+.mp{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;border:1px solid;}
+.mp.time{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber);}
+.mp.type{background:var(--navy-light);border-color:var(--navy-border);color:var(--navy);}
+.mp.excel{background:var(--excel-bg);border-color:var(--excel-border);color:var(--excel);}
+.mp.cowork{background:var(--cowork-bg);border-color:var(--cowork-border);color:var(--cowork);}
+.mp.prompt{background:var(--teal-bg);border-color:var(--teal-border);color:var(--teal);}
+.cs{background:var(--navy-light);border:1px solid var(--navy-border);border-radius:9px;padding:12px 14px;margin-bottom:18px;}
+.cs-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--navy);margin-bottom:8px;}
+.cs-links{display:flex;flex-wrap:wrap;gap:6px;}
+.cc{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;text-decoration:none;border:1px solid var(--border-2);background:white;color:var(--ink-2);transition:all 0.15s;white-space:nowrap;}
+.cc:hover{background:var(--paper);border-color:var(--navy-border);color:var(--navy);}
+.cb{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;padding:1px 5px;border-radius:3px;background:rgba(13,124,110,0.1);color:var(--teal);}
+/* TOOL INTRO BOXES */
+.tool-intro{border-radius:12px;padding:16px 18px;margin:0 0 16px;}
+.tool-intro.excel{background:var(--excel-bg);border:1px solid var(--excel-border);}
+.tool-intro.cowork{background:var(--cowork-bg);border:1px solid var(--cowork-border);}
+.tool-intro h4{font-size:13px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.tool-intro.excel h4{color:var(--excel);}
+.tool-intro.cowork h4{color:var(--cowork);}
+.tool-intro p{font-size:12px;line-height:1.7;color:var(--ink-2);}
+/* EXCEL PROMPT BOX */
+.excel-box{background:var(--excel-bg);border:1px solid var(--excel-border);border-radius:10px;padding:14px 16px;margin:10px 0 12px;}
+.excel-box .eb-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:var(--excel);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.excel-prompt{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-2);background:white;border:1px solid var(--border-2);border-radius:6px;padding:10px 12px;margin-bottom:6px;line-height:1.6;}
+/* COWORK BOX */
+.cowork-box{background:var(--cowork-bg);border:1px solid var(--cowork-border);border-radius:10px;padding:14px 16px;margin:10px 0 12px;}
+.cowork-box .cwb-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:var(--cowork);margin-bottom:8px;}
+.cowork-step{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}
+.cw-num{width:20px;height:20px;border-radius:50%;background:var(--cowork);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.cw-text{font-size:12px;color:var(--ink-2);line-height:1.6;flex:1;}
+/* PROMPT EXPERIMENT */
+.exp-box{background:white;border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:10px 0 12px;box-shadow:var(--shadow-sm);}
+.exp-box h5{font-size:12px;font-weight:700;color:var(--teal);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.exp-row{display:grid;grid-template-columns:80px 1fr;gap:8px;margin-bottom:8px;font-size:12px;}
+.exp-row .el{font-weight:600;color:var(--ink-2);padding-top:1px;}
+.exp-row .ev{color:var(--muted);background:var(--cream);padding:6px 10px;border-radius:6px;line-height:1.5;border:1px solid var(--border);}
+/* SHARED */
+.block{background:var(--warm-white);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow-sm);}
+.block-header{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;user-select:none;transition:background 0.15s;}
+.block-header:hover{background:var(--paper);}
+.bico{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.bico.learn{background:var(--navy-light);}
+.bico.task{background:var(--amber-bg);}
+.bico.excel{background:var(--excel-bg);}
+.bico.cowork{background:var(--cowork-bg);}
+.bico.prompt{background:var(--teal-bg);}
+.bico.check{background:var(--rose-bg);}
+.btg{flex:1;}
+.bt{font-weight:600;font-size:13px;color:var(--ink);}
+.bm{font-size:11px;color:var(--muted);margin-top:1px;}
+.bdur{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-2);background:var(--cream);border:1px solid var(--border);border-radius:5px;padding:3px 8px;}
+.chev{color:var(--muted-2);font-size:10px;transition:transform 0.2s;margin-left:4px;}
+.block.open .chev{transform:rotate(180deg);}
+.block-body{display:none;padding:4px 16px 16px;border-top:1px solid var(--border);}
+.block.open .block-body{display:block;}
+.daily-quest{background:linear-gradient(135deg,var(--xp-bg),rgba(245,158,11,0.04));border:1px solid var(--xp-border);border-radius:10px;padding:14px 16px;margin:10px 0 12px;}
+.dq-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.dq-badge{background:var(--xp);color:white;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:2px 8px;border-radius:4px;}
+.dq-xp{font-size:11px;font-weight:600;color:var(--xp);}
+.dq-text{font-size:13px;color:var(--ink-2);line-height:1.6;}
+.dq-complete{margin-top:10px;display:flex;align-items:center;gap:8px;}
+.dq-complete input{width:15px;height:15px;accent-color:var(--xp);cursor:pointer;}
+.dq-complete label{font-size:12px;color:var(--muted);cursor:pointer;}
+.rl{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.ri{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;background:var(--cream);border:1px solid var(--border);border-radius:7px;text-decoration:none;transition:all 0.15s;}
+.ri:hover{background:var(--paper);border-color:var(--border-2);}
+.ri .ico{font-size:18px;flex-shrink:0;margin-top:1px;}
+.ri .rb{flex:1;}
+.ri .rn{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+.ri .rd{font-size:11px;color:var(--muted);line-height:1.4;}
+.ri .rbg{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:var(--navy-light);color:var(--navy);margin-top:4px;border:1px solid var(--navy-border);}
+.tl{display:flex;flex-direction:column;gap:8px;}
+.ti{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--cream);border:1px solid var(--border);border-radius:7px;transition:all 0.2s;}
+.ti input[type="checkbox"]{margin-top:2px;width:15px;height:15px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;}
+.ti label{font-size:13px;color:var(--ink-2);cursor:pointer;line-height:1.5;}
+.ti.chk{background:var(--paper);}
+.ti.chk label{text-decoration:line-through;color:var(--muted-2);}
+.ti.xp-task{border-left:3px solid var(--xp);}
+.tn{margin-top:6px;padding:8px 10px;background:var(--amber-bg);border-left:2px solid var(--amber);border-radius:0 5px 5px 0;font-size:12px;color:#92400e;font-style:italic;line-height:1.5;}
+.ci-box{padding-top:10px;}
+.ci-prompt{font-size:13px;color:var(--ink-2);font-family:'Lora',serif;font-style:italic;margin-bottom:10px;line-height:1.6;padding:10px 14px;background:var(--rose-bg);border-left:3px solid var(--rose);border-radius:0 6px 6px 0;}
+.ci-ta{width:100%;min-height:90px;padding:10px 12px;background:var(--cream);border:1px solid var(--border-2);border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink);resize:vertical;outline:none;margin-bottom:8px;}
+.ci-ta::placeholder{color:var(--muted-2);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;border:none;}
+.btn-navy{background:var(--navy);color:white;}.btn-navy:hover{background:#243a62;}
+.btn-outline{background:transparent;color:var(--navy);border:1px solid var(--navy-border);}.btn-outline:hover{background:var(--navy-light);}
+.btn-amber{background:var(--amber);color:white;}.btn-amber:hover{background:#b45309;}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.ds{margin-top:20px;padding:14px 16px;background:var(--navy);border-radius:10px;display:flex;align-items:center;gap:16px;}
+.ds p{font-size:12px;color:rgba(255,255,255,0.65);flex:1;line-height:1.5;}
+.ds p strong{color:white;}
+.ds-nav{display:flex;gap:8px;}
+/* SIDEBAR */
+.sidebar{background:var(--warm-white);display:flex;flex-direction:column;height:calc(100vh - 185px);position:sticky;top:0;}
+.stabs{display:flex;border-bottom:1px solid var(--border);}
+.stab{flex:1;padding:12px 8px;border:none;background:none;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;}
+.stab.active{color:var(--navy);border-bottom-color:var(--amber);}
+.sp{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.sp.active{display:flex;}
+.sc{padding:10px 14px;border-bottom:1px solid var(--border);font-size:11px;}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;}
+.msg{display:flex;gap:9px;align-items:flex-start;}
+.ma{width:26px;height:26px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;margin-top:1px;}
+.msg.sys .ma{background:var(--navy);}
+.msg.usr .ma{background:var(--amber-bg);border:1px solid var(--amber-border);}
+.mb{flex:1;padding:9px 11px;border-radius:8px;font-size:12.5px;line-height:1.6;}
+.msg.sys .mb{background:var(--paper);border:1px solid var(--border);color:var(--ink-2);}
+.msg.usr .mb{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--ink-2);}
+.msg.load .mb{background:var(--paper);border:1px solid var(--border);color:var(--muted);font-style:italic;}
+.td{display:inline-flex;gap:3px;align-items:center;}
+.td span{width:5px;height:5px;background:var(--muted-2);border-radius:50%;animation:boun 1.2s infinite;}
+.td span:nth-child(2){animation-delay:0.2s;}
+.td span:nth-child(3){animation-delay:0.4s;}
+@keyframes boun{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.cia{padding:12px 14px;border-top:1px solid var(--border);background:var(--warm-white);}
+.qps{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.qp{font-size:11px;padding:3px 9px;border-radius:12px;background:var(--cream);border:1px solid var(--border-2);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.qp:hover{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber);}
+.ci-row{display:flex;gap:7px;align-items:flex-end;}
+.ci-inp{flex:1;padding:8px 11px;background:var(--cream);border:1px solid var(--border-2);border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;color:var(--ink);resize:none;outline:none;min-height:38px;max-height:120px;}
+.ci-inp::placeholder{color:var(--muted-2);}
+.sb-btn{width:36px;height:36px;border-radius:7px;background:var(--amber);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.sb-btn:hover{background:#b45309;}
+.sb-btn:disabled{background:var(--border-2);cursor:not-allowed;}
+.rev-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;}
+.rev-intro{padding:10px 12px;background:var(--navy-light);border:1px solid var(--navy-border);border-radius:7px;font-size:12px;color:var(--navy);line-height:1.6;}
+.rev-sec{display:flex;flex-direction:column;gap:6px;}
+.rev-sec label{font-size:12px;font-weight:600;color:var(--ink-2);}
+.rev-ta{width:100%;padding:10px 12px;background:var(--cream);border:1px solid var(--border-2);border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;color:var(--ink);resize:vertical;outline:none;min-height:100px;}
+.rev-ta::placeholder{color:var(--muted-2);}
+.rev-res{display:none;padding:12px;background:var(--paper);border:1px solid var(--border);border-radius:7px;font-size:12.5px;color:var(--ink-2);line-height:1.7;white-space:pre-wrap;}
+.rev-res.vis{display:block;}
+.prg-body{flex:1;overflow-y:auto;padding:14px;}
+.prg-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:7px;margin-bottom:6px;border:1px solid var(--border);background:var(--cream);cursor:pointer;transition:all 0.15s;}
+.prg-row.act{background:var(--amber-bg);border-color:var(--amber-border);}
+.prg-icon{font-size:16px;}
+.prg-text{flex:1;}
+.prg-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:1px;}
+.prg-status{font-size:11px;color:var(--muted);}
+.prg-pct{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-2);}
+.prg-track{height:3px;background:var(--border);border-radius:2px;margin:14px 0 8px;overflow:hidden;}
+.prg-fill{height:100%;background:linear-gradient(90deg,var(--amber),#fbbf24);border-radius:2px;transition:width 0.5s ease;}
+.wgb{padding:12px 14px;background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:8px;margin-bottom:14px;}
+.wgb h4{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--amber);margin-bottom:5px;}
+.wgb p{font-size:12px;color:var(--ink-2);line-height:1.6;}
+.xp-summary{padding:10px 12px;background:var(--xp-bg);border:1px solid var(--xp-border);border-radius:7px;margin-top:12px;}
+.xp-summary h5{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--xp);margin-bottom:6px;}
+.xp-val{font-family:'Lora',serif;font-size:22px;font-weight:700;color:var(--xp);}
+.xp-sub-txt{font-size:11px;color:var(--muted);margin-top:2px;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+
+/* CERT CALLOUT */
+.cert-box{background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(139,92,246,0.06));border:1px solid rgba(139,92,246,0.25);border-radius:10px;padding:14px 16px;margin:12px 0;}
+.cert-box-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#7c3aed;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.cert-box-label .cert-badge{background:#7c3aed;color:white;font-size:9px;padding:1px 7px;border-radius:10px;font-weight:700;}
+.cert-links{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.cert-link{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:white;border:1px solid rgba(139,92,246,0.2);border-radius:7px;text-decoration:none;transition:all 0.15s;}
+.cert-link:hover{border-color:rgba(139,92,246,0.4);background:rgba(139,92,246,0.03);}
+.cert-link-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.cert-link-body{flex:1;}
+.cert-link-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+.cert-link-desc{font-size:11px;color:var(--muted);line-height:1.4;}
+.cert-link-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;margin-top:4px;}
+.cert-link-tag.free{background:rgba(13,124,110,0.1);color:var(--teal);border:1px solid var(--teal-border);}
+.cert-link-tag.paid{background:rgba(245,158,11,0.1);color:var(--amber);border:1px solid var(--amber-border);}
+.cert-exam-box{background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(217,119,6,0.06));border:2px solid rgba(245,158,11,0.35);border-radius:12px;padding:18px 20px;margin:12px 0;}
+.ceb-title{font-family:'Lora',serif;font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.ceb-tag{background:var(--amber);color:white;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px;}
+.ceb-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px;}
+.ceb-domains{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;}
+.ceb-domain{padding:8px 10px;background:white;border:1px solid var(--border);border-radius:7px;}
+.ceb-domain-pct{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--amber);margin-bottom:2px;}
+.ceb-domain-name{font-size:11px;color:var(--ink-2);}
+.ceb-domain-status{font-size:10px;color:var(--teal);margin-top:2px;font-style:italic;}
+
+</style>
+</head>
+<body>
+
+<div class="xp-toast" id="xp-toast">+10 XP ⚡</div>
+
+<div class="prog-nav">
+  <a class="pn-link pn-home" href="index.html">🏠 Program Home</a>
+  <span class="pn-center">Summer Week 2 · Days 6–10 · AI Tools Power User</span>
+  <div class="pn-right">
+    <a class="pn-link" href="s_week1_daily_guide.html">← Week 1</a>
+    <a class="pn-link" href="s_week3_daily_guide.html">Week 3 →</a>
+  </div>
+</div>
+
+<div class="header">
+  <div class="hl"><div class="eyebrow">ClaimPulse AI · Summer Arc</div><h1>Claim<span>Pulse</span></h1></div>
+  <div class="hc"><div class="wt">Week 2 — AI Tools: Claude in Excel, Cowork &amp; Prompt Engineering</div><div class="ws">Use AI as a power user — analyse real claim data in Excel, automate with Cowork, and master prompting before a single line of custom code</div></div>
+  <div class="hr">
+    <div class="hstat"><span class="hstat-val">5</span><span class="hstat-label">Days</span></div>
+    <div class="hstat-div"></div>
+    <div class="hstat"><span class="hstat-val">175</span><span class="hstat-label">XP Available</span></div>
+    <div class="hstat-div"></div>
+    <div class="hstat"><span class="hstat-val">W2</span><span class="hstat-label">Summer</span></div>
+  </div>
+</div>
+
+<div class="xp-banner">
+  <span class="xb-label">⚡ Week 2 XP: 175</span>
+  <span class="xb-tasks">Still no code — this week is about using AI tools at maximum effectiveness</span>
+  <div class="xb-badges">
+    <span class="xb-badge">📊 Excel Power User — unlockable</span>
+    <span class="xb-badge">⚙️ Automation Builder — unlockable</span>
+    <span class="xb-badge">🧠 Prompt Craftsman — unlockable</span>
+  </div>
+</div>
+
+<div class="progress-bar">
+  <div class="day-pip active" onclick="showDay(1)" id="pip1"><div class="pip-dot"></div><div class="pip-label">Mon</div></div>
+  <div class="day-pip" onclick="showDay(2)" id="pip2"><div class="pip-dot"></div><div class="pip-label">Tue</div></div>
+  <div class="day-pip" onclick="showDay(3)" id="pip3"><div class="pip-dot"></div><div class="pip-label">Wed</div></div>
+  <div class="day-pip" onclick="showDay(4)" id="pip4"><div class="pip-dot"></div><div class="pip-label">Thu</div></div>
+  <div class="day-pip" onclick="showDay(5)" id="pip5"><div class="pip-dot"></div><div class="pip-label">Fri</div></div>
+</div>
+
+<div class="layout">
+<main class="main">
+
+<!-- ════ DAY 6 ════ -->
+<div class="day-view active" id="day1">
+  <div class="day-header">
+    <div class="dnb"><span class="dow">Mon</span><span class="dn">6</span></div>
+    <div class="dht">
+      <div class="dh-heading">Claude in Excel — AI Analysis on Real Claim Data</div>
+      <div class="dh-goal">Goal: Use Claude in Excel to analyse the same claim CSV from Week 1 — without writing Python. By end of day you'll have answered the 7 KPI questions using natural language in Excel and seen exactly where AI-augmented spreadsheets hit their limits.</div>
+      <div class="dh-meta"><span class="mp time">⏱ ~4 hours</span><span class="mp excel">📗 Claude in Excel</span></div>
+    </div>
+  </div>
+  <div class="cs"><div class="cs-label">📚 Install &amp; Reference</div>
+    <div class="cs-links">
+      <a class="cc" href="https://www.anthropic.com/claude/excel" target="_blank">📗 Claude in Excel — Install <span class="cb">Requires Claude.ai</span></a>
+      <a class="cc" href="https://support.claude.ai/hc/en-us/articles/excel" target="_blank">📗 Claude in Excel — Help Docs <span class="cb">Free</span></a>
+    </div>
+  </div>
+
+  <div class="block open" id="b1a">
+    <div class="block-header" onclick="tog('b1a')"><div class="bico excel">📗</div><div class="btg"><div class="bt">Morning: Install Claude in Excel + First Analysis</div><div class="bm">Get Claude running inside Excel and ask your first billing question against the real data</div></div><span class="bdur">~2 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="tool-intro excel">
+        <h4>📗 What is Claude in Excel?</h4>
+        <p>Claude in Excel is an add-in that puts a Claude chat panel directly inside Microsoft Excel. You can describe the analysis you want in plain English — "show me denial rate by payer" — and Claude generates the formula, pivot table, or chart for you. It sees your data and can work with it directly. This week you're using it to answer all 7 dashboard KPIs before writing a single line of Python.</p>
+      </div>
+      <div class="excel-box">
+        <div class="eb-label">📗 Day 6 Excel Prompts — Try These in Order</div>
+        <div class="excel-prompt">"I have a claim CSV with columns: claim_id, service_date, payer_name, cpt_code, icd_code, billed_amount, status, denial_reason. Calculate the overall denial rate as a percentage."</div>
+        <div class="excel-prompt">"Create a pivot table showing denial rate by payer. Sort it from highest to lowest denial rate. Which payer should we be most concerned about?"</div>
+        <div class="excel-prompt">"For claims where status = 'denied', group them by denial_reason and count how many claims have each reason. Which reason code appears most?"</div>
+        <div class="excel-prompt">"Calculate days in A/R: the average number of days between service_date and today for all claims where status = 'pending' or 'denied'. What does this tell us?"</div>
+      </div>
+      <div class="tl">
+        <div class="ti xp-task" id="t1a1"><input type="checkbox" id="c1a1" onchange="chk('t1a1','c1a1')"><label for="c1a1">Install Claude in Excel — open the claim CSV and confirm Claude can see the column headers</label></div>
+        <div class="ti xp-task" id="t1a2"><input type="checkbox" id="c1a2" onchange="chk('t1a2','c1a2')"><label for="c1a2">Use Claude in Excel to calculate denial rate overall — verify the number matches your manual calculation from Week 1</label></div>
+        <div class="ti xp-task" id="t1a3"><input type="checkbox" id="c1a3" onchange="chk('t1a3','c1a3')"><label for="c1a3">Use Claude in Excel to create the denial-rate-by-payer pivot table — screenshot the result</label></div>
+        <div class="ti xp-task" id="t1a4"><input type="checkbox" id="c1a4" onchange="chk('t1a4','c1a4')"><label for="c1a4">Use Claude in Excel to create the denial-reason breakdown — confirm the top denial code matches what you found manually in Week 1</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b1b">
+    <div class="block-header" onclick="tog('b1b')"><div class="bico excel">📊</div><div class="btg"><div class="bt">Afternoon: Answer All 7 KPIs + Document Excel's Limits</div><div class="bm">The goal is to understand what Excel + AI can do, and — critically — where it breaks down</div></div><span class="bdur">~2 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="tl">
+        <div class="ti xp-task" id="t1b1"><input type="checkbox" id="c1b1" onchange="chk('t1b1','c1b1')"><label for="c1b1">Use Claude in Excel to compute values for all 7 KPIs defined in Week 1 — document the result for each in a "KPI verification" sheet</label></div>
+        <div class="ti xp-task" id="t1b2"><input type="checkbox" id="c1b2" onchange="chk('t1b2','c1b2')"><label for="c1b2">Ask Claude in Excel: "Create a line chart showing denial rate by month over the dataset" — does it succeed? Note exactly what it can and can't do</label></div>
+        <div class="ti xp-task" id="t1b3"><input type="checkbox" id="c1b3" onchange="chk('t1b3','c1b3')"><label for="c1b3">Document 3 things Claude in Excel does well and 3 limitations — be specific. Example of a limitation: "It can't automatically refresh when new data arrives without manual re-prompting." This gap is exactly why the Streamlit dashboard is needed.</label></div>
+      </div>
+      <div class="tn">💡 The point of today is NOT to replace Python with Excel. It's to deeply understand the domain before writing code. Every limitation you find today becomes a requirement for the dashboard.</div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Ask Claude in Excel: "If I wanted this analysis to run automatically every morning without anyone opening Excel, what would need to change?" Document its answer — this is the business case for building a custom dashboard.</div>
+        <div class="dq-complete"><input type="checkbox" id="dq1" onchange="chk('dq1','dq1',25)"><label for="dq1">Quest complete — document Claude's answer about automation limits</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b1c"><div class="block-header" onclick="tog('b1c')"><div class="bico check">✏️</div><div class="btg"><div class="bt">End-of-Day Check-in</div></div><span class="bdur">~30 min</span><span class="chev">▼</span></div>
+    <div class="block-body"><div class="ci-box">
+      <div class="ci-prompt">"What is the most important thing Claude in Excel can do that saves time for a billing manager? And — what is the single biggest limitation that means a custom Streamlit dashboard is still worth building? Be specific."</div>
+      <textarea class="ci-ta" id="ci1" placeholder="Best thing + biggest limitation, both specific..."></textarea>
+      <button class="btn btn-navy btn-sm" onclick="sendCI(1)">📤 Send to Tutor</button>
+    </div></div>
+  </div>
+  <div class="ds"><p><strong>Day 6 done?</strong> Claude in Excel mastered, all 7 KPIs computed, Excel's limits documented. Tomorrow: Cowork — automate the manual file preparation workflow.</p><div class="ds-nav"><button class="btn btn-amber btn-sm" onclick="showDay(2)">Day 7 →</button></div></div>
+</div>
+
+<!-- ════ DAY 7 ════ -->
+<div class="day-view" id="day2">
+  <div class="day-header">
+    <div class="dnb"><span class="dow">Tue</span><span class="dn">7</span></div>
+    <div class="dht">
+      <div class="dh-heading">Cowork — Automate the Manual Billing Prep Workflow</div>
+      <div class="dh-goal">Goal: Use Cowork to build an automation that handles the manual steps billing staff do before they can even start analysing data. Map the current manual workflow, then automate the tedious parts — file moving, renaming, folder organisation, report generation.</div>
+      <div class="dh-meta"><span class="mp time">⏱ ~4 hours</span><span class="mp cowork">⚙️ Cowork</span></div>
+    </div>
+  </div>
+  <div class="cs"><div class="cs-links">
+    <a class="cc" href="https://www.anthropic.com/claude/cowork" target="_blank">⚙️ Cowork — Install &amp; Get Started <span class="cb">Requires Claude.ai</span></a>
+    <a class="cc" href="https://support.claude.ai/hc/en-us/articles/cowork" target="_blank">⚙️ Cowork — Help Documentation <span class="cb">Free</span></a>
+  </div></div>
+
+  <div class="block open" id="b2a">
+    <div class="block-header" onclick="tog('b2a')"><div class="bico cowork">⚙️</div><div class="btg"><div class="bt">Morning: Map the Manual Workflow + Install Cowork</div><div class="bm">You can't automate what you haven't mapped — interview billing staff first, then build</div></div><span class="bdur">~1.5 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="tool-intro cowork">
+        <h4>⚙️ What is Cowork?</h4>
+        <p>Cowork is a desktop automation tool from Anthropic that lets non-developers automate file management, folder organisation, and repetitive computer tasks using plain English instructions. You describe what you want Claude to do — "every Monday, move this week's exports to this folder and rename them with today's date" — and Cowork handles the rest. This week you'll use it to automate the manual data prep steps that billing staff do before they can analyse anything.</p>
+      </div>
+      <div class="tl">
+        <div class="ti xp-task" id="t2a1"><input type="checkbox" id="c2a1" onchange="chk('t2a1','c2a1')"><label for="c2a1">Install Cowork on the desktop — confirm it launches without errors</label></div>
+        <div class="ti xp-task" id="t2a2"><input type="checkbox" id="c2a2" onchange="chk('t2a2','c2a2')"><label for="c2a2">Interview a billing staff member: "Walk me through exactly what you do with the claim export before you can start working with the data — every manual step, even the small ones." Document the full sequence.</label></div>
+        <div class="ti xp-task" id="t2a3"><input type="checkbox" id="c2a3" onchange="chk('t2a3','c2a3')"><label for="c2a3">Identify which steps in that sequence are pure manual busywork (moving files, renaming, checking for duplicates) vs. steps that require judgment — only the busywork steps are candidates for Cowork automation</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b2b">
+    <div class="block-header" onclick="tog('b2b')"><div class="bico cowork">🤖</div><div class="btg"><div class="bt">Afternoon: Build and Run a Cowork Automation</div><div class="bm">Automate at least one real step from the billing prep workflow</div></div><span class="bdur">~2 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="cowork-box">
+        <div class="cwb-label">⚙️ Example Cowork Automation to Build</div>
+        <div class="cowork-step"><div class="cw-num">1</div><div class="cw-text"><strong>Open Cowork</strong> and describe the automation in plain English: "When a new CSV file appears in the Downloads folder with 'claims' in the name, move it to the project data folder, rename it with today's date in YYYY-MM-DD format at the start, and create a copy in an archive subfolder."</div></div>
+        <div class="cowork-step"><div class="cw-num">2</div><div class="cw-text"><strong>Review what Cowork plans to do</strong> — it will show you the steps before executing. Confirm they're correct.</div></div>
+        <div class="cowork-step"><div class="cw-num">3</div><div class="cw-text"><strong>Test it</strong> — drop a test CSV file into Downloads and confirm Cowork moves and renames it correctly.</div></div>
+        <div class="cowork-step"><div class="cw-num">4</div><div class="cw-text"><strong>Document it</strong> — write down what the automation does, what it assumes, and what would break it. This is the "automation spec" that goes in the requirements doc.</div></div>
+      </div>
+      <div class="tl">
+        <div class="ti xp-task" id="t2b1"><input type="checkbox" id="c2b1" onchange="chk('t2b1','c2b1')"><label for="c2b1">Build at least one Cowork automation that eliminates a manual step from the billing prep workflow — it must run successfully on a real test file</label></div>
+        <div class="ti xp-task" id="t2b2"><input type="checkbox" id="c2b2" onchange="chk('t2b2','c2b2')"><label for="c2b2">Show the automation to the billing staff member who described the workflow — ask "would this save you time?" and document their exact response</label></div>
+        <div class="ti xp-task" id="t2b3"><input type="checkbox" id="c2b3" onchange="chk('t2b3','c2b3')"><label for="c2b3">Write a one-paragraph "Automation Spec" describing what the Cowork workflow does, what triggers it, and its assumptions — add it to the requirements doc</label></div>
+      </div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Build a second Cowork automation: one that generates a simple daily summary text file — date, number of files in the data folder, and a reminder of this week's KPI targets. It doesn't need to be complex — the goal is to see how far plain-English automation can go before it needs code.</div>
+        <div class="dq-complete"><input type="checkbox" id="dq2" onchange="chk('dq2','dq2',25)"><label for="dq2">Quest complete — second automation built and tested</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b2c"><div class="block-header" onclick="tog('b2c')"><div class="bico check">✏️</div><div class="btg"><div class="bt">End-of-Day Check-in</div></div><span class="bdur">~30 min</span><span class="chev">▼</span></div>
+    <div class="block-body"><div class="ci-box">
+      <div class="ci-prompt">"What is the fundamental difference between what Cowork can automate and what requires custom Python code? Use a specific example from the billing workflow for each."</div>
+      <textarea class="ci-ta" id="ci2" placeholder="Cowork's ceiling vs what Python can do, with specific billing examples..."></textarea>
+      <button class="btn btn-navy btn-sm" onclick="sendCI(2)">📤 Send to Tutor</button>
+    </div></div>
+  </div>
+  <div class="ds"><p><strong>Day 7 done?</strong> Cowork automation built and tested. Wednesday and Thursday are prompt engineering — the foundation for the AI briefings in Week 8.</p><div class="ds-nav"><button class="btn btn-outline btn-sm" onclick="showDay(1)">← Day 6</button><button class="btn btn-amber btn-sm" onclick="showDay(3)">Day 8 →</button></div></div>
+</div>
+
+<!-- ════ DAY 8 ════ -->
+<div class="day-view" id="day3">
+  <div class="day-header">
+    <div class="dnb"><span class="dow">Wed</span><span class="dn">8</span></div>
+    <div class="dht">
+      <div class="dh-heading">Anthropic Academy + LLM Fundamentals</div>
+      <div class="dh-goal">Goal: Understand how Claude actually works — tokens, context windows, temperature, system prompts, and why prompting is a skill that requires deliberate practice. Complete the Anthropic Academy intro module and take notes.</div>
+      <div class="dh-meta"><span class="mp time">⏱ ~4 hours</span><span class="mp prompt">🧠 AI Foundations</span></div>
+    </div>
+  </div>
+  <div class="cs"><div class="cs-links">
+    <a class="cc" href="https://www.anthropic.com/learn" target="_blank">🟠 Anthropic Academy <span class="cb">Free</span></a>
+    <a class="cc" href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank">🟠 Prompt Engineering Overview <span class="cb">Free</span></a>
+    <a class="cc" href="https://docs.anthropic.com/en/docs/about-claude/models" target="_blank">🟠 Claude Model Overview <span class="cb">Free</span></a>
+  </div></div>
+
+  <div class="block open" id="b3a">
+    <div class="block-header" onclick="tog('b3a')"><div class="bico learn">📚</div><div class="btg"><div class="bt">Morning: Anthropic Academy — Core LLM Concepts</div><div class="bm">Read the official material, then explain it back in your own words — the tutor will check your understanding</div></div><span class="bdur">~2 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="rl">
+        <a class="ri" href="https://www.anthropic.com/learn" target="_blank"><span class="ico">🟠</span><div class="rb"><div class="rn">Anthropic Academy — Introduction Module</div><div class="rd">Start here. Covers what LLMs are, how they generate text, what "training" means in plain English, and why the same prompt can give different answers. Take notes — this is the conceptual foundation for all of Week 8's API work.</div><span class="rbg">Free · anthropic.com</span></div></a>
+        <a class="ri" href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank"><span class="ico">🟠</span><div class="rb"><div class="rn">Anthropic — Prompt Engineering Overview</div><div class="rd">The official guide to getting the best results from Claude. Read especially: "Be clear and direct", "Use examples", "Chain of thought", and "System prompts." These techniques directly affect the AI briefings built in Week 8.</div><span class="rbg">Free · docs.anthropic.com</span></div></a>
+      </div>
+      <div class="tl">
+        <div class="ti xp-task" id="t3a1"><input type="checkbox" id="c3a1" onchange="chk('t3a1','c3a1')"><label for="c3a1">Complete the Anthropic Academy intro module — write a one-sentence definition for each: tokens, context window, temperature, system prompt, hallucination</label></div>
+        <div class="ti xp-task" id="t3a2"><input type="checkbox" id="c3a2" onchange="chk('t3a2','c3a2')"><label for="c3a2">Read the prompt engineering overview — identify the 3 techniques most relevant to generating a reliable medical billing briefing (hint: examples, XML tags, and chain-of-thought are all in there)</label></div>
+        <div class="ti xp-task" id="t3a3"><input type="checkbox" id="c3a3" onchange="chk('t3a3','c3a3')"><label for="c3a3">Ask the tutor: "What is the single most common prompting mistake people make when building AI features for business applications?" — write the answer in your prompt journal</label></div>
+      </div>
+    </div>
+  </div>
+
+  
+      <div class="cert-box" style="margin-top:14px;">
+        <div class="cert-box-label">🎓 Anthropic Academy — Earn 3 Completion Certificates Today <span class="cert-badge">CERT</span></div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px;">Since you're already spending the morning on Anthropic Academy, take 30 extra minutes to complete these three short courses in full. Each gives a shareable completion certificate for LinkedIn. You already know this material — the courses just formalise it.</p>
+        <div class="cert-links">
+          <a class="cert-link" href="https://anthropic.skilljar.com/claude-101" target="_blank">
+            <span class="cert-link-icon">🟠</span>
+            <div class="cert-link-body"><div class="cert-link-name">Claude 101</div><div class="cert-link-desc">Core features, practical use, responsible AI basics. Takes ~45 min. You've been using Claude for 2 weeks already — this is a fast pass.</div><span class="cert-link-tag free">✓ Free · Completion Certificate</span></div>
+          </a>
+          <a class="cert-link" href="https://anthropic.skilljar.com/ai-fluency-for-students" target="_blank">
+            <span class="cert-link-icon">🎓</span>
+            <div class="cert-link-body"><div class="cert-link-name">AI Fluency for Students</div><div class="cert-link-desc">Designed exactly for college students doing work like this — AI collaboration, career planning, academic integrity with AI. ~1 hr. Directly relevant to the retrospective you'll write in Week 10.</div><span class="cert-link-tag free">✓ Free · Completion Certificate</span></div>
+          </a>
+          <a class="cert-link" href="https://anthropic.skilljar.com/introduction-to-claude-cowork" target="_blank">
+            <span class="cert-link-icon">⚙️</span>
+            <div class="cert-link-body"><div class="cert-link-name">Introduction to Claude Cowork</div><div class="cert-link-desc">Official Cowork course — you used it yesterday. ~30 min to complete. Confirm and formalise what you already learned hands-on.</div><span class="cert-link-tag free">✓ Free · Completion Certificate</span></div>
+          </a>
+        </div>
+        <p style="font-size:11px;color:var(--muted);font-style:italic;">Add each certificate to LinkedIn as you complete it. By end of today you'll have 3 official Anthropic credentials alongside the prompt engineering work.</p>
+      </div>
+      <div class="tl" style="margin-top:10px;">
+        <div class="ti xp-task" id="t3cert1"><input type="checkbox" id="c3cert1" onchange="chk('t3cert1','c3cert1')"><label for="c3cert1">Complete <strong>Claude 101</strong> on Anthropic Academy (anthropic.skilljar.com/claude-101) — add the completion certificate to LinkedIn</label></div>
+        <div class="ti xp-task" id="t3cert2"><input type="checkbox" id="c3cert2" onchange="chk('t3cert2','c3cert2')"><label for="c3cert2">Complete <strong>AI Fluency for Students</strong> (anthropic.skilljar.com/ai-fluency-for-students) — note 2 concepts most relevant to the Week 10 retrospective</label></div>
+        <div class="ti xp-task" id="t3cert3"><input type="checkbox" id="c3cert3" onchange="chk('t3cert3','c3cert3')"><label for="c3cert3">Complete <strong>Introduction to Claude Cowork</strong> (anthropic.skilljar.com/introduction-to-claude-cowork) — compare official course content to what you actually built on Day 7</label></div>
+      </div>
+<div class="block open" id="b3b">
+    <div class="block-header" onclick="tog('b3b')"><div class="bico prompt">🧪</div><div class="btg"><div class="bt">Afternoon: First 3 Prompt Experiments</div><div class="bm">Test specific techniques against the billing briefing use case — document every result</div></div><span class="bdur">~1.5 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="exp-box">
+        <h5>🧪 Experiment Format — Use This for All 5 Experiments</h5>
+        <div class="exp-row"><span class="el">Hypothesis</span><span class="ev">What I'm testing and what I predict will happen</span></div>
+        <div class="exp-row"><span class="el">Prompt v1</span><span class="ev">The baseline prompt (no technique applied)</span></div>
+        <div class="exp-row"><span class="el">Prompt v2</span><span class="ev">The same request with the technique applied</span></div>
+        <div class="exp-row"><span class="el">Result</span><span class="ev">How the outputs differed — be specific</span></div>
+        <div class="exp-row"><span class="el">Verdict</span><span class="ev">Did the technique improve the output for this use case?</span></div>
+      </div>
+      <div class="tl">
+        <div class="ti xp-task" id="t3b1"><input type="checkbox" id="c3b1" onchange="chk('t3b1','c3b1')"><label for="c3b1"><strong>Experiment 1 — Vague vs. Specific:</strong> Ask Claude to "summarise the billing data" (vague) then again with a specific role, specific output format, and specific data provided. Document the difference in precision and usefulness.</label></div>
+        <div class="ti xp-task" id="t3b2"><input type="checkbox" id="c3b2" onchange="chk('t3b2','c3b2')"><label for="c3b2"><strong>Experiment 2 — Without vs. With XML Tags:</strong> Ask for a billing summary without structure, then again asking for the response in &lt;summary&gt;, &lt;alerts&gt;, and &lt;recommendations&gt; tags. Document how the structure changes usability.</label></div>
+        <div class="ti xp-task" id="t3b3"><input type="checkbox" id="c3b3" onchange="chk('t3b3','c3b3')"><label for="c3b3"><strong>Experiment 3 — Without vs. With a System Prompt:</strong> Ask the same billing question without any system context, then with a system prompt that establishes Claude's role as a medical billing analyst with specific constraints. Document the shift in tone and accuracy.</label></div>
+      </div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Find an example of Claude hallucinating — confidently stating something incorrect about medical billing. Use a prompt that you think might cause a hallucination (e.g., ask about a very specific CARC code or a payer policy that would require knowledge you haven't provided). Document the hallucination and then the corrected prompt that prevents it.</div>
+        <div class="dq-complete"><input type="checkbox" id="dq3" onchange="chk('dq3','dq3',25)"><label for="dq3">Quest complete — hallucination example + prevention technique documented</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b3c"><div class="block-header" onclick="tog('b3c')"><div class="bico check">✏️</div><div class="btg"><div class="bt">End-of-Day Check-in</div></div><span class="bdur">~30 min</span><span class="chev">▼</span></div>
+    <div class="block-body"><div class="ci-box">
+      <div class="ci-prompt">"What is a context window and why does it matter for the ClaimPulse AI briefing feature you'll build in Week 8? What happens if the billing data you send to Claude is too long for the context window?"</div>
+      <textarea class="ci-ta" id="ci3" placeholder="Context window explanation + the implication for the ClaimPulse AI briefing..."></textarea>
+      <button class="btn btn-navy btn-sm" onclick="sendCI(3)">📤 Send to Tutor</button>
+    </div></div>
+  </div>
+  <div class="ds"><p><strong>Day 8 done?</strong> 3 experiments complete. Tomorrow: 2 more experiments plus writing the Master System Prompt — the production prompt that Week 8 will use.</p><div class="ds-nav"><button class="btn btn-outline btn-sm" onclick="showDay(2)">← Day 7</button><button class="btn btn-amber btn-sm" onclick="showDay(4)">Day 9 →</button></div></div>
+</div>
+
+<!-- ════ DAY 9 ════ -->
+<div class="day-view" id="day4">
+  <div class="day-header">
+    <div class="dnb"><span class="dow">Thu</span><span class="dn">9</span></div>
+    <div class="dht">
+      <div class="dh-heading">Experiments 4 &amp; 5 + Write the Master System Prompt</div>
+      <div class="dh-goal">Goal: Complete the final 2 prompt experiments, then synthesise everything learned into a production-quality Master System Prompt for the ClaimPulse AI Briefing. This is the prompt that Week 8 plugs directly into the Anthropic API.</div>
+      <div class="dh-meta"><span class="mp time">⏱ ~4 hours</span><span class="mp prompt">🧠 Prompt Engineering</span></div>
+    </div>
+  </div>
+  <div class="cs"><div class="cs-links">
+    <a class="cc" href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/chain-of-thought" target="_blank">🟠 Chain-of-Thought Prompting <span class="cb">Free</span></a>
+    <a class="cc" href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/use-xml-tags" target="_blank">🟠 XML Tags Guide <span class="cb">Free</span></a>
+  </div></div>
+
+  <div class="block open" id="b4a">
+    <div class="block-header" onclick="tog('b4a')"><div class="bico prompt">🧪</div><div class="btg"><div class="bt">Morning: Experiments 4 &amp; 5</div><div class="bm">Two advanced techniques — chain-of-thought and few-shot examples</div></div><span class="bdur">~1.5 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="tl">
+        <div class="ti xp-task" id="t4a1"><input type="checkbox" id="c4a1" onchange="chk('t4a1','c4a1')"><label for="c4a1"><strong>Experiment 4 — Chain-of-Thought:</strong> Ask Claude to immediately state whether the denial rate is "good" or "bad" (no CoT), then ask it to "think step by step" about what the denial rate means, what might be causing it, and what action is warranted. Document whether CoT gives a more useful analysis for billing staff.</label></div>
+        <div class="ti xp-task" id="t4a2"><input type="checkbox" id="c4a2" onchange="chk('t4a2','c4a2')"><label for="c4a2"><strong>Experiment 5 — Few-Shot Examples:</strong> Provide Claude with one example of what a good billing briefing looks like (your ideal output), then ask it to generate a briefing for different metrics. Does matching the example's format and tone improve the output? Document the comparison.</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b4b">
+    <div class="block-header" onclick="tog('b4b')"><div class="bico task">📐</div><div class="btg"><div class="bt">Afternoon: Write the Master System Prompt</div><div class="bm">Synthesise all 5 experiments into one production-quality prompt — this goes into the API in Week 8</div></div><span class="bdur">~2 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="exp-box">
+        <h5>📐 Master System Prompt Structure</h5>
+        <div class="exp-row"><span class="el">Role</span><span class="ev">Who Claude is in this context (experienced billing analyst, not a general AI assistant)</span></div>
+        <div class="exp-row"><span class="el">Task</span><span class="ev">What it does (generates a structured daily briefing from real metrics)</span></div>
+        <div class="exp-row"><span class="el">Constraints</span><span class="ev">What it must not do (invent data, give clinical advice, name specific patients)</span></div>
+        <div class="exp-row"><span class="el">Output format</span><span class="ev">Exact XML tags: &lt;summary&gt;, &lt;alerts&gt;, &lt;top_issues&gt;, &lt;recommendations&gt;</span></div>
+        <div class="exp-row"><span class="el">Tone</span><span class="ev">How it should sound (direct, professional, action-oriented — not academic)</span></div>
+        <div class="exp-row"><span class="el">Context</span><span class="ev">What the user message will contain (a structured block of real metrics)</span></div>
+      </div>
+      <div class="tl">
+        <div class="ti xp-task" id="t4b1"><input type="checkbox" id="c4b1" onchange="chk('t4b1','c4b1')"><label for="c4b1">Write the Master System Prompt using all 5 experiment learnings — incorporate XML tags, a clear role, specific constraints, and tone guidance</label></div>
+        <div class="ti xp-task" id="t4b2"><input type="checkbox" id="c4b2" onchange="chk('t4b2','c4b2')"><label for="c4b2">Test the Master System Prompt: manually pass in the 7 KPI values from the real data and confirm the output is structured, action-oriented, and grounded in the numbers you provided</label></div>
+        <div class="ti xp-task" id="t4b3"><input type="checkbox" id="c4b3" onchange="chk('t4b3','c4b3')"><label for="c4b3">Save the Master System Prompt as <code>docs/master_system_prompt.md</code> — this file will be committed to GitHub in Week 3</label></div>
+      </div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Intentionally try to break the Master System Prompt — send it adversarial inputs (fake data, missing data, all zeros, a non-billing question) and document what happens. Then add a constraint to the system prompt that prevents each failure mode. A prompt that handles edge cases gracefully is production-quality. One that breaks on bad input is not.</div>
+        <div class="dq-complete"><input type="checkbox" id="dq4" onchange="chk('dq4','dq4',25)"><label for="dq4">Quest complete — 3 failure modes found and addressed in the prompt</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b4c"><div class="block-header" onclick="tog('b4c')"><div class="bico check">✏️</div><div class="btg"><div class="bt">End-of-Day Check-in</div></div><span class="bdur">~30 min</span><span class="chev">▼</span></div>
+    <div class="block-body"><div class="ci-box">
+      <div class="ci-prompt">"Paste your Master System Prompt here and explain: which specific finding from your 5 experiments most influenced how you wrote it? What would the briefing look like without that learning?"</div>
+      <textarea class="ci-ta" id="ci4" placeholder="Master system prompt + the experiment that shaped it most..."></textarea>
+      <button class="btn btn-navy btn-sm" onclick="sendCI(4)">📤 Send to Tutor</button>
+    </div></div>
+  </div>
+  <div class="ds"><p><strong>Day 9 done?</strong> All 5 experiments complete, Master System Prompt written and tested. Friday closes out Week 2 and prepares for the biggest shift: Week 3 brings Claude Code.</p><div class="ds-nav"><button class="btn btn-outline btn-sm" onclick="showDay(3)">← Day 8</button><button class="btn btn-amber btn-sm" onclick="showDay(5)">Day 10 →</button></div></div>
+</div>
+
+<!-- ════ DAY 10 ════ -->
+<div class="day-view" id="day5">
+  <div class="day-header">
+    <div class="dnb"><span class="dow">Fri</span><span class="dn">10</span></div>
+    <div class="dht">
+      <div class="dh-heading">Week 2 Review — What Tools Do What, and Why Code Is Next</div>
+      <div class="dh-goal">Goal: Consolidate everything from the two pre-code weeks into a clear mental model of the AI tools landscape. Write the "tool comparison" document that explains to the billing manager why a custom Streamlit dashboard is the right next step. Then prepare for Week 3.</div>
+      <div class="dh-meta"><span class="mp time">⏱ ~4 hours</span><span class="mp type">📋 Synthesis + Prep</span></div>
+    </div>
+  </div>
+
+  <div class="block open" id="b5a">
+    <div class="block-header" onclick="tog('b5a')"><div class="bico task">📊</div><div class="btg"><div class="bt">Morning: The AI Tools Landscape — What Each Tool Does and Doesn't Do</div><div class="bm">A clear mental model that explains why weeks 1–2 led inevitably to needing custom code</div></div><span class="bdur">~1.5 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="tl">
+        <div class="ti xp-task" id="t5a1"><input type="checkbox" id="c5a1" onchange="chk('t5a1','c5a1')"><label for="c5a1">Write a one-page "Tool Comparison" document comparing: Claude in Chrome, Claude in Excel, Cowork, and the future Streamlit dashboard. For each: what it does well, what it can't do, and what type of user it's best for.</label></div>
+        <div class="ti xp-task" id="t5a2"><input type="checkbox" id="c5a2" onchange="chk('t5a2','c5a2')"><label for="c5a2">Write the "Why Code?" section: a 3-paragraph explanation for a non-technical billing manager of why the existing AI tools can't fully replace a purpose-built dashboard — and what specifically the dashboard will do that none of the existing tools can.</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b5b">
+    <div class="block-header" onclick="tog('b5b')"><div class="bico learn">🚀</div><div class="btg"><div class="bt">Afternoon: Preview Week 3 — What Claude Code Is and How It Changes Everything</div><div class="bm">Read the Claude Code docs and form a mental model before the first hands-on session Monday</div></div><span class="bdur">~1.5 hrs</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <div class="cs"><div class="cs-links">
+        <a class="cc" href="https://www.anthropic.com/claude-code" target="_blank">💻 Claude Code — Overview <span class="cb">Free</span></a>
+        <a class="cc" href="https://docs.anthropic.com/en/docs/claude-code" target="_blank">💻 Claude Code — Documentation <span class="cb">Free</span></a>
+      </div></div>
+      <div class="exp-box">
+        <h5>💻 The Claude Code Mental Model — Read This Before Monday</h5>
+        <div class="exp-row"><span class="el">What it is</span><span class="ev">A command-line AI coding assistant that works in your terminal alongside your code editor. You describe what you want to build, and Claude Code writes the code, tests it, debugs errors, and explains what it did.</span></div>
+        <div class="exp-row"><span class="el">What changes</span><span class="ev">You stop typing code and start directing. Your job is to: describe requirements clearly, review what Claude Code produces, test it, and decide whether it meets the spec — not to write every line yourself.</span></div>
+        <div class="exp-row"><span class="el">What stays the same</span><span class="ev">You still need to understand the code. If Claude Code produces a function you don't understand, you ask it to explain. You can't approve code you can't evaluate.</span></div>
+        <div class="exp-row"><span class="el">The new skill</span><span class="ev">Writing good requirements. The better you describe what you want — in precise, testable terms — the better Claude Code's output. All of Week 1's KPI definitions and Week 2's prompt experiments directly apply here.</span></div>
+      </div>
+      <div class="tl">
+        <div class="ti xp-task" id="t5b1"><input type="checkbox" id="c5b1" onchange="chk('t5b1','c5b1')"><label for="c5b1">Read the Claude Code overview and documentation — write 3 questions you want answered in the first Week 3 hands-on session</label></div>
+        <div class="ti xp-task" id="t5b2"><input type="checkbox" id="c5b2" onchange="chk('t5b2','c5b2')"><label for="c5b2">Save the Tool Comparison doc and the Master System Prompt together in a <code>docs/</code> folder — these go into the GitHub repo in Week 3</label></div>
+        <div class="ti xp-task" id="t5b3"><input type="checkbox" id="c5b3" onchange="chk('t5b3','c5b3')"><label for="c5b3">Submit the Master System Prompt for final tutor review via the Submit Work panel</label></div>
+      </div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Write a one-paragraph "letter to yourself" to be read at the start of Week 3: describe where you are now (zero code written, domain knowledge solid, AI tools mastered, requirements defined), what you're nervous about (the first coding session), and what you're most curious to see Claude Code do. This gets committed to the repo at the end of Week 3.</div>
+        <div class="dq-complete"><input type="checkbox" id="dq5" onchange="chk('dq5','dq5',25)"><label for="dq5">Quest complete — letter written and saved as docs/letter_to_week3_self.md</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block open" id="b5c"><div class="block-header" onclick="tog('b5c')"><div class="bico check">✏️</div><div class="btg"><div class="bt">Week 2 Deliverable Review</div></div><span class="bdur">Submit →</span><span class="chev">▼</span></div>
+    <div class="block-body">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Submit your Master System Prompt for final review before it goes into production in Week 8. Your tutor evaluates: role clarity, output format precision, hallucination prevention, and whether it's specific enough to the medical billing domain.</p>
+      <button class="btn btn-amber" onclick="switchTab('review')">📋 Submit Master System Prompt →</button>
+    </div>
+  </div>
+
+  <div class="ds"><p>🎉 <strong>Week 2 complete — 🧠 Prompt Craftsman badge unlocked!</strong> Two weeks of domain + tools, zero code. That gap is intentional. Week 3 opens the terminal for the first time.</p><div class="ds-nav"><button class="btn btn-outline btn-sm" onclick="showDay(4)">← Day 9</button></div></div>
+</div>
+
+</main>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="stabs">
+    <button class="stab active" id="stab-tutor" onclick="switchTab('tutor')">💬 Ask Tutor</button>
+    <button class="stab" id="stab-review" onclick="switchTab('review')">📋 Submit Work</button>
+    <button class="stab" id="stab-progress" onclick="switchTab('progress')">📍 Progress</button>
+  </div>
+  <div class="sp active" id="panel-tutor">
+    <div class="sc" style="background:var(--amber-bg);border-bottom:1px solid var(--amber-border);color:var(--amber);font-size:11px;padding:10px 14px;"><strong>Week 2 AI Tutor</strong> — Claude in Excel, Cowork, Prompt Engineering. Ask about any tool or technique.</div>
+    <div class="msgs" id="msgs">
+      <div class="msg sys"><div class="ma">🎓</div><div class="mb">Welcome to Week 2! Still no code this week — and that's completely deliberate. You're building the mental model and the domain fluency that will make your code meaningful when it arrives in Week 3.<br><br>Ask me about Claude in Excel, how to structure a Cowork automation, what makes a prompt experiment valid, how to write a good system prompt, or why you're learning these tools in this order.</div></div>
+    </div>
+    <div class="cia">
+      <div class="qps">
+        <span class="qp" onclick="qp('What is the most important thing to include in a system prompt for a medical billing AI assistant?')">System prompt essentials?</span>
+        <span class="qp" onclick="qp('How is Claude in Excel different from just using the Claude website to analyse data?')">Excel vs claude.ai?</span>
+        <span class="qp" onclick="qp('What kinds of tasks is Cowork best at, and where does it break down?')">Cowork limits?</span>
+        <span class="qp" onclick="qp('Why does chain-of-thought prompting produce better analysis for complex business questions?')">Why chain-of-thought works?</span>
+        <span class="qp" onclick="qp('What should I know about Claude Code before my first hands-on session in Week 3?')">Claude Code preview?</span>
+      </div>
+      <div class="ci-row"><textarea class="ci-inp" id="inp" placeholder="Ask about AI tools or prompt engineering..." rows="1" onkeydown="hk(event)"></textarea><button class="sb-btn" id="sbtn" onclick="sendMsg()">➤</button></div>
+    </div>
+  </div>
+  <div class="sp" id="panel-review">
+    <div class="rev-body">
+      <div class="rev-intro">Submit your Master System Prompt, Tool Comparison doc, Cowork automation spec, or experiment journal entries. Your tutor evaluates quality and readiness for the API integration in Week 8.</div>
+      <div class="rev-sec"><label>What are you submitting?</label>
+        <select id="rev-type" style="padding:8px 10px;border:1px solid var(--border-2);border-radius:7px;background:var(--cream);font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;">
+          <option value="system_prompt">Master System Prompt</option>
+          <option value="experiment">Prompt Experiment Entry</option>
+          <option value="cowork">Cowork Automation Spec</option>
+          <option value="tool_comparison">Tool Comparison Doc</option>
+          <option value="checkin">Daily Check-In</option>
+        </select>
+      </div>
+      <div class="rev-sec"><label>Paste your work</label><textarea class="rev-ta" id="rev-text" placeholder="Paste your system prompt, experiment, or document..."></textarea></div>
+      <button class="btn btn-navy" onclick="submitRev()" style="width:100%;justify-content:center;">📤 Submit for Review</button>
+      <div class="divider"></div><div id="rev-res" class="rev-res"></div>
+    </div>
+  </div>
+  <div class="sp" id="panel-progress">
+    <div class="prg-body">
+      <div class="wgb"><h4>Week 2 Goal</h4><p>Claude in Excel mastered (all 7 KPIs computed), one Cowork automation built and demonstrated to billing staff, 5 prompt experiments completed with notes, Master System Prompt written and tested, Tool Comparison doc written, Week 3 preview read.</p></div>
+      <div class="prg-track"><div class="prg-fill" id="prg-bar" style="width:0%"></div></div>
+      <p style="font-size:11px;color:var(--muted);text-align:right;margin-bottom:14px;" id="prg-label">0% complete</p>
+      <div class="prg-row act" onclick="showDay(1)" id="pr1"><span class="prg-icon">📗</span><div class="prg-text"><div class="prg-name">Day 6 — Claude in Excel</div><div class="prg-status" id="ps1">Not started</div></div><span class="prg-pct" id="pp1">0%</span></div>
+      <div class="prg-row" onclick="showDay(2)" id="pr2"><span class="prg-icon">⚙️</span><div class="prg-text"><div class="prg-name">Day 7 — Cowork Automation</div><div class="prg-status" id="ps2">Not started</div></div><span class="prg-pct" id="pp2">0%</span></div>
+      <div class="prg-row" onclick="showDay(3)" id="pr3"><span class="prg-icon">📚</span><div class="prg-text"><div class="prg-name">Day 8 — LLM Foundations + Experiments 1–3</div><div class="prg-status" id="ps3">Not started</div></div><span class="prg-pct" id="pp3">0%</span></div>
+      <div class="prg-row" onclick="showDay(4)" id="pr4"><span class="prg-icon">🧪</span><div class="prg-text"><div class="prg-name">Day 9 — Experiments 4–5 + Master Prompt</div><div class="prg-status" id="ps4">Not started</div></div><span class="prg-pct" id="pp4">0%</span></div>
+      <div class="prg-row" onclick="showDay(5)" id="pr5"><span class="prg-icon">🚀</span><div class="prg-text"><div class="prg-name">Day 10 — Review + Week 3 Prep</div><div class="prg-status" id="ps5">Not started</div></div><span class="prg-pct" id="pp5">0%</span></div>
+      <div class="divider"></div>
+      <div class="xp-summary">
+        <h5>Week 2 XP Earned</h5>
+        <div class="xp-val" id="xp-total">0</div>
+        <div class="xp-sub-txt">/ 275 available (175 tasks + 100 quests)</div>
+      </div>
+    </div>
+  </div>
+</aside>
+</div>
+
+<script>
+const S=JSON.parse(localStorage.getItem('sw2_tasks')||'{}');
+const SYS=`You are a dedicated tutor for an intern in Week 2 of a 16-week AI internship. This is the "AI Tools Power User" week — still completely pre-code.
+
+Week 2 context:
+- Monday: Claude in Excel — used to compute all 7 billing KPIs from the real claim CSV
+- Tuesday: Cowork — built an automation that handles manual billing prep workflow steps
+- Wednesday-Thursday: Prompt engineering — Anthropic Academy, 5 structured experiments, writing the Master System Prompt
+- Friday: Week synthesis and Week 3 preview (Claude Code)
+
+Prior week: The intern has domain knowledge (billing vocabulary, claim lifecycle, CARC codes), real claim data with denial patterns found, 7 KPIs defined with formulas, and a wireframe with billing staff sign-off.
+
+Key tools this week:
+- Claude in Excel: AI add-in for natural-language data analysis within Excel — good for ad-hoc analysis, limited for automation
+- Cowork: desktop automation using plain English — eliminates manual file management, can't replace custom code logic
+- Prompt engineering: roles, XML tags, chain-of-thought, few-shot examples, hallucination prevention
+
+The Master System Prompt structure: role definition, task description, output format in XML tags (<summary> <alerts> <top_issues> <recommendations>), constraints (no invented data, no clinical advice), tone guidance.
+
+Next week (Week 3): Claude Code — intern transitions from using AI tools to directing AI to write code. Claude Code builds the Python project structure. The intern reviews, tests, and owns the output without necessarily writing every line.
+
+Tutoring style:
+- Connect every tool's capability and limitation back to "what does this mean for the ClaimPulse dashboard?"
+- For prompt experiments, push for specificity — "what exactly was different about the output?" not just "it was better"
+- For the Master System Prompt, evaluate: is the role specific? does it constrain hallucination? is the output format precise?
+- When they ask about Week 3 / Claude Code, be encouraging but calibrate expectations: directing code is a real skill that takes practice
+- Use Strengths → Improvements → Next Step for formal submissions`;
+
+const DAY_TASKS={
+  1:['c1a1','c1a2','c1a3','c1a4','c1b1','c1b2','c1b3','dq1'],
+  2:['c2a1','c2a2','c2a3','c2b1','c2b2','c2b3','dq2'],
+  3:['c3a1','c3a2','c3a3','c3cert1','c3cert2','c3cert3','c3b1','c3b2','c3b3','dq3'],
+  4:['c4a1','c4a2','c4b1','c4b2','c4b3','dq4'],
+  5:['c5a1','c5a2','c5b1','c5b2','c5b3','dq5']
+};
+const chatHistory=[];let toastTimer;
+
+function showXP(a){
+  const t=document.getElementById('xp-toast');t.textContent='+'+a+' XP ⚡';t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2000);
+}
+function chk(rowId,cbId,xpOverride){
+  const row=document.getElementById(rowId);const cb=document.getElementById(cbId);if(!cb)return;
+  cb.checked?row.classList.add('chk'):row.classList.remove('chk');
+  S[cbId]=cb.checked;localStorage.setItem('sw2_tasks',JSON.stringify(S));
+  if(cb.checked)showXP(xpOverride||10);updateProgress();
+}
+function restore(){
+  Object.entries(S).forEach(([id,v])=>{
+    const cb=document.getElementById(id);if(!cb)return;cb.checked=v;
+    const row=cb.closest('.ti,.dq-complete');if(row&&v)row.classList.add('chk');
+  });updateProgress();
+}
+function updateProgress(){
+  let total=0,done=0;
+  [1,2,3,4,5].forEach(d=>{
+    const tasks=DAY_TASKS[d];const dayDone=tasks.filter(id=>S[id]).length;
+    total+=tasks.length;done+=dayDone;
+    const pct=Math.round((dayDone/tasks.length)*100);
+    const pp=document.getElementById('pp'+d);const ps=document.getElementById('ps'+d);const pip=document.getElementById('pip'+d);
+    if(pp)pp.textContent=pct+'%';
+    if(ps){
+      if(dayDone===0){ps.textContent='Not started';ps.style.color='var(--muted)';if(pip)pip.classList.remove('done');}
+      else if(dayDone===tasks.length){ps.textContent='✓ Complete';ps.style.color='var(--teal)';if(pip)pip.classList.add('done');}
+      else{ps.textContent=dayDone+'/'+tasks.length+' done';ps.style.color='var(--amber)';if(pip)pip.classList.remove('done');}
+    }
+  });
+  const pct=Math.round((done/total)*100);
+  const bar=document.getElementById('prg-bar');const lbl=document.getElementById('prg-label');const xpt=document.getElementById('xp-total');
+  if(bar)bar.style.width=pct+'%';if(lbl)lbl.textContent=pct+'% complete — '+done+'/'+total+' tasks';if(xpt)xpt.textContent=(done*10).toLocaleString();
+}
+function showDay(d){
+  document.querySelectorAll('.day-view').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.day-pip').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.prg-row').forEach(e=>e.classList.remove('act'));
+  document.getElementById('day'+d).classList.add('active');
+  document.getElementById('pip'+d).classList.add('active');
+  const pr=document.getElementById('pr'+d);if(pr)pr.classList.add('act');
+}
+function tog(id){document.getElementById(id).classList.toggle('open');}
+function switchTab(t){
+  ['tutor','review','progress'].forEach(tab=>{
+    const s=document.getElementById('stab-'+tab);const p=document.getElementById('panel-'+tab);
+    if(s)t===tab?s.classList.add('active'):s.classList.remove('active');
+    if(p)t===tab?p.classList.add('active'):p.classList.remove('active');
+  });
+}
+function qp(text){document.getElementById('inp').value=text;sendMsg();}
+function hk(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function addMsg(role,text){
+  const c=document.getElementById('msgs');const div=document.createElement('div');div.className='msg '+(role==='assistant'?'sys':'usr');
+  const av=document.createElement('div');av.className='ma';av.textContent=role==='assistant'?'🎓':'👤';
+  const bub=document.createElement('div');bub.className='mb';bub.textContent=text;
+  div.appendChild(av);div.appendChild(bub);c.appendChild(div);c.scrollTop=c.scrollHeight;
+}
+function addLoad(){
+  const c=document.getElementById('msgs');const div=document.createElement('div');div.className='msg load';div.id='loading';
+  const av=document.createElement('div');av.className='ma';av.textContent='🎓';
+  const bub=document.createElement('div');bub.className='mb';bub.innerHTML='<div class="td"><span></span><span></span><span></span></div>';
+  div.appendChild(av);div.appendChild(bub);c.appendChild(div);c.scrollTop=c.scrollHeight;
+}
+function remLoad(){const el=document.getElementById('loading');if(el)el.remove();}
+async function sendMsg(){
+  const inp=document.getElementById('inp');const btn=document.getElementById('sbtn');
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';btn.disabled=true;addMsg('user',text);chatHistory.push({role:'user',content:text});addLoad();switchTab('tutor');
+  try{
+    const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBfCsCBO7ReNPS2Ktmt5me3kg-Vn25Fvs0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:SYS}]},contents:chatHistory.map(m=>({role:m.role==='assistant'?'model':m.role,parts:[{text:m.content}]}))})});
+    const data=await res.json();const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'Try again.';
+    remLoad();addMsg('assistant',reply);chatHistory.push({role:'assistant',content:reply});
+  }catch(e){remLoad();addMsg('assistant','Connection issue.');}
+  btn.disabled=false;
+}
+async function sendCI(day){
+  const ta=document.getElementById('ci'+day);const text=ta.value.trim();if(!text){alert('Write your reflection first.');return;}
+  switchTab('tutor');const msg=`[Day ${day+5} Check-In — Summer Week 2]\n\n${text}`;
+  chatHistory.push({role:'user',content:msg});addMsg('user',msg);addLoad();
+  try{
+    const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBfCsCBO7ReNPS2Ktmt5me3kg-Vn25Fvs0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:SYS}]},contents:chatHistory.map(m=>({role:m.role==='assistant'?'model':m.role,parts:[{text:m.content}]}))})});
+    const data=await res.json();const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'Error.';
+    remLoad();addMsg('assistant',reply);chatHistory.push({role:'assistant',content:reply});
+  }catch(e){remLoad();addMsg('assistant','Error.');}
+}
+async function submitRev(){
+  const text=document.getElementById('rev-text').value.trim();const type=document.getElementById('rev-type').value;
+  if(!text){alert('Paste your work first.');return;}
+  const res_el=document.getElementById('rev-res');res_el.className='rev-res vis';res_el.textContent='⏳ Reviewing...';
+  try{
+    const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBfCsCBO7ReNPS2Ktmt5me3kg-Vn25Fvs0',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:SYS}]},contents:[{role:'user',parts:[{text:`Review this ${type} submission.\n\nFeedback format:\n**Strengths**\n**Improvements** (2-3 specific)\n**Next Step**\n\n${text}`}]}]})});
+    const data=await res.json();res_el.textContent=data.candidates?.[0]?.content?.parts?.[0]?.text||'Failed.';
+  }catch(e){res_el.textContent='Error.';}
+}
+restore();
+</script>
+</body>
+</html>

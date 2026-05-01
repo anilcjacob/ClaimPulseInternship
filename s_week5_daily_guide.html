@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClaimPulse — Week 5 · Days 21–25</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{--cream:#f7f3ee;--paper:#faf8f5;--warm-white:#fffefb;--ink:#1a1812;--ink-2:#2e2a22;--muted:#7a7060;--muted-2:#b0a898;--border:#e2ddd6;--border-2:#cdc7bc;--navy:#1b2a4a;--navy-light:rgba(27,42,74,0.08);--navy-border:rgba(27,42,74,0.2);--amber:#d97706;--amber-bg:rgba(217,119,6,0.07);--amber-border:rgba(217,119,6,0.22);--teal:#0d7c6e;--teal-bg:rgba(13,124,110,0.07);--teal-border:rgba(13,124,110,0.2);--rose:#b5413a;--rose-bg:rgba(181,65,58,0.06);--rose-border:rgba(181,65,58,0.2);--xp:#f59e0b;--xp-bg:rgba(245,158,11,0.08);--xp-border:rgba(245,158,11,0.25);--shadow-sm:0 1px 4px rgba(26,24,18,0.06),0 0 0 1px rgba(26,24,18,0.04);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.65;min-height:100vh;}
+.prog-nav{background:var(--paper);border-bottom:1px solid var(--border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:40px;position:sticky;top:0;z-index:200;}
+.pn-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--muted);text-decoration:none;padding:3px 8px;border-radius:5px;transition:all 0.15s;}
+.pn-link:hover{color:var(--navy);background:var(--navy-light);}
+.pn-home{font-weight:600;color:var(--navy);}
+.pn-right{display:flex;gap:4px;}
+.pn-center{font-size:11px;color:var(--muted-2);font-family:'IBM Plex Mono',monospace;}
+.xp-toast{position:fixed;top:60px;right:24px;background:var(--navy);color:white;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;z-index:300;transform:translateY(-80px);opacity:0;transition:all 0.35s;}
+.xp-toast.show{transform:translateY(0);opacity:1;}
+.header{background:var(--navy);color:white;padding:0 40px;display:flex;align-items:stretch;border-bottom:3px solid var(--amber);}
+.hl{padding:22px 32px 22px 0;border-right:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;justify-content:center;min-width:200px;}
+.hl .eyebrow{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:5px;}
+.hl h1{font-family:'Lora',serif;font-size:22px;font-weight:700;color:white;}
+.hl h1 span{color:#fbbf24;}
+.hc{flex:1;padding:22px 32px;display:flex;flex-direction:column;justify-content:center;}
+.wt{font-family:'Lora',serif;font-size:18px;font-weight:600;color:white;margin-bottom:4px;}
+.ws{font-size:12px;color:rgba(255,255,255,0.5);}
+.hr{padding:22px 0 22px 32px;border-left:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:20px;}
+.hstat{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.hstat-val{font-family:'Lora',serif;font-size:20px;font-weight:700;color:white;}
+.hstat-label{font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;}
+.hstat-div{width:1px;height:32px;background:rgba(255,255,255,0.1);}
+.xp-banner{background:var(--xp-bg);border-bottom:1px solid var(--xp-border);padding:8px 40px;display:flex;align-items:center;gap:16px;}
+.xb-label{font-size:11px;font-weight:600;color:var(--xp);}
+.xb-tasks{font-size:11px;color:var(--muted);}
+.xb-badge{font-size:12px;padding:2px 8px;border-radius:4px;background:white;border:1px solid var(--xp-border);font-weight:600;color:var(--xp);margin-left:auto;}
+.progress-bar{background:var(--navy);padding:0 40px 14px;display:flex;}
+.day-pip{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:8px 6px 0;border-top:2px solid transparent;transition:all 0.2s;}
+.day-pip.active{border-top-color:var(--amber);}
+.day-pip.done{border-top-color:#34d399;}
+.pip-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.2);}
+.day-pip.active .pip-dot{background:var(--amber);}
+.day-pip.done .pip-dot{background:#34d399;}
+.pip-label{font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.07em;font-weight:500;}
+.day-pip.active .pip-label{color:rgba(255,255,255,0.8);}
+.layout{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 185px);}
+.main{padding:32px 36px;border-right:1px solid var(--border);}
+.day-view{display:none;}
+.day-view.active{display:block;}
+.day-header{display:flex;align-items:flex-start;gap:18px;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+.dnb{flex-shrink:0;width:52px;height:52px;background:var(--amber);color:white;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.dow{font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.6);font-weight:600;}
+.dn{font-family:'Lora',serif;font-size:20px;font-weight:700;line-height:1;}
+.dht{flex:1;}
+.dh-heading{font-family:'Lora',serif;font-size:20px;font-weight:700;color:var(--ink);margin-bottom:5px;line-height:1.25;}
+.dh-goal{font-size:13px;color:var(--muted);margin-bottom:8px;font-style:italic;}
+.dh-meta{display:flex;gap:12px;flex-wrap:wrap;}
+.mp{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;border:1px solid;}
+.mp.time{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber);}
+.mp.code{background:rgba(30,30,46,0.08);border-color:rgba(30,30,46,0.2);color:var(--ink-2);}
+.mp.review{background:var(--teal-bg);border-color:var(--teal-border);color:var(--teal);}
+.block{background:var(--warm-white);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden;box-shadow:var(--shadow-sm);}
+.block-header{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;user-select:none;transition:background 0.15s;}
+.block-header:hover{background:var(--paper);}
+.bico{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.bico.task{background:var(--amber-bg);}
+.bico.check{background:var(--rose-bg);}
+.btg{flex:1;}
+.bt{font-weight:600;font-size:13px;color:var(--ink);}
+.chev{color:var(--muted-2);font-size:10px;transition:transform 0.2s;margin-left:4px;}
+.block.open .chev{transform:rotate(180deg);}
+.block-body{display:none;padding:4px 16px 16px;border-top:1px solid var(--border);}
+.block.open .block-body{display:block;}
+.daily-quest{background:linear-gradient(135deg,var(--xp-bg),rgba(245,158,11,0.04));border:1px solid var(--xp-border);border-radius:10px;padding:14px 16px;margin:10px 0 12px;}
+.dq-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.dq-badge{background:var(--xp);color:white;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:2px 8px;border-radius:4px;}
+.dq-xp{font-size:11px;font-weight:600;color:var(--xp);}
+.dq-text{font-size:13px;color:var(--ink-2);line-height:1.6;}
+.dq-complete{margin-top:10px;display:flex;align-items:center;gap:8px;}
+.dq-complete input{width:15px;height:15px;accent-color:var(--xp);cursor:pointer;}
+.dq-complete label{font-size:12px;color:var(--muted);cursor:pointer;}
+.tl{display:flex;flex-direction:column;gap:8px;}
+.ti{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--cream);border:1px solid var(--border);border-radius:7px;transition:all 0.2s;}
+.ti input[type="checkbox"]{margin-top:2px;width:15px;height:15px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;}
+.ti label{font-size:13px;color:var(--ink-2);cursor:pointer;line-height:1.5;}
+.ti.chk{background:var(--paper);}
+.ti.chk label{text-decoration:line-through;color:var(--muted-2);}
+.ti.xp-task{border-left:3px solid var(--xp);}
+.ci-box{padding-top:10px;}
+.ci-prompt{font-size:13px;color:var(--ink-2);font-family:'Lora',serif;font-style:italic;margin-bottom:10px;line-height:1.6;padding:10px 14px;background:var(--rose-bg);border-left:3px solid var(--rose);border-radius:0 6px 6px 0;}
+.ci-ta{width:100%;min-height:90px;padding:10px 12px;background:var(--cream);border:1px solid var(--border-2);border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink);resize:vertical;outline:none;margin-bottom:8px;}
+.ci-ta::placeholder{color:var(--muted-2);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;border:none;}
+.btn-navy{background:var(--navy);color:white;}.btn-navy:hover{background:#243a62;}
+.btn-outline{background:transparent;color:var(--navy);border:1px solid var(--navy-border);}.btn-outline:hover{background:var(--navy-light);}
+.btn-amber{background:var(--amber);color:white;}.btn-amber:hover{background:#b45309;}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.ds{margin-top:20px;padding:14px 16px;background:var(--navy);border-radius:10px;display:flex;align-items:center;gap:16px;}
+.ds p{font-size:12px;color:rgba(255,255,255,0.65);flex:1;line-height:1.5;}
+.ds p strong{color:white;}
+.ds-nav{display:flex;gap:8px;}
+.sidebar{background:var(--warm-white);display:flex;flex-direction:column;height:calc(100vh - 185px);position:sticky;top:0;}
+.stabs{display:flex;border-bottom:1px solid var(--border);}
+.stab{flex:1;padding:12px 8px;border:none;background:none;font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;}
+.stab.active{color:var(--navy);border-bottom-color:var(--amber);}
+.sp{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.sp.active{display:flex;}
+.sc{padding:10px 14px;border-bottom:1px solid var(--border);font-size:11px;background:var(--amber-bg);color:var(--amber);}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;}
+.msg{display:flex;gap:9px;align-items:flex-start;}
+.ma{width:26px;height:26px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;margin-top:1px;}
+.msg.sys .ma{background:var(--navy);}
+.msg.usr .ma{background:var(--amber-bg);border:1px solid var(--amber-border);}
+.mb{flex:1;padding:9px 11px;border-radius:8px;font-size:12.5px;line-height:1.6;}
+.msg.sys .mb{background:var(--paper);border:1px solid var(--border);color:var(--ink-2);}
+.msg.usr .mb{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--ink-2);}
+.msg.load .mb{background:var(--paper);border:1px solid var(--border);color:var(--muted);font-style:italic;}
+.td{display:inline-flex;gap:3px;align-items:center;}
+.td span{width:5px;height:5px;background:var(--muted-2);border-radius:50%;animation:boun 1.2s infinite;}
+.td span:nth-child(2){animation-delay:0.2s;}
+.td span:nth-child(3){animation-delay:0.4s;}
+@keyframes boun{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.cia{padding:12px 14px;border-top:1px solid var(--border);background:var(--warm-white);}
+.qps{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.qp{font-size:11px;padding:3px 9px;border-radius:12px;background:var(--cream);border:1px solid var(--border-2);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.qp:hover{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber);}
+.ci-row{display:flex;gap:7px;align-items:flex-end;}
+.ci-inp{flex:1;padding:8px 11px;background:var(--cream);border:1px solid var(--border-2);border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;color:var(--ink);resize:none;outline:none;min-height:38px;max-height:120px;}
+.ci-inp::placeholder{color:var(--muted-2);}
+.sb-btn{width:36px;height:36px;border-radius:7px;background:var(--amber);border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.sb-btn:hover{background:#b45309;}
+.sb-btn:disabled{background:var(--border-2);cursor:not-allowed;}
+.rev-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;}
+.rev-ta{width:100%;padding:10px 12px;background:var(--cream);border:1px solid var(--border-2);border-radius:7px;font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;color:var(--ink);resize:vertical;outline:none;min-height:100px;}
+.rev-ta::placeholder{color:var(--muted-2);}
+.rev-res{display:none;padding:12px;background:var(--paper);border:1px solid var(--border);border-radius:7px;font-size:12.5px;color:var(--ink-2);line-height:1.7;white-space:pre-wrap;}
+.rev-res.vis{display:block;}
+.prg-body{flex:1;overflow-y:auto;padding:14px;}
+.prg-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:7px;margin-bottom:6px;border:1px solid var(--border);background:var(--cream);cursor:pointer;transition:all 0.15s;}
+.prg-row.act{background:var(--amber-bg);border-color:var(--amber-border);}
+.prg-icon{font-size:16px;}
+.prg-text{flex:1;}
+.prg-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:1px;}
+.prg-status{font-size:11px;color:var(--muted);}
+.prg-pct{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-2);}
+.prg-track{height:3px;background:var(--border);border-radius:2px;margin:14px 0 8px;overflow:hidden;}
+.prg-fill{height:100%;background:linear-gradient(90deg,var(--amber),#fbbf24);border-radius:2px;transition:width 0.5s ease;}
+.wgb{padding:12px 14px;background:var(--amber-bg);border:1px solid var(--amber-border);border-radius:8px;margin-bottom:14px;}
+.wgb h4{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--amber);margin-bottom:5px;}
+.wgb p{font-size:12px;color:var(--ink-2);line-height:1.6;}
+.xp-s{padding:10px 12px;background:var(--xp-bg);border:1px solid var(--xp-border);border-radius:7px;margin-top:12px;}
+.xp-s h5{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--xp);margin-bottom:6px;}
+.xp-v{font-family:'Lora',serif;font-size:22px;font-weight:700;color:var(--xp);}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+</style>
+</head>
+<body>
+<div class="xp-toast" id="xp-toast">+10 XP ⚡</div>
+<div class="prog-nav">
+  <a class="pn-link pn-home" href="index.html">🏠 Program Home</a>
+  <span class="pn-center">Summer Week 5 · Days 21–25 · Visualization</span>
+  <div class="pn-right">
+    <a class="pn-link" href="s_week4_daily_guide.html">← Week 4</a>
+    <a class="pn-link" href="s_week6_daily_guide.html">Week 6 →</a>
+  </div>
+</div>
+<div class="header">
+  <div class="hl"><div class="eyebrow">ClaimPulse AI · Summer Arc</div><h1>Claim<span>Pulse</span></h1></div>
+  <div class="hc"><div class="wt">Week 5 — Visualization: Claude Code Builds the Charts</div><div class="ws">Direct Claude Code to build 6 Plotly chart functions — evaluate and refine AI-generated visuals</div></div>
+  <div class="hr">
+    <div class="hstat"><span class="hstat-val">5</span><span class="hstat-label">Days</span></div>
+    <div class="hstat-div"></div>
+    <div class="hstat"><span class="hstat-val">250</span><span class="hstat-label">XP Available</span></div>
+    <div class="hstat-div"></div>
+    <div class="hstat"><span class="hstat-val">Week 5</span><span class="hstat-label">Summer</span></div>
+  </div>
+</div>
+<div class="xp-banner">
+  <span class="xb-label">⚡ Week 5 · Days 21–25 XP: 250</span>
+  <span class="xb-tasks">Every checked task earns 10 XP · Daily quests earn bonus 25 XP</span>
+  <span class="xb-badge">📊 Chart Whisperer — unlockable this week</span>
+</div>
+<div class="progress-bar"><div class="day-pip active" onclick="showDay(1)" id="pip1"><div class="pip-dot"></div><div class="pip-label">Mon</div></div>
+<div class="day-pip" onclick="showDay(2)" id="pip2"><div class="pip-dot"></div><div class="pip-label">Tue</div></div>
+<div class="day-pip" onclick="showDay(3)" id="pip3"><div class="pip-dot"></div><div class="pip-label">Wed</div></div>
+<div class="day-pip" onclick="showDay(4)" id="pip4"><div class="pip-dot"></div><div class="pip-label">Thu</div></div>
+<div class="day-pip" onclick="showDay(5)" id="pip5"><div class="pip-dot"></div><div class="pip-label">Fri</div></div>
+</div>
+<div class="layout">
+<main class="main">
+<div class="day-view active" id="day1">
+  <div class="day-header">
+    <div class="dnb"><span class="dow">Mon</span><span class="dn">21</span></div>
+    <div class="dht">
+      <div class="dh-heading">Chart Theory + Brief Claude Code + Denial Rate Trend (Chart 1)</div>
+      <div class="dh-goal">Before building charts, understand why each chart type exists. Read the Plotly Express docs. Then give Claude Code the Week 5 brief and build Chart 1 — the denial rate trend line — with a focus on design even at this early stage.</div>
+      <div class="dh-meta"><span class="mp time">⏱ ~4 hours</span><span class="mp code">📊 Plotly</span><span class="mp code">💻 Claude Code</span></div>
+    </div>
+  </div>
+  <div class="block open" id="b1a">
+    <div class="block-header" onclick="tog('b1a')"><div class="bico task">⚡</div><div class="btg"><div class="bt">Day 21 Tasks</div></div><span class="chev">▼</span></div>
+    <div class="block-body"><div class="tl"><div class="ti xp-task" id="t1_1"><input type="checkbox" id="c1_1" onchange="chk('t1_1','c1_1')"><label for="c1_1">Read Plotly Express quickstart — ask Claude Code to explain when to use line vs bar vs scatter charts in the context of billing data</label></div>
+<div class="ti xp-task" id="t1_2"><input type="checkbox" id="c1_2" onchange="chk('t1_2','c1_2')"><label for="c1_2">Give Claude Code the Week 5 brief — ask it to confirm it understands the chart specifications before writing any code</label></div>
+<div class="ti xp-task" id="t1_3"><input type="checkbox" id="c1_3" onchange="chk('t1_3','c1_3')"><label for="c1_3">Direct: 'Build chart_denial_trend(df) in src/charts.py — a line chart of denial rate by month. The x-axis is month, y-axis is % denial rate. Include a horizontal benchmark line at 10%.' Review every line.</label></div>
+<div class="ti xp-task" id="t1_4"><input type="checkbox" id="c1_4" onchange="chk('t1_4','c1_4')"><label for="c1_4">Run the chart in a Jupyter notebook or standalone script — does it show the pattern you found manually in Week 1? Screenshot it.</label></div>
+<div class="ti xp-task" id="t1_5"><input type="checkbox" id="c1_5" onchange="chk('t1_5','c1_5')"><label for="c1_5">Commit Chart 1</label></div>
+</div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Ask Claude Code: 'What makes a line chart misleading? Show me an example with this data.' Ask it to demonstrate one misleading version (e.g., truncated y-axis) then the correct version. Visual literacy is part of building honest dashboards.</div>
+        <div class="dq-complete"><input type="checkbox" id="dq1" onchange="chk('dq1','dq1',25)"><label for="dq1">Quest complete</label></div>
+      </div>
+    </div>
+  </div>
+  <div class="block open" id="b1c"><div class="block-header" onclick="tog('b1c')"><div class="bico check">✏️</div><div class="btg"><div class="bt">End-of-Day Check-in</div></div><span class="chev">▼</span></div>
+    <div class="block-body"><div class="ci-box">
+      <div class="ci-prompt">"Describe Chart 1 to someone who can't see it — what does the trend show, what does the benchmark line communicate, and what action should a billing manager take when the line crosses above the benchmark?"</div>
+      <textarea class="ci-ta" id="ci1" placeholder="Your reflection..."></textarea>
+      <button class="btn btn-navy btn-sm" onclick="sendCI(1)">📤 Send to Tutor</button>
+    </div></div>
+  </div>
+  <div class="ds"><p>Day 21 done? Keep the momentum going.</p><div class="ds-nav"><button class="btn btn-amber btn-sm" onclick="showDay(2)">Day 22 →</button></div></div>
+</div>
+<div class="day-view" id="day2">
+  <div class="day-header">
+    <div class="dnb"><span class="dow">Tue</span><span class="dn">22</span></div>
+    <div class="dht">
+      <div class="dh-heading">Charts 2 and 3 — Denial Rate by Payer + Denial Reasons Donut</div>
+      <div class="dh-goal">Build the two comparative charts. Chart 2 reveals which payer is the problem. Chart 3 reveals why claims are being denied. Both are action-driving charts — their job is to point to a specific intervention.</div>
+      <div class="dh-meta"><span class="mp time">⏱ ~4 hours</span><span class="mp code">📊 Plotly</span></div>
+    </div>
+  </div>
+  <div class="block open" id="b2a">
+    <div class="block-header" onclick="tog('b2a')"><div class="bico task">⚡</div><div class="btg"><div class="bt">Day 22 Tasks</div></div><span class="chev">▼</span></div>
+    <div class="block-body"><div class="tl"><div class="ti xp-task" id="t2_1"><input type="checkbox" id="c2_1" onchange="chk('t2_1','c2_1')"><label for="c2_1">Direct: 'Build chart_denial_by_payer(df) — a horizontal bar chart sorted by denial rate descending. Color bars red when above 15%, amber when 10-15%, green when below 10%.' Review and run.</label></div>
+<div class="ti xp-task" id="t2_2"><input type="checkbox" id="c2_2" onchange="chk('t2_2','c2_2')"><label for="c2_2">Direct: 'Build chart_denial_reasons(df) — a donut chart of denial reasons by count. Show the top 6 reasons, group the rest as Other. Label each segment with count and percentage.' Review and run.</label></div>
+<div class="ti xp-task" id="t2_3"><input type="checkbox" id="c2_3" onchange="chk('t2_3','c2_3')"><label for="c2_3">Ask Claude Code: 'What is the apply_theme() pattern — a function that applies consistent colors, fonts, and spacing to every Plotly figure?' Implement it and apply it to Charts 1, 2, and 3.</label></div>
+<div class="ti xp-task" id="t2_4"><input type="checkbox" id="c2_4" onchange="chk('t2_4','c2_4')"><label for="c2_4">Commit Charts 2 and 3 with apply_theme() applied</label></div>
+</div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Create a charts_gallery.ipynb notebook that renders all charts built so far using the real data. Show it to the billing manager — which chart do they find most useful, and which confuses them? Document their reaction. User feedback this early is the most valuable kind.</div>
+        <div class="dq-complete"><input type="checkbox" id="dq2" onchange="chk('dq2','dq2',25)"><label for="dq2">Quest complete</label></div>
+      </div>
+    </div>
+  </div>
+  <div class="block open" id="b2c"><div class="block-header" onclick="tog('b2c')"><div class="bico check">✏️</div><div class="btg"><div class="bt">End-of-Day Check-in</div></div><span class="chev">▼</span></div>
+    <div class="block-body"><div class="ci-box">
+      <div class="ci-prompt">"The color coding on Chart 2 (red/amber/green) is a design decision. What information does it add that the raw bar heights don't convey? When is color-as-information appropriate, and when does it become noise?"</div>
+      <textarea class="ci-ta" id="ci2" placeholder="Your reflection..."></textarea>
+      <button class="btn btn-navy btn-sm" onclick="sendCI(2)">📤 Send to Tutor</button>
+    </div></div>
+  </div>
+  <div class="ds"><p>Day 22 done? Keep the momentum going.</p><div class="ds-nav"><button class="btn btn-outline btn-sm" onclick="showDay(1)">← Day 21</button><button class="btn btn-amber btn-sm" onclick="showDay(3)">Day 23 →</button></div></div>
+</div>
+<div class="day-view" id="day3">
+  <div class="day-header">
+    <div class="dnb"><span class="dow">Wed</span><span class="dn">23</span></div>
+    <div class="dht">
+      <div class="dh-heading">Charts 4 and 5 — A/R Aging + Top Denied CPT Codes</div>
+      <div class="dh-goal">Build the operational charts — the ones billing staff will use to decide what to work on today. Chart 4 shows where money is stuck in time. Chart 5 shows which procedure codes are being systematically denied.</div>
+      <div class="dh-meta"><span class="mp time">⏱ ~4 hours</span><span class="mp code">📊 Plotly</span><span class="mp code">💻 Claude Code</span></div>
+    </div>
+  </div>
+  <div class="block open" id="b3a">
+    <div class="block-header" onclick="tog('b3a')"><div class="bico task">⚡</div><div class="btg"><div class="bt">Day 23 Tasks</div></div><span class="chev">▼</span></div>
+    <div class="block-body"><div class="tl"><div class="ti xp-task" id="t3_1"><input type="checkbox" id="c3_1" onchange="chk('t3_1','c3_1')"><label for="c3_1">Direct: 'Build chart_ar_aging(df) — a stacked bar chart showing dollar value of open claims in four buckets: 0-30, 31-60, 61-90, 90+ days. Color each bucket: green, yellow, orange, red.' Review and verify bucket calculations.</label></div>
+<div class="ti xp-task" id="t3_2"><input type="checkbox" id="c3_2" onchange="chk('t3_2','c3_2')"><label for="c3_2">Direct: 'Build chart_top_denied_cpts(df, limit=10) — a horizontal bar chart of the top N CPT codes by denial count. Include the CPT description as a subtitle for each bar.' Review and run.</label></div>
+<div class="ti xp-task" id="t3_3"><input type="checkbox" id="c3_3" onchange="chk('t3_3','c3_3')"><label for="c3_3">Ask Claude Code: 'Why is the y-axis label for chart_ar_aging important — what units should it show?' This is an easy mistake to miss that makes charts unreadable.</label></div>
+<div class="ti xp-task" id="t3_4"><input type="checkbox" id="c3_4" onchange="chk('t3_4','c3_4')"><label for="c3_4">Commit Charts 4 and 5</label></div>
+</div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Ask Claude Code: 'What is the difference between a bar chart and a histogram, and why does chart_ar_aging use a bar chart instead of a histogram even though it shows distribution?' Understanding chart type decisions builds judgment for future dashboards.</div>
+        <div class="dq-complete"><input type="checkbox" id="dq3" onchange="chk('dq3','dq3',25)"><label for="dq3">Quest complete</label></div>
+      </div>
+    </div>
+  </div>
+  <div class="block open" id="b3c"><div class="block-header" onclick="tog('b3c')"><div class="bico check">✏️</div><div class="btg"><div class="bt">End-of-Day Check-in</div></div><span class="chev">▼</span></div>
+    <div class="block-body"><div class="ci-box">
+      <div class="ci-prompt">"Chart 4 (A/R aging) and Chart 5 (top denied CPTs) are both operational — they answer 'what should I do today?' How are they different from Chart 1 (denial trend) which is more strategic? When would a billing manager use each?"</div>
+      <textarea class="ci-ta" id="ci3" placeholder="Your reflection..."></textarea>
+      <button class="btn btn-navy btn-sm" onclick="sendCI(3)">📤 Send to Tutor</button>
+    </div></div>
+  </div>
+  <div class="ds"><p>Day 23 done? Keep the momentum going.</p><div class="ds-nav"><button class="btn btn-outline btn-sm" onclick="showDay(2)">← Day 22</button><button class="btn btn-amber btn-sm" onclick="showDay(4)">Day 24 →</button></div></div>
+</div>
+<div class="day-view" id="day4">
+  <div class="day-header">
+    <div class="dnb"><span class="dow">Thu</span><span class="dn">24</span></div>
+    <div class="dht">
+      <div class="dh-heading">Chart 6 (Bonus) + Design Consistency Review</div>
+      <div class="dh-goal">Build a 6th chart of your choosing based on the billing manager's feedback from the gallery session. Then do a full visual consistency review — all 6 charts should look like they come from the same product.</div>
+      <div class="dh-meta"><span class="mp time">⏱ ~4 hours</span><span class="mp review">🎨 Design</span><span class="mp code">📊 Plotly</span></div>
+    </div>
+  </div>
+  <div class="block open" id="b4a">
+    <div class="block-header" onclick="tog('b4a')"><div class="bico task">⚡</div><div class="btg"><div class="bt">Day 24 Tasks</div></div><span class="chev">▼</span></div>
+    <div class="block-body"><div class="tl"><div class="ti xp-task" id="t4_1"><input type="checkbox" id="c4_1" onchange="chk('t4_1','c4_1')"><label for="c4_1">Choose Chart 6 based on billing manager feedback from Tuesday's gallery — give Claude Code a precise brief and build it</label></div>
+<div class="ti xp-task" id="t4_2"><input type="checkbox" id="c4_2" onchange="chk('t4_2','c4_2')"><label for="c4_2">Visual consistency review: open all 6 charts side by side. Check: same font family, same color palette, same background, same spacing. Fix any inconsistencies.</label></div>
+<div class="ti xp-task" id="t4_3"><input type="checkbox" id="c4_3" onchange="chk('t4_3','c4_3')"><label for="c4_3">Ask Claude Code to add a title, subtitle, and source annotation to every chart — these details distinguish professional charts from student work</label></div>
+<div class="ti xp-task" id="t4_4"><input type="checkbox" id="c4_4" onchange="chk('t4_4','c4_4')"><label for="c4_4">Commit all 6 charts with consistent apply_theme() applied to all</label></div>
+</div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Ask Claude Code: 'What is the highest-resolution version of each chart I could export for a presentation or PDF report?' Ask it to add an export function to charts.py that saves any chart as a PNG at 300 DPI. This becomes useful for the Week 12 final presentation.</div>
+        <div class="dq-complete"><input type="checkbox" id="dq4" onchange="chk('dq4','dq4',25)"><label for="dq4">Quest complete</label></div>
+      </div>
+    </div>
+  </div>
+  <div class="block open" id="b4c"><div class="block-header" onclick="tog('b4c')"><div class="bico check">✏️</div><div class="btg"><div class="bt">End-of-Day Check-in</div></div><span class="chev">▼</span></div>
+    <div class="block-body"><div class="ci-box">
+      <div class="ci-prompt">"Describe your design system choices for the charts — color palette, font, spacing, background. What drove each decision? Could another designer look at the charts and infer the same rules you applied?"</div>
+      <textarea class="ci-ta" id="ci4" placeholder="Your reflection..."></textarea>
+      <button class="btn btn-navy btn-sm" onclick="sendCI(4)">📤 Send to Tutor</button>
+    </div></div>
+  </div>
+  <div class="ds"><p>Day 24 done? Keep the momentum going.</p><div class="ds-nav"><button class="btn btn-outline btn-sm" onclick="showDay(3)">← Day 23</button><button class="btn btn-amber btn-sm" onclick="showDay(5)">Day 25 →</button></div></div>
+</div>
+<div class="day-view" id="day5">
+  <div class="day-header">
+    <div class="dnb"><span class="dow">Fri</span><span class="dn">25</span></div>
+    <div class="dht">
+      <div class="dh-heading">Charts Gallery, Documentation + Week 6 Brief</div>
+      <div class="dh-goal">All 6 charts working, documented, and gallery-tested. Write the Week 6 brief for dashboard assembly. Show the complete gallery to billing staff one more time before building the app.</div>
+      <div class="dh-meta"><span class="mp time">⏱ ~4 hours</span><span class="mp code">📋 Document</span></div>
+    </div>
+  </div>
+  <div class="block open" id="b5a">
+    <div class="block-header" onclick="tog('b5a')"><div class="bico task">⚡</div><div class="btg"><div class="bt">Day 25 Tasks</div></div><span class="chev">▼</span></div>
+    <div class="block-body"><div class="tl"><div class="ti xp-task" id="t5_1"><input type="checkbox" id="c5_1" onchange="chk('t5_1','c5_1')"><label for="c5_1">Finalise charts_gallery.ipynb — all 6 charts render correctly from real data with no errors</label></div>
+<div class="ti xp-task" id="t5_2"><input type="checkbox" id="c5_2" onchange="chk('t5_2','c5_2')"><label for="c5_2">Each chart function has a complete docstring: what it shows, what parameters it accepts, what filters it supports</label></div>
+<div class="ti xp-task" id="t5_3"><input type="checkbox" id="c5_3" onchange="chk('t5_3','c5_3')"><label for="c5_3">Write docs/week6_brief.md: describe the Streamlit app structure, which charts go where, filter controls needed, KPI tile layout — precise enough for Claude Code to build from</label></div>
+<div class="ti xp-task" id="t5_4"><input type="checkbox" id="c5_4" onchange="chk('t5_4','c5_4')"><label for="c5_4">Submit charts.py for tutor review</label></div>
+<div class="ti xp-task" id="t5_5"><input type="checkbox" id="c5_5" onchange="chk('t5_5','c5_5')"><label for="c5_5">Commit: 'Week 5 complete — all 6 chart functions documented and gallery-tested'</label></div>
+</div>
+      <div class="daily-quest">
+        <div class="dq-header"><span class="dq-badge">Daily Quest</span><span class="dq-xp">+25 bonus XP</span></div>
+        <div class="dq-text">Show the charts gallery to someone outside the practice — a family member or friend with no billing knowledge. Which chart do they find most immediately understandable without explanation? Which requires the most explanation? This is a proxy test for whether the charts work for a non-expert audience — relevant because practice leadership who see the Week 10 demo are not billing experts.</div>
+        <div class="dq-complete"><input type="checkbox" id="dq5" onchange="chk('dq5','dq5',25)"><label for="dq5">Quest complete</label></div>
+      </div>
+    </div>
+  </div>
+  <div class="block open" id="b5c"><div class="block-header" onclick="tog('b5c')"><div class="bico check">✏️</div><div class="btg"><div class="bt">End-of-Day Check-in</div></div><span class="chev">▼</span></div>
+    <div class="block-body"><div class="ci-box">
+      <div class="ci-prompt">"Before Week 5, you knew what denial rate by payer looked like as a pivot table number. Now you can see it as a visual. What does the visual communicate that the number alone didn't — be specific about what the eye picks up that the mind doesn't with raw numbers?"</div>
+      <textarea class="ci-ta" id="ci5" placeholder="Your reflection..."></textarea>
+      <button class="btn btn-navy btn-sm" onclick="sendCI(5)">📤 Send to Tutor</button>
+    </div></div>
+  </div>
+  <div class="ds"><p>Day 25 done? Keep the momentum going.</p><div class="ds-nav"><button class="btn btn-outline btn-sm" onclick="showDay(4)">← Day 24</button></div></div>
+</div></main>
+<aside class="sidebar">
+  <div class="stabs">
+    <button class="stab active" id="stab-tutor" onclick="switchTab('tutor')">💬 Ask Tutor</button>
+    <button class="stab" id="stab-review" onclick="switchTab('review')">📋 Submit Work</button>
+    <button class="stab" id="stab-progress" onclick="switchTab('progress')">📍 Progress</button>
+  </div>
+  <div class="sp active" id="panel-tutor">
+    <div class="sc"><strong>Week 5 · Days 21–25 Tutor</strong> — Week 5 — Visualization: Claude Code Builds the Charts. Paste errors or code for help.</div>
+    <div class="msgs" id="msgs"><div class="msg sys"><div class="ma">🎓</div><div class="mb">Welcome to Week 5 · Days 21–25! Week 5 — Visualization: Claude Code Builds the Charts. Ask me anything — paste errors, code you don't understand, or Claude Code output you want evaluated. I'll give you specific, actionable feedback.</div></div></div>
+    <div class="cia">
+      <div class="qps">
+        <span class="qp" onclick="qp('Claude Code wrote code I don\'t fully understand — how should I approach understanding it?')">Don't understand code?</span>
+        <span class="qp" onclick="qp('How do I write a better Claude Code directive that produces the right output first time?')">Better directives?</span>
+        <span class="qp" onclick="qp('I got a Python error — help me understand what it means')">Python error?</span>
+        <span class="qp" onclick="qp('How do I know if my code is good enough quality to commit?')">Code quality?</span>
+      </div>
+      <div class="ci-row"><textarea class="ci-inp" id="inp" placeholder="Ask or paste code/errors..." rows="1" onkeydown="hk(event)"></textarea><button class="sb-btn" id="sbtn" onclick="sendMsg()">➤</button></div>
+    </div>
+  </div>
+  <div class="sp" id="panel-review">
+    <div class="rev-body">
+      <div style="padding:10px 12px;background:var(--navy-light);border:1px solid var(--navy-border);border-radius:7px;font-size:12px;color:var(--navy);line-height:1.6;">Paste your Python code or document. Feedback: readability, error handling, docstring quality, correctness.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><label style="font-size:12px;font-weight:600;color:var(--ink-2);">Paste your work</label><textarea class="rev-ta" id="rev-text" placeholder="Paste code or document..."></textarea></div>
+      <button class="btn btn-navy" onclick="submitRev()" style="width:100%;justify-content:center;">📤 Submit for Review</button>
+      <div class="divider"></div><div id="rev-res" class="rev-res"></div>
+    </div>
+  </div>
+  <div class="sp" id="panel-progress">
+    <div class="prg-body">
+      <div class="wgb"><h4>Week 5 · Days 21–25 Goal</h4><p>Week 5 — Visualization: Claude Code Builds the Charts — Direct Claude Code to build 6 Plotly chart functions — evaluate and refine AI-generated visuals</p></div>
+      <div class="prg-track"><div class="prg-fill" id="prg-bar" style="width:0%"></div></div>
+      <p style="font-size:11px;color:var(--muted);text-align:right;margin-bottom:14px;" id="prg-label">0% complete</p>
+      <div class="prg-row act" onclick="showDay(1)" id="pr1"><span class="prg-icon">⚡</span><div class="prg-text"><div class="prg-name">Day 21 — Chart Theory + Brief Claude Code + Denia...</div><div class="prg-status" id="ps1">Not started</div></div><span class="prg-pct" id="pp1">0%</span></div>
+<div class="prg-row" onclick="showDay(2)" id="pr2"><span class="prg-icon">⚡</span><div class="prg-text"><div class="prg-name">Day 22 — Charts 2 and 3 — Denial Rate by Payer + ...</div><div class="prg-status" id="ps2">Not started</div></div><span class="prg-pct" id="pp2">0%</span></div>
+<div class="prg-row" onclick="showDay(3)" id="pr3"><span class="prg-icon">⚡</span><div class="prg-text"><div class="prg-name">Day 23 — Charts 4 and 5 — A/R Aging + Top Denied ...</div><div class="prg-status" id="ps3">Not started</div></div><span class="prg-pct" id="pp3">0%</span></div>
+<div class="prg-row" onclick="showDay(4)" id="pr4"><span class="prg-icon">⚡</span><div class="prg-text"><div class="prg-name">Day 24 — Chart 6 (Bonus) + Design Consistency Rev...</div><div class="prg-status" id="ps4">Not started</div></div><span class="prg-pct" id="pp4">0%</span></div>
+<div class="prg-row" onclick="showDay(5)" id="pr5"><span class="prg-icon">⚡</span><div class="prg-text"><div class="prg-name">Day 25 — Charts Gallery, Documentation + Week 6 B...</div><div class="prg-status" id="ps5">Not started</div></div><span class="prg-pct" id="pp5">0%</span></div>
+
+      <div class="divider"></div>
+      <div class="xp-s"><h5>XP Earned</h5><div class="xp-v" id="xp-total">0</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">/ 350 available</div></div>
+    </div>
+  </div>
+</aside>
+</div>
+<script>
+const S=JSON.parse(localStorage.getItem('sw5_tasks')||'{}');
+const SYS=`You are a dedicated tutor for an intern in Week 5 · Days 21–25 of a 16-week AI internship.
+Week 5: Building src/charts.py — 6 Plotly chart functions using Claude Code.
+Prior: metrics.py complete with 7 tested functions.
+Week 5 deliverable: charts.py with 6 functions (chart_denial_trend, chart_denial_by_payer, chart_denial_reasons, chart_ar_aging, chart_top_denied_cpts, chart_6_custom), apply_theme() helper, charts_gallery.ipynb.
+Chart specs: denial trend = line with benchmark line; payer bar = horizontal sorted, color-coded; reasons = donut top-6; aging = stacked bar 4 buckets; CPTs = horizontal bar top-N.
+Tutoring focus: push for apply_theme() consistency across all charts; verify chart outputs match manual analysis; explain chart type decisions; encourage user testing with real stakeholders.
+The Claude Code philosophy: intern directs precisely, Claude Code builds, intern reviews every line and asks about anything unclear.
+Tutoring approach: use Strengths → Improvements → Next Step for formal submissions. When they paste errors, diagnose specifically. When they share code, evaluate readability and error handling. Celebrate milestones — every working function is real progress.`;
+const DAY_TASKS={1:['c1_1','c1_2','c1_3','c1_4','c1_5','dq1'],2:['c2_1','c2_2','c2_3','c2_4','dq2'],3:['c3_1','c3_2','c3_3','c3_4','dq3'],4:['c4_1','c4_2','c4_3','c4_4','dq4'],5:['c5_1','c5_2','c5_3','c5_4','c5_5','dq5'],};
+const chatHistory=[];let toastTimer;
+function showXP(a){const t=document.getElementById('xp-toast');t.textContent='+'+a+' XP ⚡';t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2000);}
+function chk(rowId,cbId,xp){const row=document.getElementById(rowId);const cb=document.getElementById(cbId);if(!cb)return;cb.checked?row.classList.add('chk'):row.classList.remove('chk');S[cbId]=cb.checked;localStorage.setItem('sw5_tasks',JSON.stringify(S));if(cb.checked)showXP(xp||10);updateProgress();}
+function restore(){Object.entries(S).forEach(([id,v])=>{const cb=document.getElementById(id);if(!cb)return;cb.checked=v;const row=cb.closest('.ti,.dq-complete');if(row&&v)row.classList.add('chk');});updateProgress();}
+function updateProgress(){let total=0,done=0;[1,2,3,4,5].forEach(d=>{const tasks=DAY_TASKS[d];const dd=tasks.filter(id=>S[id]).length;total+=tasks.length;done+=dd;const pct=Math.round((dd/tasks.length)*100);const pp=document.getElementById('pp'+d);const ps=document.getElementById('ps'+d);const pip=document.getElementById('pip'+d);if(pp)pp.textContent=pct+'%';if(ps){if(dd===0){ps.textContent='Not started';ps.style.color='var(--muted)';if(pip)pip.classList.remove('done');}else if(dd===tasks.length){ps.textContent='✓ Complete';ps.style.color='var(--teal)';if(pip)pip.classList.add('done');}else{ps.textContent=dd+'/'+tasks.length+' done';ps.style.color='var(--amber)';if(pip)pip.classList.remove('done');}}});const pct=Math.round((done/total)*100);const bar=document.getElementById('prg-bar');const lbl=document.getElementById('prg-label');const xpt=document.getElementById('xp-total');if(bar)bar.style.width=pct+'%';if(lbl)lbl.textContent=pct+'% complete — '+done+'/'+total+' tasks';if(xpt)xpt.textContent=(done*10).toLocaleString();}
+function showDay(d){document.querySelectorAll('.day-view').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.day-pip').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.prg-row').forEach(e=>e.classList.remove('act'));document.getElementById('day'+d).classList.add('active');document.getElementById('pip'+d).classList.add('active');const pr=document.getElementById('pr'+d);if(pr)pr.classList.add('act');}
+function tog(id){document.getElementById(id).classList.toggle('open');}
+function switchTab(t){['tutor','review','progress'].forEach(tab=>{const s=document.getElementById('stab-'+tab);const p=document.getElementById('panel-'+tab);if(s)t===tab?s.classList.add('active'):s.classList.remove('active');if(p)t===tab?p.classList.add('active'):p.classList.remove('active');});}
+function qp(text){document.getElementById('inp').value=text;sendMsg();}
+function hk(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function addMsg(role,text){const c=document.getElementById('msgs');const div=document.createElement('div');div.className='msg '+(role==='assistant'?'sys':'usr');const av=document.createElement('div');av.className='ma';av.textContent=role==='assistant'?'🎓':'👤';const bub=document.createElement('div');bub.className='mb';bub.textContent=text;div.appendChild(av);div.appendChild(bub);c.appendChild(div);c.scrollTop=c.scrollHeight;}
+function addLoad(){const c=document.getElementById('msgs');const div=document.createElement('div');div.className='msg load';div.id='loading';const av=document.createElement('div');av.className='ma';av.textContent='🎓';const bub=document.createElement('div');bub.className='mb';bub.innerHTML='<div class="td"><span></span><span></span><span></span></div>';div.appendChild(av);div.appendChild(bub);c.appendChild(div);c.scrollTop=c.scrollHeight;}
+function remLoad(){const el=document.getElementById('loading');if(el)el.remove();}
+async function sendMsg(){const inp=document.getElementById('inp');const btn=document.getElementById('sbtn');const text=inp.value.trim();if(!text)return;inp.value='';btn.disabled=true;addMsg('user',text);chatHistory.push({role:'user',content:text});addLoad();switchTab('tutor');try{const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_GEMINI_KEY_HERE',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:SYS}]},contents:chatHistory.map(m=>({role:m.role==='assistant'?'model':m.role,parts:[{text:m.content}]}))})});const data=await res.json();const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'Try again.';remLoad();addMsg('assistant',reply);chatHistory.push({role:'assistant',content:reply});}catch(e){remLoad();addMsg('assistant','Connection issue.');}btn.disabled=false;}
+async function sendCI(day){const ta=document.getElementById('ci'+day);const text=ta.value.trim();if(!text){alert('Write your reflection first.');return;}switchTab('tutor');const msg='[Day Check-In]\n\n'+text;chatHistory.push({role:'user',content:msg});addMsg('user',msg);addLoad();try{const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_GEMINI_KEY_HERE',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:SYS}]},contents:chatHistory.map(m=>({role:m.role==='assistant'?'model':m.role,parts:[{text:m.content}]}))})});const data=await res.json();const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'Error.';remLoad();addMsg('assistant',reply);chatHistory.push({role:'assistant',content:reply});}catch(e){remLoad();addMsg('assistant','Error.');}}
+async function submitRev(){const text=document.getElementById('rev-text').value.trim();if(!text){alert('Paste your work first.');return;}const res_el=document.getElementById('rev-res');res_el.className='rev-res vis';res_el.textContent='⏳ Reviewing...';try{const res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_GEMINI_KEY_HERE',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:SYS}]},contents:[{role:'user',parts:[{text:'Review this submission.\n\nFeedback: **Strengths** → **Improvements** (2-3) → **Next Step**\n\n'+text}]}]})});const data=await res.json();res_el.textContent=data.candidates?.[0]?.content?.parts?.[0]?.text||'Failed.';}catch(e){res_el.textContent='Error.';}}
+restore();
+</script>
+</body>
+</html>

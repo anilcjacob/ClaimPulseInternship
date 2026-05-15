@@ -822,7 +822,7 @@ async function sendMsg(){
   addMsg('user',text);chatHistory.push({role:'user',content:text});addLoad();
   switchTab('tutor');
   try{
-    const res=await fetch('https://gemini-proxy.anilcjacob.workers.dev/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:SYSTEM_PROMPT}]},contents:chatHistory.map(m=>({role:m.role==='assistant'?'model':m.role,parts:[{text:m.content}]}))}})});
+    const res=await fetch('https://gemini-proxy.anilcjacob.workers.dev/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:SYSTEM_PROMPT}]},contents:chatHistory.map(m=>({role:m.role==='assistant'?'model':m.role,parts:[{text:m.content}]}))})});
     const data=await res.json();
     const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'Sorry, try again.';
     remLoad();addMsg('assistant',reply);chatHistory.push({role:'assistant',content:reply});
@@ -837,7 +837,7 @@ async function sendCI(day){
   const msg=`[Day ${day} Check-In — Summer Week 1]\n\n${text}`;
   chatHistory.push({role:'user',content:msg});addMsg('user',msg);addLoad();
   try{
-    const res=await fetch('https://gemini-proxy.anilcjacob.workers.dev/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:SYSTEM_PROMPT}]},contents:chatHistory.map(m=>({role:m.role==='assistant'?'model':m.role,parts:[{text:m.content}]}))}})});
+    const res=await fetch('https://gemini-proxy.anilcjacob.workers.dev/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:SYSTEM_PROMPT}]},contents:chatHistory.map(m=>({role:m.role==='assistant'?'model':m.role,parts:[{text:m.content}]}))})});
     const data=await res.json();
     const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'Error.';
     remLoad();addMsg('assistant',reply);chatHistory.push({role:'assistant',content:reply});

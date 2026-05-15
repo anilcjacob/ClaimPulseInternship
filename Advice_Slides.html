@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advice for College - Chapters 1 & 2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #8B4513;
+            --accent: #D4A574;
+            --text-dark: #2C2416;
+            --text-light: #5C5448;
+            --bg-warm: #FAF7F2;
+            --card-bg: #FFFFFF;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-warm);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .slides {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            touch-action: pan-y;
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 30px;
+            position: relative;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 50px 40px;
+            box-shadow: 
+                0 20px 60px rgba(139, 69, 19, 0.08),
+                0 8px 16px rgba(139, 69, 19, 0.04);
+            max-width: 100%;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 24px 24px 0 0;
+        }
+
+        .chapter-label {
+            font-family: 'Crimson Pro', serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-family: 'Crimson Pro', serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--primary);
+            line-height: 1.3;
+            margin-bottom: 24px;
+        }
+
+        h3 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        p {
+            font-size: 17px;
+            line-height: 1.7;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 19px;
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .highlight {
+            background: linear-gradient(180deg, transparent 60%, var(--accent) 60%);
+            padding: 2px 0;
+            font-weight: 500;
+        }
+
+        .insight-box {
+            background: #FFF9F0;
+            border-left: 4px solid var(--accent);
+            padding: 20px 24px;
+            margin: 24px 0;
+            border-radius: 8px;
+        }
+
+        .insight-label {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .nav-dots {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 12px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-light);
+            opacity: 0.3;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background: var(--primary);
+            opacity: 1;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .slide-number {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .intro-card {
+            text-align: center;
+        }
+
+        .intro-icon {
+            font-size: 60px;
+            margin-bottom: 24px;
+        }
+
+        @media print {
+            .container {
+                height: auto;
+                max-width: 100%;
+            }
+            
+            .slide {
+                page-break-after: always;
+                min-height: 100vh;
+                padding: 60px 40px;
+            }
+
+            .nav-dots {
+                display: none;
+            }
+
+            .card {
+                box-shadow: none;
+                border: 2px solid var(--accent);
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 40px 30px;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+        }
+
+        ul {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        li {
+            position: relative;
+            padding-left: 32px;
+            margin-bottom: 16px;
+            line-height: 1.7;
+            color: var(--text-dark);
+        }
+
+        li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="slides" id="slides">
+            
+            <!-- Slide 1: Cover -->
+            <div class="slide">
+                <div class="card intro-card">
+                    <div class="intro-icon">📖</div>
+                    <h1>Advice for College<br>and Life</h1>
+                    <p class="subtitle">Chapters 1 & 2<br>Swipe or tap arrows to navigate</p>
+                    <p style="color: var(--text-light); font-size: 15px; margin-top: 40px;">These are thoughts and insights to guide you through college. Read them whenever you need direction.</p>
+                </div>
+            </div>
+
+            <!-- CHAPTER 1: HOLIDAY BREAK -->
+            
+            <!-- Slide 2: Chapter 1 Intro -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">1/17</span>
+                    <div class="chapter-label">Chapter One</div>
+                    <h1>Making the Most of Holiday Break</h1>
+                    <p class="subtitle">Holiday breaks are more than just time off—they're opportunities. Here's how to make them count.</p>
+                </div>
+            </div>
+
+            <!-- Slide 3: Productive Days -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">2/17</span>
+                    <h2>The Power of Productive Days</h2>
+                    <p>Don't waste all your time. <span class="highlight">Try to get in at least 4 hours of productive work every day</span> during breaks.</p>
+                    <p>Remember: this time is when you have the greatest opportunity—but it's also when you can waste it the most.</p>
+                    <p>Build the discipline of being productive even when no one is watching. It will serve you throughout life.</p>
+                </div>
+            </div>
+
+            <!-- Slide 4: Small Habits -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">3/17</span>
+                    <h2>Small Habits Compound</h2>
+                    <div class="insight-box">
+                        <div class="insight-label">Key Insight</div>
+                        <p style="margin: 0;">Small daily habits compound over time:</p>
+                    </div>
+                    <ul>
+                        <li><strong>20 pages/day</strong> = 25-30 books per year</li>
+                        <li><strong>30 min of practice/day</strong> = 180+ hours per year</li>
+                    </ul>
+                    <p style="margin-top: 24px;"><span class="highlight">Consistency beats intensity</span> every time.</p>
+                </div>
+            </div>
+
+            <!-- Slide 5: Goal Setting -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">4/17</span>
+                    <h2>Set Your Compass</h2>
+                    <p>Make some resolutions for the New Year—and actually try to stick to them.</p>
+                    <p><span class="highlight">Develop 3-4 specific goals</span> you want to achieve by end of semester. Write them down.</p>
+                    <p>Keep them visible: on your desk, mirror, or phone wallpaper. Visual reminders keep your aspirations front and center when distractions pull you off course.</p>
+                </div>
+            </div>
+
+            <!-- Slide 6: Planning -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">5/17</span>
+                    <h2>Plan Your Semester and Summer</h2>
+                    <p>Make a plan for the upcoming semester and summer. Just making a plan helps guide your thoughts and shows you how to make best use of your time.</p>
+                    <p>Even if plans change, <span class="highlight">the act of planning forces clarity</span> about what you want.</p>
+                </div>
+            </div>
+
+            <!-- Slide 7: Social Media -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">6/17</span>
+                    <h2>Breaking the Social Media Trap</h2>
+                    <p>Instagram and TikTok are <span class="highlight">engineered to be addictive</span>. These platforms employ psychologists and data scientists whose job is to keep you scrolling.</p>
+                    <p>Understand that you're being manipulated.</p>
+                </div>
+            </div>
+
+            <!-- Slide 8: Replace Habits -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">7/17</span>
+                    <h2>Replace Passive with Active</h2>
+                    <p>Instead of scrolling, build habits of:</p>
+                    <ul>
+                        <li>Reading books and blogs</li>
+                        <li>Listening to podcasts</li>
+                        <li>Watching educational YouTube</li>
+                    </ul>
+                    <p style="margin-top: 24px;">If you can't break the habit, do what Pratik did—<span class="highlight">delete the apps</span>. Or set a strict 30-minute daily timer.</p>
+                </div>
+            </div>
+
+            <!-- Slide 9: Morning Routine -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">8/17</span>
+                    <h2>Protect Your Mornings</h2>
+                    <div class="insight-box">
+                        <div class="insight-label">Try This</div>
+                        <p style="margin: 0;">Implement a <strong>"no phone before 9 AM"</strong> rule.</p>
+                    </div>
+                    <p>The first hour of your day sets your mental state. Don't let algorithms decide it.</p>
+                    <p>Use mornings for reading, planning, or exercise instead.</p>
+                </div>
+            </div>
+
+            <!-- CHAPTER 2: ACADEMICS AND CAREER -->
+
+            <!-- Slide 10: Chapter 2 Intro -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">9/17</span>
+                    <div class="chapter-label">Chapter Two</div>
+                    <h1>Academics and Career Choices</h1>
+                    <p class="subtitle">Your career will take up a huge portion of your life. Here's how to navigate the choices ahead.</p>
+                </div>
+            </div>
+
+            <!-- Slide 11: Finding Work You Love -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">10/17</span>
+                    <h2>Find Work You Enjoy</h2>
+                    <p>The best career choice is <span class="highlight">something you enjoy doing every day</span>.</p>
+                    <p>But finding that doesn't happen by magic. You have to be intentional and try things.</p>
+                    <p>Intern. Shadow professionals. Do projects. Volunteer. The gap between what you think a job is and what it actually is can be enormous.</p>
+                </div>
+            </div>
+
+            <!-- Slide 12: Interests Journal -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">11/17</span>
+                    <h2>Track Your Interests</h2>
+                    <div class="insight-box">
+                        <div class="insight-label">Try This</div>
+                        <p style="margin: 0;">Keep an <strong>"interests journal."</strong></p>
+                    </div>
+                    <p>When you find yourself naturally curious about something, write it down.</p>
+                    <p>After a few months, patterns will emerge that point toward work you'll genuinely enjoy.</p>
+                </div>
+            </div>
+
+            <!-- Slide 13: Make a Choice -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">12/17</span>
+                    <h2>Start Somewhere</h2>
+                    <p>Be deliberate but <span class="highlight">make a choice</span>. Don't worry if it's the wrong choice—you can always change later.</p>
+                    <p>Then learn deeply about that field. Read about it. Talk to people in it. Understand the sub-areas.</p>
+                    <p style="margin-top: 24px; font-style: italic; color: var(--text-light);">You can't steer a parked car.</p>
+                </div>
+            </div>
+
+            <!-- Slide 14: Skills That Matter -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">13/17</span>
+                    <h2>The Skills That Actually Matter</h2>
+                    <p>Academic success is important. But these matter more for career success:</p>
+                    <ul>
+                        <li>Problem solving</li>
+                        <li>Communication & influence</li>
+                        <li>Learning agility</li>
+                        <li>Positive attitude</li>
+                    </ul>
+                    <p style="margin-top: 24px;">Master these and they'll help way more than any single subject.</p>
+                </div>
+            </div>
+
+            <!-- Slide 15: AI -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">14/17</span>
+                    <h2>Master AI Now</h2>
+                    <p>AI is changing the world. <span class="highlight">Learn how to use it</span>.</p>
+                    <p>You don't have to be an AI engineer—but if you learn to use AI tools effectively, you'll differentiate yourself in any field.</p>
+                    <div class="insight-box" style="margin-top: 24px;">
+                        <div class="insight-label">Reality Check</div>
+                        <p style="margin: 0;">AI won't replace most jobs, but people who use AI will replace people who don't.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 16: Building Your Story -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">15/17</span>
+                    <h2>Build Your Story</h2>
+                    <p>When interviewing, people want to hear your story. They won't scrutinize your GPA as long as it's good.</p>
+                    <p><span class="highlight">Look for opportunities every day</span> that add to your story.</p>
+                    <div class="insight-box" style="margin-top: 24px;">
+                        <div class="insight-label">Practical Tip</div>
+                        <p style="margin: 0;">After any major experience, write a reflection within 24 hours. These become invaluable for interviews.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 17: Network -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">16/17</span>
+                    <h2>Ask for Help & Build Relationships</h2>
+                    <p>You have a fantastic network through our contacts and friends. <span class="highlight">People are happy to help</span>—but you have to ask.</p>
+                    <p>If someone helps you, follow up. Send thank you notes. Share updates.</p>
+                    <p style="margin-top: 24px;">Build relationships before you need them. The best networking doesn't feel transactional.</p>
+                </div>
+            </div>
+
+            <!-- Slide 18: Marathon -->
+            <div class="slide">
+                <div class="card">
+                    <span class="slide-number">17/17</span>
+                    <h2>It's a Marathon, Not a Sprint</h2>
+                    <p>You don't need everything figured out right now.</p>
+                    <p><span class="highlight">Small, smart decisions made consistently over time</span> lead to remarkable outcomes.</p>
+                    <p style="margin-top: 40px; font-style: italic; color: var(--text-light);">Be thoughtful about your choices, open to learning, and willing to put in consistent effort.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="nav-dots" id="navDots"></div>
+    </div>
+
+    <script>
+        const slides = document.getElementById('slides');
+        const navDots = document.getElementById('navDots');
+        const slideElements = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+        let startX = 0;
+        let isDragging = false;
+
+        // Create navigation dots
+        slideElements.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            if (index === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(index));
+            navDots.appendChild(dot);
+        });
+
+        function updateSlide() {
+            slides.style.transform = `translateX(-${currentSlide * 100}%)`;
+            document.querySelectorAll('.dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function goToSlide(index) {
+            currentSlide = Math.max(0, Math.min(index, slideElements.length - 1));
+            updateSlide();
+        }
+
+        function nextSlide() {
+            if (currentSlide < slideElements.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        // Touch events
+        slides.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+        });
+
+        slides.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+        }, { passive: false });
+
+        slides.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            const endX = e.changedTouches[0].clientX;
+            const diff = startX - endX;
+
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+            }
+            isDragging = false;
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        // Mouse drag (desktop)
+        slides.addEventListener('mousedown', (e) => {
+            startX = e.clientX;
+            isDragging = true;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            const endX = e.clientX;
+            const diff = startX - endX;
+
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
+            }
+            isDragging = false;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClaimPulse — Week 1 Daily Guide</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  --cream: #f7f3ee;
+  --paper: #faf8f5;
+  --warm-white: #fffefb;
+  --ink: #1a1812;
+  --ink-2: #2e2a22;
+  --muted: #7a7060;
+  --muted-2: #b0a898;
+  --border: #e2ddd6;
+  --border-2: #cdc7bc;
+  --navy: #1b2a4a;
+  --navy-light: rgba(27,42,74,0.08);
+  --navy-border: rgba(27,42,74,0.2);
+  --amber: #d97706;
+  --amber-bg: rgba(217,119,6,0.07);
+  --amber-border: rgba(217,119,6,0.22);
+  --teal: #0d7c6e;
+  --teal-bg: rgba(13,124,110,0.07);
+  --teal-border: rgba(13,124,110,0.2);
+  --rose: #b5413a;
+  --rose-bg: rgba(181,65,58,0.06);
+  --rose-border: rgba(181,65,58,0.2);
+  --purple: #6b4fa0;
+  --purple-bg: rgba(107,79,160,0.07);
+  --shadow-sm: 0 1px 4px rgba(26,24,18,0.06), 0 0 0 1px rgba(26,24,18,0.04);
+  --shadow: 0 2px 12px rgba(26,24,18,0.08), 0 0 0 1px rgba(26,24,18,0.04);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--navy);
+  color: white;
+  padding: 0 40px;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border-bottom: 3px solid var(--amber);
+}
+
+.header-left {
+  padding: 22px 32px 22px 0;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 200px;
+}
+
+.header-left .eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 5px;
+}
+
+.header-left h1 {
+  font-family: 'Lora', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.01em;
+}
+
+.header-left h1 span { color: #60a5fa; }
+
+.header-center {
+  flex: 1;
+  padding: 22px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.week-title-header {
+  font-family: 'Lora', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.week-subtitle-header {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+}
+
+.header-right {
+  padding: 22px 0 22px 32px;
+  border-left: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.hstat { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.hstat-val { font-family: 'Lora', serif; font-size: 20px; font-weight: 700; color: white; }
+.hstat-label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; }
+.hstat-div { width: 1px; height: 32px; background: rgba(255,255,255,0.1); }
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  background: var(--navy);
+  padding: 0 40px 14px;
+  display: flex;
+  gap: 0;
+}
+
+.day-pip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 8px 6px 0;
+  border-top: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.day-pip.active { border-top-color: var(--amber); }
+.day-pip.done { border-top-color: #34d399; }
+
+.pip-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: all 0.2s;
+}
+
+.day-pip.active .pip-dot { background: var(--amber); }
+.day-pip.done .pip-dot { background: #34d399; }
+
+.pip-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.day-pip.active .pip-label { color: rgba(255,255,255,0.8); }
+.day-pip.done .pip-label { color: rgba(52,211,153,0.7); }
+
+/* ── LAYOUT ── */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 0;
+  min-height: calc(100vh - 120px);
+}
+
+/* ── MAIN CONTENT ── */
+.main {
+  padding: 32px 36px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+/* ── DAY VIEW ── */
+.day-view { display: none; }
+.day-view.active { display: block; }
+
+.day-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.day-number-badge {
+  flex-shrink: 0;
+  width: 52px; height: 52px;
+  background: var(--navy);
+  color: white;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+.day-number-badge .day-of-week {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.5);
+  font-weight: 600;
+}
+
+.day-number-badge .day-num {
+  font-family: 'Lora', serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  color: white;
+}
+
+.day-header-text { flex: 1; }
+
+.day-heading {
+  font-family: 'Lora', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 5px;
+  line-height: 1.25;
+}
+
+.day-goal {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+.day-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+
+.meta-pill.time { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber); }
+.meta-pill.type { background: var(--navy-light); border-color: var(--navy-border); color: var(--navy); }
+.meta-pill.collab { background: var(--teal-bg); border-color: var(--teal-border); color: var(--teal); }
+
+/* ── BLOCKS ── */
+.block {
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.block-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.block-header:hover { background: var(--paper); }
+
+.block-icon {
+  width: 30px; height: 30px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.block-icon.learn { background: var(--navy-light); }
+.block-icon.task  { background: var(--amber-bg); }
+.block-icon.collab { background: var(--teal-bg); }
+.block-icon.review { background: var(--purple-bg); }
+.block-icon.check { background: var(--rose-bg); }
+
+.block-title-group { flex: 1; }
+.block-title { font-weight: 600; font-size: 13px; color: var(--ink); }
+.block-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+.block-duration {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted-2);
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
+.chev { color: var(--muted-2); font-size: 10px; transition: transform 0.2s; margin-left: 4px; }
+.block.open .chev { transform: rotate(180deg); }
+
+.block-body {
+  display: none;
+  padding: 4px 16px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.block.open .block-body { display: block; }
+
+/* ── BLOCK BODY CONTENT ── */
+.resource-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+
+.resource-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.resource-item:hover { background: var(--paper); border-color: var(--border-2); box-shadow: var(--shadow-sm); }
+
+.resource-item .ri-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.resource-item .ri-body { flex: 1; }
+.resource-item .ri-name { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+.resource-item .ri-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+.resource-item .ri-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--navy-light);
+  color: var(--navy);
+  margin-top: 4px;
+  border: 1px solid var(--navy-border);
+}
+
+.task-list { display: flex; flex-direction: column; gap: 8px; }
+
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+
+.task-item input[type="checkbox"] {
+  margin-top: 2px;
+  width: 15px; height: 15px;
+  accent-color: var(--teal);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.task-item label {
+  font-size: 13px;
+  color: var(--ink-2);
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.task-item.checked label {
+  text-decoration: line-through;
+  color: var(--muted-2);
+}
+
+.task-note {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: var(--amber-bg);
+  border-left: 2px solid var(--amber);
+  border-radius: 0 5px 5px 0;
+  font-size: 12px;
+  color: #92400e;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.checkin-box {
+  padding-top: 10px;
+}
+
+.checkin-prompt {
+  font-size: 13px;
+  color: var(--ink-2);
+  font-family: 'Lora', serif;
+  font-style: italic;
+  margin-bottom: 10px;
+  line-height: 1.6;
+  padding: 10px 14px;
+  background: var(--rose-bg);
+  border-left: 3px solid var(--rose);
+  border-radius: 0 6px 6px 0;
+}
+
+.checkin-textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 10px 12px;
+  background: var(--cream);
+  border: 1px solid var(--border-2);
+  border-radius: 7px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  color: var(--ink);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+  margin-bottom: 8px;
+}
+
+.checkin-textarea:focus { border-color: var(--navy); box-shadow: 0 0 0 3px var(--navy-light); }
+
+.checkin-textarea::placeholder { color: var(--muted-2); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 7px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+}
+
+.btn-navy {
+  background: var(--navy);
+  color: white;
+}
+
+.btn-navy:hover { background: #243a62; }
+
+.btn-outline {
+  background: transparent;
+  color: var(--navy);
+  border: 1px solid var(--navy-border);
+}
+
+.btn-outline:hover { background: var(--navy-light); }
+
+.btn-amber {
+  background: var(--amber);
+  color: white;
+}
+
+.btn-amber:hover { background: #b45309; }
+
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+
+/* ── DAY SUMMARY FOOTER ── */
+.day-summary {
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: var(--navy);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.day-summary p { font-size: 12px; color: rgba(255,255,255,0.65); flex: 1; line-height: 1.5; }
+.day-summary p strong { color: white; }
+
+.day-nav { display: flex; gap: 8px; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--warm-white);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 120px);
+  position: sticky;
+  top: 0;
+}
+
+.sidebar-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.stab {
+  flex: 1;
+  padding: 12px 8px;
+  border: none;
+  background: none;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+
+.stab.active { color: var(--navy); border-bottom-color: var(--navy); }
+.stab:hover { color: var(--ink); }
+
+.sidebar-panel { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.sidebar-panel.active { display: flex; }
+
+/* ── AI TUTOR ── */
+.chat-context {
+  padding: 10px 14px;
+  background: var(--navy-light);
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.chat-context strong { color: var(--navy); }
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.msg { display: flex; gap: 9px; align-items: flex-start; }
+
+.msg-avatar {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  margin-top: 1px;
+}
+
+.msg.system .msg-avatar { background: var(--navy); }
+.msg.user .msg-avatar { background: var(--amber-bg); border: 1px solid var(--amber-border); }
+
+.msg-bubble {
+  flex: 1;
+  padding: 9px 11px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.msg.system .msg-bubble {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  color: var(--ink-2);
+}
+
+.msg.user .msg-bubble {
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-border);
+  color: var(--ink-2);
+}
+
+.msg.loading .msg-bubble {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-style: italic;
+}
+
+.typing-dots { display: inline-flex; gap: 3px; align-items: center; }
+.typing-dots span {
+  width: 5px; height: 5px; background: var(--muted-2); border-radius: 50%;
+  animation: bounce 1.2s infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+
+.chat-input-area {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--warm-white);
+}
+
+.chat-quick-prompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.qprompt {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 12px;
+  background: var(--cream);
+  border: 1px solid var(--border-2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.qprompt:hover { background: var(--navy-light); border-color: var(--navy-border); color: var(--navy); }
+
+.chat-input-row {
+  display: flex;
+  gap: 7px;
+  align-items: flex-end;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 8px 11px;
+  background: var(--cream);
+  border: 1px solid var(--border-2);
+  border-radius: 7px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12.5px;
+  color: var(--ink);
+  resize: none;
+  outline: none;
+  min-height: 38px;
+  max-height: 120px;
+  transition: border-color 0.15s;
+}
+
+.chat-input:focus { border-color: var(--navy); box-shadow: 0 0 0 2px var(--navy-light); }
+.chat-input::placeholder { color: var(--muted-2); }
+
+.send-btn {
+  width: 36px; height: 36px;
+  border-radius: 7px;
+  background: var(--navy);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.send-btn:hover { background: #243a62; }
+.send-btn:disabled { background: var(--border-2); cursor: not-allowed; }
+
+/* ── REVIEW PANEL ── */
+.review-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review-intro {
+  padding: 10px 12px;
+  background: var(--purple-bg);
+  border: 1px solid rgba(107,79,160,0.2);
+  border-radius: 7px;
+  font-size: 12px;
+  color: var(--purple);
+  line-height: 1.6;
+}
+
+.review-section { display: flex; flex-direction: column; gap: 6px; }
+.review-section label { font-size: 12px; font-weight: 600; color: var(--ink-2); }
+
+.review-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--cream);
+  border: 1px solid var(--border-2);
+  border-radius: 7px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12.5px;
+  color: var(--ink);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+  min-height: 100px;
+}
+
+.review-textarea:focus { border-color: var(--purple); box-shadow: 0 0 0 2px rgba(107,79,160,0.08); }
+.review-textarea::placeholder { color: var(--muted-2); }
+
+.review-result {
+  display: none;
+  padding: 12px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.review-result.visible { display: block; }
+
+/* ── PROGRESS PANEL ── */
+.progress-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.progress-day-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 7px;
+  margin-bottom: 6px;
+  border: 1px solid var(--border);
+  background: var(--cream);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.progress-day-row:hover { background: var(--paper); }
+.progress-day-row.active-day { background: var(--navy-light); border-color: var(--navy-border); }
+
+.progress-day-icon { font-size: 16px; }
+.progress-day-text { flex: 1; }
+.progress-day-name { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 1px; }
+.progress-day-status { font-size: 11px; color: var(--muted); }
+.progress-pct { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted-2); }
+
+.progress-track {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 14px 0 8px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--navy), #60a5fa);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.week-goal-box {
+  padding: 12px 14px;
+  background: var(--teal-bg);
+  border: 1px solid var(--teal-border);
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+
+.week-goal-box h4 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--teal); margin-bottom: 5px; }
+.week-goal-box p { font-size: 12px; color: var(--ink-2); line-height: 1.6; }
+
+/* ── UTILITIES ── */
+.divider { height: 1px; background: var(--border); margin: 14px 0; }
+.section-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted-2); margin-bottom: 8px; margin-top: 14px; }
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="eyebrow">ClaimPulse AI · Module 1</div>
+    <h1>Claim<span>Pulse</span></h1>
+  </div>
+  <div class="header-center">
+    <div class="week-title-header">Week 1 — Domain Immersion</div>
+    <div class="week-subtitle-header">Understanding medical billing so you can build tools that actually help</div>
+  </div>
+  <div class="header-right">
+    <div class="hstat"><span class="hstat-val">5</span><span class="hstat-label">Days</span></div>
+    <div class="hstat-div"></div>
+    <div class="hstat"><span class="hstat-val">20</span><span class="hstat-label">Hours</span></div>
+    <div class="hstat-div"></div>
+    <div class="hstat"><span class="hstat-val">M1·W1</span><span class="hstat-label">Progress</span></div>
+  </div>
+</div>
+
+<!-- DAY PROGRESS STRIP -->
+<div class="progress-bar">
+  <div class="day-pip active" onclick="showDay(1)" id="pip1"><div class="pip-dot"></div><div class="pip-label">Mon</div></div>
+  <div class="day-pip" onclick="showDay(2)" id="pip2"><div class="pip-dot"></div><div class="pip-label">Tue</div></div>
+  <div class="day-pip" onclick="showDay(3)" id="pip3"><div class="pip-dot"></div><div class="pip-label">Wed</div></div>
+  <div class="day-pip" onclick="showDay(4)" id="pip4"><div class="pip-dot"></div><div class="pip-label">Thu</div></div>
+  <div class="day-pip" onclick="showDay(5)" id="pip5"><div class="pip-dot"></div><div class="pip-label">Fri</div></div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- MAIN DAILY CONTENT -->
+  <main class="main">
+
+    <!-- ══════════════ DAY 1 ══════════════ -->
+    <div class="day-view active" id="day1">
+      <div class="day-header">
+        <div class="day-number-badge">
+          <span class="day-of-week">Mon</span>
+          <span class="day-num">1</span>
+        </div>
+        <div class="day-header-text">
+          <div class="day-heading">What Is AI — and Why Does It Matter for Business?</div>
+          <div class="day-goal">Goal: Build a mental foundation for the whole program. Understand what AI actually is before we touch any code or billing data.</div>
+          <div class="day-meta">
+            <span class="meta-pill time">⏱ ~4 hours</span>
+            <span class="meta-pill type">📚 Learning Day</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 1 -->
+      <div class="block" id="b1_1">
+        <div class="block-header" onclick="togBlock('b1_1')">
+          <div class="block-icon learn">🟢</div>
+          <div class="block-title-group">
+            <div class="block-title">Morning: Google AI Essentials</div>
+            <div class="block-meta">Start here — it's the most accessible intro to AI for a business context</div>
+          </div>
+          <span class="block-duration">~2 hrs</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="section-label">Resource</div>
+          <div class="resource-list">
+            <a class="resource-item" href="https://grow.google/certificates/ai-essentials/" target="_blank">
+              <span class="ri-icon">🟢</span>
+              <div class="ri-body">
+                <div class="ri-name">Google AI Essentials</div>
+                <div class="ri-desc">A 5-module course covering AI fundamentals, using AI tools responsibly, and applying AI in a work context. Complete the first 2 modules today.</div>
+                <span class="ri-badge">Free · grow.google</span>
+              </div>
+            </a>
+          </div>
+          <div class="section-label">What to focus on</div>
+          <div class="task-list">
+            <div class="task-item" id="t_1_1_1">
+              <input type="checkbox" id="cb_1_1_1" onchange="toggleTask('t_1_1_1', 'cb_1_1_1')">
+              <label for="cb_1_1_1">Complete Module 1: Introduction to AI — take notes on the definition of AI, machine learning, and generative AI</label>
+            </div>
+            <div class="task-item" id="t_1_1_2">
+              <input type="checkbox" id="cb_1_1_2" onchange="toggleTask('t_1_1_2', 'cb_1_1_2')">
+              <label for="cb_1_1_2">Complete Module 2: Maximize Productivity with AI Tools — pay attention to the business use case examples</label>
+            </div>
+            <div class="task-item" id="t_1_1_3">
+              <input type="checkbox" id="cb_1_1_3" onchange="toggleTask('t_1_1_3', 'cb_1_1_3')">
+              <label for="cb_1_1_3">Write down 3 AI use cases from the course that remind you of a problem the billing department might have</label>
+            </div>
+          </div>
+          <div class="task-note">💡 Don't just watch — pause and write a one-sentence summary after each module section. Active notes stick better than passive viewing.</div>
+        </div>
+      </div>
+
+      <!-- Block 2 -->
+      <div class="block" id="b1_2">
+        <div class="block-header" onclick="togBlock('b1_2')">
+          <div class="block-icon learn">🟣</div>
+          <div class="block-title-group">
+            <div class="block-title">Afternoon: AI For Everyone — Andrew Ng</div>
+            <div class="block-meta">The business perspective on AI — skip the hype, understand what it can and can't actually do</div>
+          </div>
+          <span class="block-duration">~1.5 hrs</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="resource-list">
+            <a class="resource-item" href="https://www.coursera.org/learn/ai-for-everyone" target="_blank">
+              <span class="ri-icon">🟣</span>
+              <div class="ri-body">
+                <div class="ri-name">AI For Everyone — Andrew Ng (Coursera)</div>
+                <div class="ri-desc">Week 1 only today: "What is AI?" — designed for non-engineers. Andrew Ng is the clearest explainer of AI in plain English. Free to audit.</div>
+                <span class="ri-badge">Free to audit · Coursera</span>
+              </div>
+            </a>
+          </div>
+          <div class="section-label">Focus tasks</div>
+          <div class="task-list">
+            <div class="task-item" id="t_1_2_1">
+              <input type="checkbox" id="cb_1_2_1" onchange="toggleTask('t_1_2_1', 'cb_1_2_1')">
+              <label for="cb_1_2_1">Watch Week 1 videos: "What is AI?", "Machine Learning", "What is Data?", "The terminology of AI"</label>
+            </div>
+            <div class="task-item" id="t_1_2_2">
+              <input type="checkbox" id="cb_1_2_2" onchange="toggleTask('t_1_2_2', 'cb_1_2_2')">
+              <label for="cb_1_2_2">Note the difference between AI that can do a task and AI that can't — what does Andrew Ng say makes a task AI-suitable?</label>
+            </div>
+            <div class="task-item" id="t_1_2_3">
+              <input type="checkbox" id="cb_1_2_3" onchange="toggleTask('t_1_2_3', 'cb_1_2_3')">
+              <label for="cb_1_2_3">Think: does medical claim review fit the criteria for a task AI could help with? Why or why not? Write 2–3 sentences.</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 3 — End of Day Check-in -->
+      <div class="block" id="b1_3">
+        <div class="block-header" onclick="togBlock('b1_3')">
+          <div class="block-icon check">✏️</div>
+          <div class="block-title-group">
+            <div class="block-title">End-of-Day Check-in</div>
+            <div class="block-meta">Reflect and write — send to your AI tutor for feedback</div>
+          </div>
+          <span class="block-duration">~30 min</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="checkin-box">
+            <div class="checkin-prompt">"In your own words: what is AI, and what is one specific thing AI could potentially do to help a medical billing department? Be specific — don't just say 'improve efficiency.'"</div>
+            <textarea class="checkin-textarea" id="checkin_day1" placeholder="Write your reflection here — then click Send to Tutor to get feedback from Claude..."></textarea>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-navy btn-sm" onclick="sendCheckin(1)">📤 Send to Tutor for Feedback</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="day-summary">
+        <p><strong>Day 1 complete?</strong> You've laid the conceptual foundation. Tomorrow you start learning the domain — medical billing — that the whole project is built around.</p>
+        <div class="day-nav">
+          <button class="btn btn-amber btn-sm" onclick="showDay(2)">Day 2 → </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ DAY 2 ══════════════ -->
+    <div class="day-view" id="day2">
+      <div class="day-header">
+        <div class="day-number-badge">
+          <span class="day-of-week">Tue</span>
+          <span class="day-num">2</span>
+        </div>
+        <div class="day-header-text">
+          <div class="day-heading">How Medical Claims Work — End to End</div>
+          <div class="day-goal">Goal: Understand the full claim lifecycle, CPT and ICD-10 codes, and what a real claim form looks like. This is the domain knowledge your dashboard will be built on.</div>
+          <div class="day-meta">
+            <span class="meta-pill time">⏱ ~4 hours</span>
+            <span class="meta-pill type">📚 Domain Learning</span>
+            <span class="meta-pill collab">🗂 Hands On</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="block" id="b2_1">
+        <div class="block-header" onclick="togBlock('b2_1')">
+          <div class="block-icon learn">📄</div>
+          <div class="block-title-group">
+            <div class="block-title">Morning: The Claim Lifecycle & Coding Systems</div>
+            <div class="block-meta">CMS resources + guided reading on CPT and ICD-10</div>
+          </div>
+          <span class="block-duration">~2 hrs</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="resource-list">
+            <a class="resource-item" href="https://www.cms.gov/training-education/medicare-learning-network-mln/mlnproducts" target="_blank">
+              <span class="ri-icon">🔴</span>
+              <div class="ri-body">
+                <div class="ri-name">CMS MLN — Medicare Learning Network Products</div>
+                <div class="ri-desc">Search "claim submission" and "denial" — CMS publishes plain-language guides on how claims are submitted and adjudicated. Read the "Medicare Claims Processing" fact sheet.</div>
+                <span class="ri-badge">Free · CMS.gov</span>
+              </div>
+            </a>
+            <a class="resource-item" href="https://www.ama-assn.org/practice-management/cpt/what-cpt" target="_blank">
+              <span class="ri-icon">🩺</span>
+              <div class="ri-body">
+                <div class="ri-name">AMA — What Is a CPT Code?</div>
+                <div class="ri-desc">The American Medical Association's plain-English explanation of CPT codes — the 5-digit codes that describe every medical procedure billed to insurance.</div>
+                <span class="ri-badge">Free · AMA-ASSN.org</span>
+              </div>
+            </a>
+            <a class="resource-item" href="https://www.cdc.gov/nchs/icd/icd-10-cm/index.htm" target="_blank">
+              <span class="ri-icon">🏥</span>
+              <div class="ri-body">
+                <div class="ri-name">CDC — ICD-10-CM Official Information</div>
+                <div class="ri-desc">ICD-10 diagnosis codes — the alphanumeric codes that describe why a patient was seen. Understanding how CPT (what was done) and ICD-10 (why) must "match" is critical for billing.</div>
+                <span class="ri-badge">Free · CDC.gov</span>
+              </div>
+            </a>
+          </div>
+          <div class="section-label">Reading tasks</div>
+          <div class="task-list">
+            <div class="task-item" id="t_2_1_1">
+              <input type="checkbox" id="cb_2_1_1" onchange="toggleTask('t_2_1_1', 'cb_2_1_1')">
+              <label for="cb_2_1_1">Draw the claim lifecycle on paper: Patient Visit → Documentation → Coding → Claim Submission → Adjudication → Payment or Denial</label>
+            </div>
+            <div class="task-item" id="t_2_1_2">
+              <input type="checkbox" id="cb_2_1_2" onchange="toggleTask('t_2_1_2', 'cb_2_1_2')">
+              <label for="cb_2_1_2">Find 3 real CPT codes that are likely used in your Dad's practice (hint: ask, or look up the specialty) — write down what each one means</label>
+            </div>
+            <div class="task-item" id="t_2_1_3">
+              <input type="checkbox" id="cb_2_1_3" onchange="toggleTask('t_2_1_3', 'cb_2_1_3')">
+              <label for="cb_2_1_3">Understand why CPT-ICD pairing matters — write one sentence explaining what a "diagnosis-procedure mismatch" denial is</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block" id="b2_2">
+        <div class="block-header" onclick="togBlock('b2_2')">
+          <div class="block-icon task">📋</div>
+          <div class="block-title-group">
+            <div class="block-title">Afternoon: Look at a Real Claim Form</div>
+            <div class="block-meta">Get an anonymized CMS-1500 form from the practice — identify every field</div>
+          </div>
+          <span class="block-duration">~1.5 hrs</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="resource-list">
+            <a class="resource-item" href="https://www.cms.gov/medicare/cms-forms/cms-forms/downloads/cms1500.pdf" target="_blank">
+              <span class="ri-icon">📄</span>
+              <div class="ri-body">
+                <div class="ri-name">CMS-1500 Claim Form (Blank)</div>
+                <div class="ri-desc">The standard paper claim form used for physician billing. Download and annotate it — even though claims are electronic today, this form contains every field that matters.</div>
+                <span class="ri-badge">Free · CMS.gov PDF</span>
+              </div>
+            </a>
+          </div>
+          <div class="task-list">
+            <div class="task-item" id="t_2_2_1">
+              <input type="checkbox" id="cb_2_2_1" onchange="toggleTask('t_2_2_1', 'cb_2_2_1')">
+              <label for="cb_2_2_1">Ask Dad or the billing staff for one anonymized completed claim form (or use the blank CMS-1500 and fill in hypothetical values)</label>
+            </div>
+            <div class="task-item" id="t_2_2_2">
+              <input type="checkbox" id="cb_2_2_2" onchange="toggleTask('t_2_2_2', 'cb_2_2_2')">
+              <label for="cb_2_2_2">Identify and label at least 10 key fields: patient DOB, rendering provider NPI, date of service, place of service, CPT code(s), ICD-10 code(s), billed amount, payer ID</label>
+            </div>
+            <div class="task-item" id="t_2_2_3">
+              <input type="checkbox" id="cb_2_2_3" onchange="toggleTask('t_2_2_3', 'cb_2_2_3')">
+              <label for="cb_2_2_3">Circle any field that, if wrong or missing, would likely cause a claim to be denied — think about what a computer system checking this form would validate</label>
+            </div>
+          </div>
+          <div class="task-note">🔒 HIPAA reminder: if using a real form, confirm with Dad that all 18 patient identifiers are removed or replaced with fictitious values before you work with it.</div>
+        </div>
+      </div>
+
+      <div class="block" id="b2_3">
+        <div class="block-header" onclick="togBlock('b2_3')">
+          <div class="block-icon check">✏️</div>
+          <div class="block-title-group">
+            <div class="block-title">End-of-Day Check-in</div>
+            <div class="block-meta">Write and submit for tutor review</div>
+          </div>
+          <span class="block-duration">~30 min</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="checkin-box">
+            <div class="checkin-prompt">"Explain the claim lifecycle in your own words, as if you were explaining it to a friend who has no medical background. Then describe two ways a claim could get denied before the insurance company even reads it."</div>
+            <textarea class="checkin-textarea" id="checkin_day2" placeholder="Write your answer here..."></textarea>
+            <button class="btn btn-navy btn-sm" onclick="sendCheckin(2)">📤 Send to Tutor for Feedback</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="day-summary">
+        <p><strong>Day 2 complete?</strong> You now know what a claim looks like and where it can go wrong. Tomorrow you go live — shadowing the billing team in person.</p>
+        <div class="day-nav">
+          <button class="btn btn-outline btn-sm" onclick="showDay(1)">← Day 1</button>
+          <button class="btn btn-amber btn-sm" onclick="showDay(3)">Day 3 →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ DAY 3 ══════════════ -->
+    <div class="day-view" id="day3">
+      <div class="day-header">
+        <div class="day-number-badge">
+          <span class="day-of-week">Wed</span>
+          <span class="day-num">3</span>
+        </div>
+        <div class="day-header-text">
+          <div class="day-heading">Shadow the Billing Team — First Session</div>
+          <div class="day-goal">Goal: See real billing work happening in real time. No amount of reading replaces watching a professional biller handle a claim and a denial appeal.</div>
+          <div class="day-meta">
+            <span class="meta-pill time">⏱ ~4 hours</span>
+            <span class="meta-pill collab">🤝 Collaborative</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="block" id="b3_1">
+        <div class="block-header" onclick="togBlock('b3_1')">
+          <div class="block-icon task">📝</div>
+          <div class="block-title-group">
+            <div class="block-title">Morning Prep: Build Your Question List</div>
+            <div class="block-meta">Before you shadow, prepare thoughtful questions — you'll learn 3x more</div>
+          </div>
+          <span class="block-duration">~1 hr</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="task-list">
+            <div class="task-item" id="t_3_1_1">
+              <input type="checkbox" id="cb_3_1_1" onchange="toggleTask('t_3_1_1', 'cb_3_1_1')">
+              <label for="cb_3_1_1">Write 5–7 questions to ask during the shadow session (see suggested starters below)</label>
+            </div>
+            <div class="task-item" id="t_3_1_2">
+              <input type="checkbox" id="cb_3_1_2" onchange="toggleTask('t_3_1_2', 'cb_3_1_2')">
+              <label for="cb_3_1_2">Prepare a simple observation log — paper or notes app — to capture what you see in real time</label>
+            </div>
+            <div class="task-item" id="t_3_1_3">
+              <input type="checkbox" id="cb_3_1_3" onchange="toggleTask('t_3_1_3', 'cb_3_1_3')">
+              <label for="cb_3_1_3">Review your Day 2 notes so the context is fresh when you observe the real software</label>
+            </div>
+          </div>
+          <div class="task-note">💬 Suggested question starters: "What does your morning routine look like when you start work?" / "Can you show me what a denial looks like when it comes in?" / "What information do you wish you had at a glance?" / "Which payer gives you the most trouble and why?" / "What's the most common mistake that causes a denial?"</div>
+        </div>
+      </div>
+
+      <div class="block" id="b3_2">
+        <div class="block-header" onclick="togBlock('b3_2')">
+          <div class="block-icon collab">👥</div>
+          <div class="block-title-group">
+            <div class="block-title">Shadow Session 1 — Claim Submission Workflow</div>
+            <div class="block-meta">Watch a biller submit claims from start to finish — note every step and every tool they use</div>
+          </div>
+          <span class="block-duration">~2 hrs</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="task-list">
+            <div class="task-item" id="t_3_2_1">
+              <input type="checkbox" id="cb_3_2_1" onchange="toggleTask('t_3_2_1', 'cb_3_2_1')">
+              <label for="cb_3_2_1">Observe the full submission workflow — what software is used? What does the biller check before submitting each claim?</label>
+            </div>
+            <div class="task-item" id="t_3_2_2">
+              <input type="checkbox" id="cb_3_2_2" onchange="toggleTask('t_3_2_2', 'cb_3_2_2')">
+              <label for="cb_3_2_2">Ask the biller to show you a recently denied claim and walk through how they handle it — what do they look for first?</label>
+            </div>
+            <div class="task-item" id="t_3_2_3">
+              <input type="checkbox" id="cb_3_2_3" onchange="toggleTask('t_3_2_3', 'cb_3_2_3')">
+              <label for="cb_3_2_3">Ask your interview questions — make sure to capture "What numbers do you wish you could see every morning?"</label>
+            </div>
+            <div class="task-item" id="t_3_2_4">
+              <input type="checkbox" id="cb_3_2_4" onchange="toggleTask('t_3_2_4', 'cb_3_2_4')">
+              <label for="cb_3_2_4">Note any moment where the biller switches tabs, copies data between screens, or says "I wish I could just see this automatically" — these are dashboard opportunities</label>
+            </div>
+          </div>
+          <div class="task-note">🎯 Key question to ask: "If you had a single screen you could look at every morning to know the health of our claims, what would be on it?" — this answer directly informs the dashboard.</div>
+        </div>
+      </div>
+
+      <div class="block" id="b3_3">
+        <div class="block-header" onclick="togBlock('b3_3')">
+          <div class="block-icon check">✏️</div>
+          <div class="block-title-group">
+            <div class="block-title">Post-Session Write-Up + Check-in</div>
+            <div class="block-meta">Capture what you observed while it's still fresh</div>
+          </div>
+          <span class="block-duration">~1 hr</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="task-list">
+            <div class="task-item" id="t_3_3_1">
+              <input type="checkbox" id="cb_3_3_1" onchange="toggleTask('t_3_3_1', 'cb_3_3_1')">
+              <label for="cb_3_3_1">Write a 1-page "Shadow Session Notes" document — tools used, key observations, answers to your questions, biggest surprise</label>
+            </div>
+          </div>
+          <div class="checkin-box" style="margin-top:12px;">
+            <div class="checkin-prompt">"Describe one specific moment from today's shadow session that changed or deepened your understanding of how billing actually works. What did you expect, and what was different from what you saw?"</div>
+            <textarea class="checkin-textarea" id="checkin_day3" placeholder="Write your reflection..."></textarea>
+            <button class="btn btn-navy btn-sm" onclick="sendCheckin(3)">📤 Send to Tutor for Feedback</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="day-summary">
+        <p><strong>Day 3 complete?</strong> Real-world observation beats any textbook. Tomorrow you go deeper into denial categories and pull actual data.</p>
+        <div class="day-nav">
+          <button class="btn btn-outline btn-sm" onclick="showDay(2)">← Day 2</button>
+          <button class="btn btn-amber btn-sm" onclick="showDay(4)">Day 4 →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ DAY 4 ══════════════ -->
+    <div class="day-view" id="day4">
+      <div class="day-header">
+        <div class="day-number-badge">
+          <span class="day-of-week">Thu</span>
+          <span class="day-num">4</span>
+        </div>
+        <div class="day-header-text">
+          <div class="day-heading">Denial Categories, KPIs & the Data Review</div>
+          <div class="day-goal">Goal: Learn the major denial reason codes, understand what KPIs billing managers track, and review real denial data with the billing manager.</div>
+          <div class="day-meta">
+            <span class="meta-pill time">⏱ ~4 hours</span>
+            <span class="meta-pill type">📚 Learning</span>
+            <span class="meta-pill collab">🤝 Data Review</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="block" id="b4_1">
+        <div class="block-header" onclick="togBlock('b4_1')">
+          <div class="block-icon learn">📊</div>
+          <div class="block-title-group">
+            <div class="block-title">Morning: Top Denial Reason Codes & Billing KPIs</div>
+            <div class="block-meta">The vocabulary every dashboard builder needs to know</div>
+          </div>
+          <span class="block-duration">~1.5 hrs</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="resource-list">
+            <a class="resource-item" href="https://www.carc.com/" target="_blank">
+              <span class="ri-icon">📋</span>
+              <div class="ri-body">
+                <div class="ri-name">CARC / RARC Code Lookup</div>
+                <div class="ri-desc">Claim Adjustment Reason Codes — the official codes payers use to explain denials. Look up: CO-4, CO-16, CO-18, CO-22, CO-97, PR-1, PR-2. Know what each means.</div>
+                <span class="ri-badge">Free · CARC.com</span>
+              </div>
+            </a>
+            <a class="resource-item" href="https://www.hfma.org/revenue-cycle/denials/" target="_blank">
+              <span class="ri-icon">📈</span>
+              <div class="ri-body">
+                <div class="ri-name">HFMA — Revenue Cycle Denial Management Resources</div>
+                <div class="ri-desc">The Healthcare Financial Management Association publishes practical denial management content. Skim their denial category overviews.</div>
+                <span class="ri-badge">Free · HFMA.org</span>
+              </div>
+            </a>
+          </div>
+          <div class="section-label">Study tasks</div>
+          <div class="task-list">
+            <div class="task-item" id="t_4_1_1">
+              <input type="checkbox" id="cb_4_1_1" onchange="toggleTask('t_4_1_1', 'cb_4_1_1')">
+              <label for="cb_4_1_1">Build a "Denial Reason Code Cheat Sheet" — look up the top 10 CARC codes and write a plain-English description of each in your own words</label>
+            </div>
+            <div class="task-item" id="t_4_1_2">
+              <input type="checkbox" id="cb_4_1_2" onchange="toggleTask('t_4_1_2', 'cb_4_1_2')">
+              <label for="cb_4_1_2">Research and define these 5 KPIs: Denial Rate, Days in A/R, Clean Claim Rate, First-Pass Rate, Net Collection Rate</label>
+            </div>
+            <div class="task-item" id="t_4_1_3">
+              <input type="checkbox" id="cb_4_1_3" onchange="toggleTask('t_4_1_3', 'cb_4_1_3')">
+              <label for="cb_4_1_3">For each KPI, note: the formula to calculate it and what a "good" vs "concerning" benchmark looks like</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block" id="b4_2">
+        <div class="block-header" onclick="togBlock('b4_2')">
+          <div class="block-icon collab">📂</div>
+          <div class="block-title-group">
+            <div class="block-title">Afternoon: Review 3-Month Denial Report with Billing Manager</div>
+            <div class="block-meta">Pull real data — this is where the requirements doc starts taking shape</div>
+          </div>
+          <span class="block-duration">~2 hrs</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="task-list">
+            <div class="task-item" id="t_4_2_1">
+              <input type="checkbox" id="cb_4_2_1" onchange="toggleTask('t_4_2_1', 'cb_4_2_1')">
+              <label for="cb_4_2_1">Ask the billing manager to pull a 3-month denial summary report from the practice management software</label>
+            </div>
+            <div class="task-item" id="t_4_2_2">
+              <input type="checkbox" id="cb_4_2_2" onchange="toggleTask('t_4_2_2', 'cb_4_2_2')">
+              <label for="cb_4_2_2">Sit with them and review it together — ask: "Which of these categories surprises you? Which do you already know how to fix?"</label>
+            </div>
+            <div class="task-item" id="t_4_2_3">
+              <input type="checkbox" id="cb_4_2_3" onchange="toggleTask('t_4_2_3', 'cb_4_2_3')">
+              <label for="cb_4_2_3">Note the top 5 denial reasons by volume in the actual data — do they match what you studied this morning?</label>
+            </div>
+            <div class="task-item" id="t_4_2_4">
+              <input type="checkbox" id="cb_4_2_4" onchange="toggleTask('t_4_2_4', 'cb_4_2_4')">
+              <label for="cb_4_2_4">Ask: "If you could track only 5 numbers on a daily dashboard, what would they be?" — write down exactly what they say</label>
+            </div>
+          </div>
+          <div class="task-note">📌 Start a running list of "dashboard must-haves" from this conversation — this becomes the core of tomorrow's requirements doc.</div>
+        </div>
+      </div>
+
+      <div class="block" id="b4_3">
+        <div class="block-header" onclick="togBlock('b4_3')">
+          <div class="block-icon check">✏️</div>
+          <div class="block-title-group">
+            <div class="block-title">End-of-Day Check-in</div>
+            <div class="block-meta">The most important check-in of the week</div>
+          </div>
+          <span class="block-duration">~30 min</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="checkin-box">
+            <div class="checkin-prompt">"Based on everything you've seen and learned this week: list the 7 specific metrics you believe ClaimPulse needs to show on the dashboard. For each one, write: the metric name, how it's calculated, and why it matters to a billing manager."</div>
+            <textarea class="checkin-textarea" id="checkin_day4" placeholder="List your 7 metrics here — be specific about the formula and the 'so what'..."></textarea>
+            <button class="btn btn-navy btn-sm" onclick="sendCheckin(4)">📤 Send to Tutor for Feedback</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="day-summary">
+        <p><strong>Day 4 complete?</strong> You've done the research, reviewed real data, and started the metrics list. Tomorrow you write the Week 1 deliverable — the dashboard requirements document.</p>
+        <div class="day-nav">
+          <button class="btn btn-outline btn-sm" onclick="showDay(3)">← Day 3</button>
+          <button class="btn btn-amber btn-sm" onclick="showDay(5)">Day 5 →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ DAY 5 ══════════════ -->
+    <div class="day-view" id="day5">
+      <div class="day-header">
+        <div class="day-number-badge">
+          <span class="day-of-week">Fri</span>
+          <span class="day-num">5</span>
+        </div>
+        <div class="day-header-text">
+          <div class="day-heading">Write the Dashboard Requirements Doc &amp; Wireframe</div>
+          <div class="day-goal">Goal: Produce the Week 1 deliverable — a written requirements document and a hand-drawn wireframe that will guide everything built in Weeks 3–6.</div>
+          <div class="day-meta">
+            <span class="meta-pill time">⏱ ~4 hours</span>
+            <span class="meta-pill type">✍️ Writing</span>
+            <span class="meta-pill collab">✅ Review</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="block" id="b5_1">
+        <div class="block-header" onclick="togBlock('b5_1')">
+          <div class="block-icon task">📄</div>
+          <div class="block-title-group">
+            <div class="block-title">Morning: Write the Dashboard Requirements Document</div>
+            <div class="block-meta">This is the Week 1 deliverable — treat it like a professional memo</div>
+          </div>
+          <span class="block-duration">~2 hrs</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="task-note" style="margin-bottom:12px;">📋 Use this structure for the document: (1) Purpose — what problem does ClaimPulse solve? (2) Users — who will use it and when? (3) Metrics — the 7 KPIs with formulas and definitions (4) Data Source — what file/export will feed the dashboard? (5) Filters needed — date range, payer, provider? (6) Priority — which 3 metrics are most critical?</div>
+          <div class="task-list">
+            <div class="task-item" id="t_5_1_1">
+              <input type="checkbox" id="cb_5_1_1" onchange="toggleTask('t_5_1_1', 'cb_5_1_1')">
+              <label for="cb_5_1_1">Write the full requirements doc — aim for 1–2 pages, written clearly enough for someone who didn't do this week's research to understand it</label>
+            </div>
+            <div class="task-item" id="t_5_1_2">
+              <input type="checkbox" id="cb_5_1_2" onchange="toggleTask('t_5_1_2', 'cb_5_1_2')">
+              <label for="cb_5_1_2">For each metric: define it, write the formula, state the data column(s) needed to calculate it, and note the "red flag" threshold (e.g., denial rate above 15% = concern)</label>
+            </div>
+            <div class="task-item" id="t_5_1_3">
+              <input type="checkbox" id="cb_5_1_3" onchange="toggleTask('t_5_1_3', 'cb_5_1_3')">
+              <label for="cb_5_1_3">Save the doc as requirements.md in your GitHub repo (create the repo today if you haven't yet)</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block" id="b5_2">
+        <div class="block-header" onclick="togBlock('b5_2')">
+          <div class="block-icon task">🖊️</div>
+          <div class="block-title-group">
+            <div class="block-title">Afternoon: Draw the Dashboard Wireframe</div>
+            <div class="block-meta">Sketch the layout on paper — where each metric lives and how they're arranged</div>
+          </div>
+          <span class="block-duration">~1 hr</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="resource-list">
+            <a class="resource-item" href="https://www.figma.com" target="_blank">
+              <span class="ri-icon">🎨</span>
+              <div class="ri-body">
+                <div class="ri-name">Figma (optional — paper is fine)</div>
+                <div class="ri-desc">If you want to make a digital wireframe, Figma is free and excellent for layout sketching. But a hand-drawn sketch on paper, photographed, works just as well for this stage.</div>
+                <span class="ri-badge">Free tier · figma.com</span>
+              </div>
+            </a>
+          </div>
+          <div class="task-list">
+            <div class="task-item" id="t_5_2_1">
+              <input type="checkbox" id="cb_5_2_1" onchange="toggleTask('t_5_2_1', 'cb_5_2_1')">
+              <label for="cb_5_2_1">Sketch a rectangle representing the browser window — draw the header, then lay out the 4 KPI tiles across the top row</label>
+            </div>
+            <div class="task-item" id="t_5_2_2">
+              <input type="checkbox" id="cb_5_2_2" onchange="toggleTask('t_5_2_2', 'cb_5_2_2')">
+              <label for="cb_5_2_2">Below the KPIs: sketch where the charts will go (denial trend line, payer bar, reasons donut, aging chart) — label each box with the chart type and metric name</label>
+            </div>
+            <div class="task-item" id="t_5_2_3">
+              <input type="checkbox" id="cb_5_2_3" onchange="toggleTask('t_5_2_3', 'cb_5_2_3')">
+              <label for="cb_5_2_3">Add a sidebar sketch showing the filter controls: date range, payer multi-select</label>
+            </div>
+            <div class="task-item" id="t_5_2_4">
+              <input type="checkbox" id="cb_5_2_4" onchange="toggleTask('t_5_2_4', 'cb_5_2_4')">
+              <label for="cb_5_2_4">Photo it and add to the GitHub repo README — this is your first commit</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="block" id="b5_3">
+        <div class="block-header" onclick="togBlock('b5_3')">
+          <div class="block-icon collab">✅</div>
+          <div class="block-title-group">
+            <div class="block-title">End-of-Day: Biller Sign-Off on Requirements</div>
+            <div class="block-meta">The real test — show your requirements doc to a biller and ask if it captures what they need</div>
+          </div>
+          <span class="block-duration">~30 min</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <div class="task-list">
+            <div class="task-item" id="t_5_3_1">
+              <input type="checkbox" id="cb_5_3_1" onchange="toggleTask('t_5_3_1', 'cb_5_3_1')">
+              <label for="cb_5_3_1">Show the billing manager or a biller your requirements doc and wireframe — ask: "Does this capture what you need? What's missing?"</label>
+            </div>
+            <div class="task-item" id="t_5_3_2">
+              <input type="checkbox" id="cb_5_3_2" onchange="toggleTask('t_5_3_2', 'cb_5_3_2')">
+              <label for="cb_5_3_2">Update the requirements doc with any changes from the review — this is the final Week 1 deliverable</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINAL WEEK REVIEW -->
+      <div class="block" id="b5_4">
+        <div class="block-header" onclick="togBlock('b5_4')">
+          <div class="block-icon review">🎓</div>
+          <div class="block-title-group">
+            <div class="block-title">Week 1 Final Deliverable Review</div>
+            <div class="block-meta">Paste your requirements doc here — get a full written review from your AI tutor</div>
+          </div>
+          <span class="block-duration">Use sidebar →</span>
+          <span class="chev">▼</span>
+        </div>
+        <div class="block-body">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Submit your completed Dashboard Requirements Document using the <strong>Submit Work</strong> tab in the right sidebar. Your AI tutor will review it against the Week 1 goals and give you structured written feedback.</p>
+          <button class="btn btn-navy" onclick="switchSidebarTab('review')">📋 Open Work Review →</button>
+        </div>
+      </div>
+
+      <div class="day-summary">
+        <p>🎉 <strong>Week 1 complete!</strong> You have a requirements doc, a wireframe, billing staff sign-off, and a GitHub repo initialized. Week 2 starts with AI foundations — building on this domain knowledge to understand how Claude will power the dashboard.</p>
+        <div class="day-nav">
+          <button class="btn btn-outline btn-sm" onclick="showDay(4)">← Day 4</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-tabs">
+      <button class="stab active" id="stab-tutor" onclick="switchSidebarTab('tutor')">💬 Ask Tutor</button>
+      <button class="stab" id="stab-review" onclick="switchSidebarTab('review')">📋 Submit Work</button>
+      <button class="stab" id="stab-progress" onclick="switchSidebarTab('progress')">📍 Progress</button>
+    </div>
+
+    <!-- TUTOR PANEL -->
+    <div class="sidebar-panel active" id="panel-tutor">
+      <div class="chat-context">
+        You're talking to your <strong>Week 1 AI Tutor</strong>. Ask anything about medical billing, AI basics, or today's tasks.
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="msg system">
+          <div class="msg-avatar">🎓</div>
+          <div class="msg-bubble">Hi! I'm your Week 1 tutor for the ClaimPulse internship. I know the full program — ask me anything about medical billing, CPT codes, ICD-10, denial reason codes, or what you're working on today.<br><br>You can also paste your check-in answers here and I'll give you feedback. What's on your mind?</div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <div class="chat-quick-prompts">
+          <span class="qprompt" onclick="quickPrompt('What is the difference between CPT and ICD-10 codes?')">CPT vs ICD-10?</span>
+          <span class="qprompt" onclick="quickPrompt('Explain denial reason code CO-97 in plain English')">CO-97 denial?</span>
+          <span class="qprompt" onclick="quickPrompt('What is Days in A/R and why do billing managers care about it?')">Days in A/R?</span>
+          <span class="qprompt" onclick="quickPrompt('What questions should I ask during my billing staff shadow session?')">Shadow questions?</span>
+          <span class="qprompt" onclick="quickPrompt('What should a Dashboard Requirements Document include?')">Requirements doc?</span>
+        </div>
+        <div class="chat-input-row">
+          <textarea class="chat-input" id="chat-input" placeholder="Ask anything..." rows="1" onkeydown="handleKey(event)"></textarea>
+          <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVIEW PANEL -->
+    <div class="sidebar-panel" id="panel-review">
+      <div class="review-panel-body">
+        <div class="review-intro">
+          Paste your written work here for a structured review. Your tutor will assess it against the week's learning goals and give you specific, actionable feedback.
+        </div>
+
+        <div class="review-section">
+          <label>What are you submitting?</label>
+          <select id="review-type" style="padding:8px 10px;border:1px solid var(--border-2);border-radius:7px;background:var(--cream);font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;">
+            <option value="checkin">Daily check-in reflection</option>
+            <option value="requirements">Dashboard Requirements Document</option>
+            <option value="wireframe_desc">Wireframe description</option>
+            <option value="shadow_notes">Shadow session notes</option>
+            <option value="kpi_list">KPI definitions list</option>
+          </select>
+        </div>
+
+        <div class="review-section">
+          <label>Paste your work below</label>
+          <textarea class="review-textarea" id="review-text" placeholder="Paste your written work here. The more complete it is, the more useful the feedback will be..."></textarea>
+        </div>
+
+        <button class="btn btn-navy" onclick="submitForReview()" style="width:100%;justify-content:center;">
+          📤 Submit for Review
+        </button>
+
+        <div class="divider"></div>
+
+        <div id="review-result" class="review-result"></div>
+      </div>
+    </div>
+
+    <!-- PROGRESS PANEL -->
+    <div class="sidebar-panel" id="panel-progress">
+      <div class="progress-panel-body">
+        <div class="week-goal-box">
+          <h4>Week 1 Goal</h4>
+          <p>Leave this week with a signed-off Dashboard Requirements Document, a wireframe, a GitHub repo, and enough domain knowledge to have a real conversation with the billing staff about what they need.</p>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill" id="week-progress-bar" style="width:0%"></div>
+        </div>
+        <p style="font-size:11px;color:var(--muted);text-align:right;margin-bottom:14px;" id="progress-pct-label">0% complete</p>
+
+        <div class="progress-day-row active-day" onclick="showDay(1)" id="prow1">
+          <span class="progress-day-icon">📘</span>
+          <div class="progress-day-text">
+            <div class="progress-day-name">Day 1 — AI Foundations</div>
+            <div class="progress-day-status" id="pstatus1">Not started</div>
+          </div>
+          <span class="progress-pct" id="ppct1">0%</span>
+        </div>
+        <div class="progress-day-row" onclick="showDay(2)" id="prow2">
+          <span class="progress-day-icon">📄</span>
+          <div class="progress-day-text">
+            <div class="progress-day-name">Day 2 — Claim Lifecycle</div>
+            <div class="progress-day-status" id="pstatus2">Not started</div>
+          </div>
+          <span class="progress-pct" id="ppct2">0%</span>
+        </div>
+        <div class="progress-day-row" onclick="showDay(3)" id="prow3">
+          <span class="progress-day-icon">👥</span>
+          <div class="progress-day-text">
+            <div class="progress-day-name">Day 3 — Shadow Session</div>
+            <div class="progress-day-status" id="pstatus3">Not started</div>
+          </div>
+          <span class="progress-pct" id="ppct3">0%</span>
+        </div>
+        <div class="progress-day-row" onclick="showDay(4)" id="prow4">
+          <span class="progress-day-icon">📊</span>
+          <div class="progress-day-text">
+            <div class="progress-day-name">Day 4 — Denials & KPIs</div>
+            <div class="progress-day-status" id="pstatus4">Not started</div>
+          </div>
+          <span class="progress-pct" id="ppct4">0%</span>
+        </div>
+        <div class="progress-day-row" onclick="showDay(5)" id="prow5">
+          <span class="progress-day-icon">📋</span>
+          <div class="progress-day-text">
+            <div class="progress-day-name">Day 5 — Requirements Doc</div>
+            <div class="progress-day-status" id="pstatus5">Not started</div>
+          </div>
+          <span class="progress-pct" id="ppct5">0%</span>
+        </div>
+
+        <div class="divider"></div>
+        <p style="font-size:12px;color:var(--muted);line-height:1.6;">✅ Check off tasks as you complete them — your progress is tracked automatically and saved in your browser.</p>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+// ── STATE ──
+const taskState = JSON.parse(localStorage.getItem('week1_tasks') || '{}');
+const SYSTEM_PROMPT = `You are a dedicated tutor for a college freshman (rising sophomore at Rutgers Business School, Management and Computer Science major) who is completing a summer internship program called ClaimPulse AI. 
+
+She is currently in Week 1 of Module 1. This week is entirely about domain immersion — learning medical billing before writing any code.
+
+Week 1 goals:
+- Understand the medical claim lifecycle end to end
+- Learn CPT codes, ICD-10 codes, and why they pair
+- Know the top denial reason codes (CARC codes like CO-4, CO-16, CO-97, etc.)
+- Understand 5 key billing KPIs: Denial Rate, Days in A/R, Clean Claim Rate, First-Pass Rate, Net Collection Rate
+- Complete two shadow sessions with billing staff
+- Produce a Dashboard Requirements Document listing 7 core metrics with formulas
+- Sketch a wireframe of the ClaimPulse dashboard layout
+
+The final project (ClaimPulse) is a daily claims intelligence dashboard built in Python/Streamlit, with Claude AI summaries and an MCP server. The practice is her father's medical practice with real anonymized claim data.
+
+Your tutoring style:
+- Socratic when appropriate — ask questions to guide her to answers rather than just giving them
+- Encouraging but honest — give real feedback, not just praise
+- Use plain English; avoid jargon unless you're teaching it
+- Be specific in feedback — don't say "good job," say what specifically was good and what could be improved
+- When reviewing work, structure feedback as: Strengths → Specific Improvements → Next Step
+- Keep responses concise — she's reading this on a side panel while working
+
+If she asks a factual question about medical billing or AI, answer it clearly and completely. If she submits work for review, give structured written feedback. If she seems stuck or frustrated, be encouraging and break the problem down.`;
+
+// ── DAY NAVIGATION ──
+let currentDay = 1;
+
+function showDay(d) {
+  document.querySelectorAll('.day-view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.day-pip').forEach(el => el.classList.remove('active'));
+  document.getElementById('day' + d).classList.add('active');
+  document.getElementById('pip' + d).classList.add('active');
+  document.querySelectorAll('.progress-day-row').forEach(el => el.classList.remove('active-day'));
+  document.getElementById('prow' + d).classList.add('active-day');
+  currentDay = d;
+}
+
+// ── BLOCK TOGGLE ──
+function togBlock(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+// ── TASK TRACKING ──
+function toggleTask(rowId, cbId) {
+  const row = document.getElementById(rowId);
+  const cb = document.getElementById(cbId);
+  if (cb.checked) { row.classList.add('checked'); }
+  else { row.classList.remove('checked'); }
+  taskState[cbId] = cb.checked;
+  localStorage.setItem('week1_tasks', JSON.stringify(taskState));
+  updateProgress();
+}
+
+function restoreTaskState() {
+  Object.entries(taskState).forEach(([cbId, checked]) => {
+    const cb = document.getElementById(cbId);
+    if (!cb) return;
+    cb.checked = checked;
+    const row = cb.closest('.task-item');
+    if (row) { checked ? row.classList.add('checked') : row.classList.remove('checked'); }
+  });
+  updateProgress();
+}
+
+// Tasks per day
+const dayTasks = {
+  1: ['cb_1_1_1','cb_1_1_2','cb_1_1_3','cb_1_2_1','cb_1_2_2','cb_1_2_3'],
+  2: ['cb_2_1_1','cb_2_1_2','cb_2_1_3','cb_2_2_1','cb_2_2_2','cb_2_2_3'],
+  3: ['cb_3_1_1','cb_3_1_2','cb_3_1_3','cb_3_2_1','cb_3_2_2','cb_3_2_3','cb_3_2_4','cb_3_3_1'],
+  4: ['cb_4_1_1','cb_4_1_2','cb_4_1_3','cb_4_2_1','cb_4_2_2','cb_4_2_3','cb_4_2_4'],
+  5: ['cb_5_1_1','cb_5_1_2','cb_5_1_3','cb_5_2_1','cb_5_2_2','cb_5_2_3','cb_5_2_4','cb_5_3_1','cb_5_3_2']
+};
+
+function updateProgress() {
+  let total = 0, done = 0;
+  [1,2,3,4,5].forEach(d => {
+    const tasks = dayTasks[d];
+    const dayDone = tasks.filter(id => taskState[id]).length;
+    total += tasks.length;
+    done += dayDone;
+    const pct = Math.round((dayDone / tasks.length) * 100);
+    document.getElementById('ppct' + d).textContent = pct + '%';
+    const statusEl = document.getElementById('pstatus' + d);
+    if (dayDone === 0) { statusEl.textContent = 'Not started'; statusEl.style.color = 'var(--muted)'; }
+    else if (dayDone === tasks.length) { statusEl.textContent = '✓ Complete'; statusEl.style.color = 'var(--teal)'; document.getElementById('pip' + d).classList.add('done'); }
+    else { statusEl.textContent = dayDone + '/' + tasks.length + ' tasks done'; statusEl.style.color = 'var(--amber)'; }
+  });
+  const weekPct = Math.round((done / total) * 100);
+  document.getElementById('week-progress-bar').style.width = weekPct + '%';
+  document.getElementById('progress-pct-label').textContent = weekPct + '% complete — ' + done + '/' + total + ' tasks';
+}
+
+// ── SIDEBAR TABS ──
+function switchSidebarTab(tab) {
+  document.querySelectorAll('.stab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.sidebar-panel').forEach(el => el.classList.remove('active'));
+  document.getElementById('stab-' + tab).classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+// ── CHAT ──
+const chatHistory = [];
+
+function quickPrompt(text) {
+  document.getElementById('chat-input').value = text;
+  sendMessage();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function addMsg(role, text) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = role === 'system' ? '🎓' : '👩';
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.textContent = text;
+  div.appendChild(avatar);
+  div.appendChild(bubble);
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return bubble;
+}
+
+function addLoading() {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'msg loading';
+  div.id = 'loading-msg';
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar';
+  avatar.textContent = '🎓';
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  div.appendChild(avatar); div.appendChild(bubble);
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeLoading() {
+  const el = document.getElementById('loading-msg');
+  if (el) el.remove();
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  document.getElementById('send-btn').disabled = true;
+
+  addMsg('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  addLoading();
+  switchSidebarTab('tutor');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: chatHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Sorry, I had trouble responding. Try again.';
+    removeLoading();
+    addMsg('system', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch (e) {
+    removeLoading();
+    addMsg('system', 'Connection issue — please check your internet and try again.');
+  }
+  document.getElementById('send-btn').disabled = false;
+}
+
+// ── CHECK-IN SUBMISSION ──
+async function sendCheckin(day) {
+  const textarea = document.getElementById('checkin_day' + day);
+  const text = textarea.value.trim();
+  if (!text) { alert('Write your reflection first, then submit.'); return; }
+  
+  switchSidebarTab('tutor');
+  const dayNames = { 1:'Day 1', 2:'Day 2', 3:'Day 3', 4:'Day 4', 5:'Day 5' };
+  const userMsg = `[${dayNames[day]} Check-In Submission]\n\n${text}`;
+  chatHistory.push({ role: 'user', content: userMsg });
+  addMsg('user', userMsg);
+  addLoading();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: chatHistory
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Could not generate feedback. Try again.';
+    removeLoading();
+    addMsg('system', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch (e) {
+    removeLoading();
+    addMsg('system', 'Connection error. Please try again.');
+  }
+}
+
+// ── WORK REVIEW ──
+async function submitForReview() {
+  const text = document.getElementById('review-text').value.trim();
+  const type = document.getElementById('review-type').value;
+  if (!text) { alert('Paste your work before submitting.'); return; }
+
+  const typeLabels = {
+    checkin: 'Daily Check-In Reflection',
+    requirements: 'Dashboard Requirements Document',
+    wireframe_desc: 'Wireframe Description',
+    shadow_notes: 'Shadow Session Notes',
+    kpi_list: 'KPI Definitions List'
+  };
+
+  const resultEl = document.getElementById('review-result');
+  resultEl.className = 'review-result visible';
+  resultEl.textContent = '⏳ Reviewing your work...';
+
+  const reviewPrompt = `Please review this student's ${typeLabels[type]} submission for Week 1 of the ClaimPulse internship.\n\nStructure your feedback as:\n**Strengths** — what they did well (be specific)\n**Improvements** — 2-3 specific things to fix or add\n**Next Step** — one concrete action to take before moving on\n\nHere is their submission:\n\n${text}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: reviewPrompt }]
+      })
+    });
+    const data = await res.json();
+    resultEl.textContent = data.content?.[0]?.text || 'Review failed. Try again.';
+  } catch (e) {
+    resultEl.textContent = 'Connection error. Please try again.';
+  }
+}
+
+// ── INIT ──
+restoreTaskState();
+</script>
+</body>
+</html>

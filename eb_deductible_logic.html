@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E&B Deductible Logic Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F4F2ED;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE6;
+    --border: #D8D4CC;
+    --border-strong: #B8B3AA;
+    --text: #1A1916;
+    --text2: #5A5750;
+    --text3: #8A8680;
+    --accent: #1A3A2A;
+    --accent-light: #E8F0EC;
+    --amber: #7A4A00;
+    --amber-light: #FEF3DC;
+    --red: #8A1A1A;
+    --red-light: #FDEAEA;
+    --green: #1A5A2A;
+    --green-light: #E8F5ED;
+    --blue: #1A2A5A;
+    --blue-light: #EAF0F8;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 32px 24px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  /* ---------- HEADER ---------- */
+  .page-title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 4px;
+  }
+  h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 24px; color: var(--text); }
+
+  /* ---------- PATIENT CARD ---------- */
+  .patient-card {
+    background: var(--accent);
+    color: #fff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .patient-name { font-size: 20px; font-weight: 600; margin-bottom: 2px; }
+  .patient-meta { font-size: 12px; opacity: 0.7; margin-bottom: 12px; }
+  .patient-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill {
+    font-size: 11px; font-weight: 500; padding: 3px 10px;
+    background: rgba(255,255,255,0.15); border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+  .ded-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ded-box { background: rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 14px; text-align: right; }
+  .ded-label { font-size: 10px; opacity: 0.65; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
+  .ded-val { font-size: 18px; font-weight: 600; font-family: var(--mono); }
+  .ded-of { font-size: 11px; opacity: 0.6; }
+  .ded-warn { font-size: 11px; margin-top: 4px; color: #FFD580; font-weight: 500; }
+
+  /* ---------- ALERT BOX ---------- */
+  .alert {
+    border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;
+    font-size: 13px; display: flex; gap: 10px; align-items: flex-start;
+    border-left: 3px solid;
+  }
+  .alert-warn { background: var(--amber-light); border-color: var(--amber); color: var(--amber); }
+  .alert-info { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+  .alert-ok   { background: var(--green-light); border-color: var(--green); color: var(--green); }
+  .alert-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .alert-body { color: var(--text); }
+  .alert-body strong { color: var(--text); font-weight: 600; }
+
+  /* ---------- SECTION HEADING ---------- */
+  h2 {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text3); margin: 28px 0 12px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ---------- SERVICE MATRIX TABLE ---------- */
+  .matrix-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); margin-bottom: 24px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { background: var(--surface2); }
+  th {
+    text-align: left; padding: 10px 12px; font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em; color: var(--text2);
+    border-bottom: 1px solid var(--border);
+  }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+  .svc-name { font-weight: 500; color: var(--text); }
+  .network-tier {
+    font-size: 11px; font-family: var(--mono); font-weight: 500; padding: 2px 8px;
+    border-radius: 4px; display: inline-block; white-space: nowrap;
+  }
+  .tier-hmo { background: var(--accent-light); color: var(--accent); }
+  .tier-ppo { background: var(--blue-light); color: var(--blue); }
+  .tier-oon { background: var(--red-light); color: var(--red); }
+  .ded-yes { color: var(--red); font-weight: 600; font-size: 12px; }
+  .ded-no  { color: var(--green); font-weight: 600; font-size: 12px; }
+  .ded-zero { color: var(--text3); font-size: 12px; }
+  .cost-tag { font-size: 12px; font-family: var(--mono); color: var(--text2); }
+  .note-cell { font-size: 11px; color: var(--text3); max-width: 200px; }
+
+  /* ---------- LOGIC ALGORITHM ---------- */
+  .algo-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 12px;
+  }
+  .algo-step {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .algo-step:last-child { border-bottom: none; padding-bottom: 0; }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--accent);
+    color: #fff; font-size: 12px; font-weight: 600; display: flex;
+    align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+  }
+  .step-body { flex: 1; }
+  .step-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .step-desc { font-size: 13px; color: var(--text2); line-height: 1.55; }
+  .step-code {
+    font-family: var(--mono); font-size: 12px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px;
+    margin-top: 8px; color: var(--text);
+  }
+  .step-code .kw { color: var(--accent); font-weight: 600; }
+  .step-code .str { color: var(--amber); }
+  .step-code .cmt { color: var(--text3); }
+
+  /* ---------- FLAGS TABLE ---------- */
+  .flags-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+  .flag-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+  .flag-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .flag-label.yes { color: var(--red); }
+  .flag-label.no  { color: var(--green); }
+  .flag-label.check { color: var(--amber); }
+  .flag-item { font-size: 12px; font-family: var(--mono); color: var(--text2); padding: 3px 0; display: flex; gap: 6px; align-items: flex-start; }
+  .flag-item::before { content: '→'; color: var(--text3); flex-shrink: 0; }
+
+  /* ---------- FOOTER NOTE ---------- */
+  .footnote { font-size: 11px; color: var(--text3); padding-top: 16px; border-top: 1px solid var(--border); line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    .patient-card { grid-template-columns: 1fr; }
+    .flags-grid { grid-template-columns: 1fr; }
+    body { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<p class="page-title">Medical Billing — E&amp;B Analysis</p>
+<h1>Deductible Logic Reference</h1>
+
+<!-- ===== PATIENT CARD ===== -->
+<div class="patient-card">
+  <div>
+    <div class="patient-name">Gabriela H. Gamez</div>
+    <div class="patient-meta">DOB 08/19/1974 &nbsp;·&nbsp; Subscriber ID: LPG905126789 &nbsp;·&nbsp; Group: 66845000 (Prince George's County BOE)</div>
+    <div class="patient-pills">
+      <span class="pill">CareFirst BCBS</span>
+      <span class="pill">HMO Triple Option</span>
+      <span class="pill">Family Coverage</span>
+      <span class="pill">PCP: Lizy B Thomas</span>
+      <span class="pill">Verified: 05/06/2026</span>
+      <span class="pill">No Secondary Insurance</span>
+    </div>
+  </div>
+  <div>
+    <div class="ded-grid">
+      <div class="ded-box">
+        <div class="ded-label">Individual Deductible</div>
+        <div class="ded-val">$200</div>
+        <div class="ded-of">$200 remaining of $200</div>
+        <div class="ded-warn">⚠ NOT MET — 0%</div>
+      </div>
+      <div class="ded-box">
+        <div class="ded-label">Family Deductible</div>
+        <div class="ded-val">$600</div>
+        <div class="ded-of">$600 remaining of $600</div>
+        <div class="ded-warn">⚠ NOT MET — 0%</div>
+      </div>
+      <div class="ded-box">
+        <div class="ded-label">Individual OOP Max</div>
+        <div class="ded-val">$890</div>
+        <div class="ded-of">$890 remaining of $1,000</div>
+        <div class="ded-of" style="color:#9DE8A0">$110 applied (copays)</div>
+      </div>
+      <div class="ded-box">
+        <div class="ded-label">Family OOP Max</div>
+        <div class="ded-val">$1,840</div>
+        <div class="ded-of">$1,840 remaining of $2,000</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ALERTS -->
+<div class="alert alert-warn">
+  <span class="alert-icon">⚠</span>
+  <div class="alert-body">
+    <strong>Deductible Alert:</strong> The individual deductible is fully intact ($200.00 remaining). Any service coded to a tier where "DEDUCTIBLE APPLIES" will require the patient to satisfy this balance before coinsurance begins. Note that $110 has already been applied to the OOP max via copays, which do not reduce the deductible.
+  </div>
+</div>
+<div class="alert alert-info">
+  <span class="alert-icon">ℹ</span>
+  <div class="alert-body">
+    <strong>Triple Option Structure:</strong> This plan operates on three tiers — <strong>BlueChoice HMO</strong> (lowest cost, copay-only), <strong>PPO</strong> (mid-tier, some deductible-based services), and <strong>Out of Network</strong> (highest cost, deductible always applies). The tier that applies depends on which network the rendering provider belongs to. Confirm network tier before calculating patient liability.
+  </div>
+</div>
+
+<!-- ===== SERVICE MATRIX ===== -->
+<h2>Service × Network Tier Matrix — Deductible Applicability</h2>
+
+<div class="matrix-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>Service Type</th>
+      <th>Network Tier</th>
+      <th>Provider Role</th>
+      <th>Deductible?</th>
+      <th>Cost Sharing</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- OFFICE VISIT -->
+    <tr>
+      <td class="svc-name" rowspan="3">Office Visit<br><span style="font-size:11px;font-weight:400;color:var(--text3)">Sick / 470</span></td>
+      <td><span class="network-tier tier-hmo">BlueChoice HMO</span></td>
+      <td>PCP</td>
+      <td class="ded-no">NO</td>
+      <td class="cost-tag">$10 copay</td>
+      <td class="note-cell">Copay only; no deductible stated</td>
+    </tr>
+    <tr>
+      <td><span class="network-tier tier-hmo">BlueChoice HMO</span></td>
+      <td>Specialist</td>
+      <td class="ded-no">NO</td>
+      <td class="cost-tag">$25 copay</td>
+      <td class="note-cell">Copay only; no deductible stated</td>
+    </tr>
+    <tr>
+      <td><span class="network-tier tier-oon">Out of Network</span></td>
+      <td>Any</td>
+      <td class="ded-yes">YES</td>
+      <td class="cost-tag">30% coinsurance</td>
+      <td class="note-cell">Explicit "DEDUCTIBLE APPLIES" in E&amp;B</td>
+    </tr>
+    <!-- PPO OFFICE -->
+    <tr>
+      <td class="svc-name" rowspan="2">Office Visit (PPO)<br><span style="font-size:11px;font-weight:400;color:var(--text3)">470 – POS: Office</span></td>
+      <td><span class="network-tier tier-ppo">PPO In-Network</span></td>
+      <td>PCP</td>
+      <td class="ded-zero">$0 Ded</td>
+      <td class="cost-tag">$20 copay</td>
+      <td class="note-cell">Plan shows "Deductible $0.00 Contract" for office POS</td>
+    </tr>
+    <tr>
+      <td><span class="network-tier tier-ppo">PPO In-Network</span></td>
+      <td>Specialist</td>
+      <td class="ded-zero">$0 Ded</td>
+      <td class="cost-tag">$35 copay</td>
+      <td class="note-cell">Plan shows "Deductible $0.00 Contract" for office POS</td>
+    </tr>
+    <!-- PPO OUTPT HOSP -->
+    <tr>
+      <td class="svc-name">Office Visit (PPO)<br><span style="font-size:11px;font-weight:400;color:var(--text3)">470 – POS: Outpt Hospital</span></td>
+      <td><span class="network-tier tier-ppo">PPO In-Network</span></td>
+      <td>PCP / Specialist</td>
+      <td class="ded-yes">YES</td>
+      <td class="cost-tag">20% coinsurance</td>
+      <td class="note-cell">Explicit "DEDUCTIBLE APPLIES" at hospital POS</td>
+    </tr>
+    <!-- INFUSION -->
+    <tr>
+      <td class="svc-name" rowspan="3">Infusion Therapy<br><span style="font-size:11px;font-weight:400;color:var(--text3)">418 / 422 – Office</span></td>
+      <td><span class="network-tier tier-hmo">BlueChoice HMO</span></td>
+      <td>PCP</td>
+      <td class="ded-no">NO</td>
+      <td class="cost-tag">$10 copay</td>
+      <td class="note-cell">Specialty drugs need prior auth via pharmacy vendor</td>
+    </tr>
+    <tr>
+      <td><span class="network-tier tier-hmo">BlueChoice HMO</span></td>
+      <td>Specialist</td>
+      <td class="ded-no">NO</td>
+      <td class="cost-tag">$25 copay</td>
+      <td class="note-cell">Specialty drugs need prior auth via pharmacy vendor</td>
+    </tr>
+    <tr>
+      <td><span class="network-tier tier-oon">Out of Network</span></td>
+      <td>Any</td>
+      <td class="ded-yes">YES</td>
+      <td class="cost-tag">30% coinsurance</td>
+      <td class="note-cell">Non-compliance adds 20% member penalty</td>
+    </tr>
+    <!-- INFUSION PPO -->
+    <tr>
+      <td class="svc-name" rowspan="2">Infusion Therapy<br><span style="font-size:11px;font-weight:400;color:var(--text3)">418 / 422 – PPO</span></td>
+      <td><span class="network-tier tier-ppo">PPO In-Network</span></td>
+      <td>Any – Office POS</td>
+      <td class="ded-zero">$0 Ded</td>
+      <td class="cost-tag">$20/$35 copay</td>
+      <td class="note-cell">"Deductible $0.00 Contract" at office POS</td>
+    </tr>
+    <tr>
+      <td><span class="network-tier tier-ppo">PPO In-Network</span></td>
+      <td>Any – Outpt Hospital</td>
+      <td class="ded-yes">YES</td>
+      <td class="cost-tag">20% coinsurance</td>
+      <td class="note-cell">Explicit "DEDUCTIBLE APPLIES" at hospital POS</td>
+    </tr>
+    <!-- CHIRO -->
+    <tr>
+      <td class="svc-name" rowspan="3">Chiropractic<br><span style="font-size:11px;font-weight:400;color:var(--text3)">CPT 200</span></td>
+      <td><span class="network-tier tier-hmo">BlueChoice HMO</span></td>
+      <td>Specialist</td>
+      <td class="ded-no">NO</td>
+      <td class="cost-tag">$25 copay</td>
+      <td class="note-cell">Limit: 20 visits/year (accumulation not available)</td>
+    </tr>
+    <tr>
+      <td><span class="network-tier tier-ppo">PPO In-Network</span></td>
+      <td>Specialist</td>
+      <td class="ded-yes">YES</td>
+      <td class="cost-tag">20% coinsurance</td>
+      <td class="note-cell">Explicit "DEDUCTIBLE APPLIES"; 20 visits/year limit</td>
+    </tr>
+    <tr>
+      <td><span class="network-tier tier-oon">Out of Network</span></td>
+      <td>Any</td>
+      <td class="ded-yes">YES</td>
+      <td class="cost-tag">30% coinsurance</td>
+      <td class="note-cell">20 visits/year limit applies</td>
+    </tr>
+    <!-- EMERGENCY -->
+    <tr>
+      <td class="svc-name" rowspan="2">Emergency Room<br><span style="font-size:11px;font-weight:400;color:var(--text3)">CPT 300 / 290 / 270</span></td>
+      <td><span class="network-tier tier-hmo">BlueChoice HMO</span></td>
+      <td>Facility</td>
+      <td class="ded-no">NO</td>
+      <td class="cost-tag">$150 copay</td>
+      <td class="note-cell">Copay waived if admitted; $0 coinsurance</td>
+    </tr>
+    <tr>
+      <td><span class="network-tier tier-oon">Out of Network</span></td>
+      <td>Facility</td>
+      <td class="ded-no">NO</td>
+      <td class="cost-tag">$150 copay</td>
+      <td class="note-cell">OON treated at in-network level; copay waived if admitted</td>
+    </tr>
+    <!-- INPATIENT -->
+    <tr>
+      <td class="svc-name" rowspan="2">Inpatient Admission<br><span style="font-size:11px;font-weight:400;color:var(--text3)">Med/Surg 640</span></td>
+      <td><span class="network-tier tier-hmo">BlueChoice HMO</span></td>
+      <td>Facility</td>
+      <td class="ded-no">NO</td>
+      <td class="cost-tag">$150 copay</td>
+      <td class="note-cell">Prior auth required; semi-private room</td>
+    </tr>
+    <tr>
+      <td><span class="network-tier tier-ppo">PPO In-Network</span></td>
+      <td>Facility</td>
+      <td class="ded-yes">YES</td>
+      <td class="cost-tag">20% coinsurance</td>
+      <td class="note-cell">Explicit "DEDUCTIBLE APPLIES"</td>
+    </tr>
+    <!-- URGENT CARE -->
+    <tr>
+      <td class="svc-name" rowspan="2">Urgent Care<br><span style="font-size:11px;font-weight:400;color:var(--text3)">740 / 742</span></td>
+      <td><span class="network-tier tier-hmo">BlueChoice HMO</span></td>
+      <td>Specialist</td>
+      <td class="ded-no">NO</td>
+      <td class="cost-tag">$15 copay</td>
+      <td class="note-cell">$0 coinsurance; no deductible stated</td>
+    </tr>
+    <tr>
+      <td><span class="network-tier tier-ppo">PPO In-Network</span></td>
+      <td>Any</td>
+      <td class="ded-zero">$0 Ded</td>
+      <td class="cost-tag">$35 copay</td>
+      <td class="note-cell">"Deductible $0.00 Contract" for urgent care</td>
+    </tr>
+    <!-- NUTRITION -->
+    <tr>
+      <td class="svc-name">Diabetes Nutrition<br><span style="font-size:11px;font-weight:400;color:var(--text3)">CPT 469</span></td>
+      <td><span class="network-tier tier-hmo">Any / All Tiers</span></td>
+      <td>Specialist</td>
+      <td class="ded-no">NO</td>
+      <td class="cost-tag">$0 (0% coinsurance)</td>
+      <td class="note-cell">No deductible at any tier or OON; preventive mandate</td>
+    </tr>
+    <!-- PREVENTIVE -->
+    <tr>
+      <td class="svc-name">Preventive Services<br><span style="font-size:11px;font-weight:400;color:var(--text3)">Well visit / ACA</span></td>
+      <td><span class="network-tier tier-hmo">BlueChoice / PPO / OON</span></td>
+      <td>PCP / Specialist</td>
+      <td class="ded-no">NO</td>
+      <td class="cost-tag">$0</td>
+      <td class="note-cell">"COST SHARING MAY NOT APPLY FOR PREVENTIVE SERVICES" + mandated benefit waiver</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ===== LOGIC ALGORITHM ===== -->
+<h2>Reusable Logic — Reading Any E&amp;B for Deductible Applicability</h2>
+
+<div class="algo-card">
+  <div class="algo-step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <div class="step-title">Identify the plan type and tier structure</div>
+      <div class="step-desc">
+        Look for "Active Health Plan" in the E&amp;B header. Determine if it's an HMO, PPO, HDHP, EPO, or multi-option (like this "Triple Option"). Multi-option plans will show multiple tiers in the benefit detail rows. The tier that applies is determined by the rendering provider's network participation — confirm via provider directory or NPI lookup before proceeding.
+      </div>
+      <div class="step-code">
+        <span class="kw">IF</span> plan_type == <span class="str">"HMO"</span>: <span class="cmt">→ copay-only structure; deductible rare</span><br>
+        <span class="kw">IF</span> plan_type == <span class="str">"HDHP"</span>: <span class="cmt">→ deductible applies first on nearly all services</span><br>
+        <span class="kw">IF</span> plan_type == <span class="str">"PPO"</span>: <span class="cmt">→ depends on service type and POS; check each row</span><br>
+        <span class="kw">IF</span> plan_type == <span class="str">"Multi-Option"</span>: <span class="cmt">→ determine which sub-tier applies first</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="algo-step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <div class="step-title">Find the service type row matching the visit</div>
+      <div class="step-desc">
+        Match the service being rendered to the E&amp;B benefit rows. Key identifiers in CareFirst-style documents include service type labels (Office Visit, Infusion Therapy, Emergency Room, etc.) paired with a CMS service type code in parentheses. Match on both label AND the network tier/provider role that applies to your provider.
+      </div>
+      <div class="step-code">
+        <span class="cmt">Example service type codes found in this E&amp;B:</span><br>
+        200 = Chiropractic &nbsp;|&nbsp; 280/290/300 = Emergency &nbsp;|&nbsp; 418/422 = Infusion<br>
+        469 = Nutrition Counseling &nbsp;|&nbsp; 470 = Office/Clinic Visit &nbsp;|&nbsp; 640 = Inpatient<br>
+        740/742 = Urgent Care &nbsp;|&nbsp; 122 = Outpatient Observation
+      </div>
+    </div>
+  </div>
+
+  <div class="algo-step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <div class="step-title">Check the place of service — it changes deductible status</div>
+      <div class="step-desc">
+        This is the most commonly missed factor. The same service can have different deductible rules depending on place of service. In this plan, infusion at an office POS has no deductible, but the same infusion at an outpatient hospital POS has "DEDUCTIBLE APPLIES." Always confirm and document the place of service before determining liability.
+      </div>
+      <div class="step-code">
+        <span class="cmt">CareFirst POS deductible pattern for this plan:</span><br>
+        Office (POS 11) → typically <span class="kw">NO deductible</span> (copay only)<br>
+        On Campus Outpatient Hospital (POS 22) → often <span class="kw">DEDUCTIBLE APPLIES</span><br>
+        Inpatient Hospital (POS 21) → often <span class="kw">DEDUCTIBLE APPLIES</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="algo-step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <div class="step-title">Scan for the explicit "DEDUCTIBLE APPLIES" flag</div>
+      <div class="step-desc">
+        CareFirst and most modern 270/271 E&amp;B responses explicitly embed the text "DEDUCTIBLE APPLIES" in the benefit description when applicable. If the phrase is present on the matching service row → deductible applies. If the phrase is absent AND a flat copay is shown with 0% coinsurance → deductible does not apply for that service/tier combination.
+      </div>
+      <div class="step-code">
+        <span class="kw">SEARCH</span> benefit_text <span class="kw">FOR</span> <span class="str">"DEDUCTIBLE APPLIES"</span><br>
+        <span class="kw">IF</span> found → deductible applies<br>
+        <span class="kw">ELSE IF</span> copay_present AND coinsurance == 0% → <span class="kw">NO</span> deductible<br>
+        <span class="kw">ELSE IF</span> "Deductible $0.00 Contract" present → <span class="kw">NO</span> deductible for this service
+      </div>
+    </div>
+  </div>
+
+  <div class="algo-step">
+    <div class="step-num">5</div>
+    <div class="step-body">
+      <div class="step-title">Check deductible accumulation (remaining vs. total)</div>
+      <div class="step-desc">
+        Even if the deductible applies structurally, it may already be fully or partially met. Look at the deductible remaining amounts for both the individual and family. Use whichever is lower (the one that will be met first). If remaining = $0 → skip to coinsurance. If remaining > $0 → the patient owes up to the remaining amount at the allowed rate before coinsurance begins.
+      </div>
+      <div class="step-code">
+        <span class="cmt">For Gabriela as of 05/06/2026:</span><br>
+        Individual deductible remaining: <span class="kw">$200.00</span> (fully unmet)<br>
+        Family deductible remaining: <span class="kw">$600.00</span> (fully unmet)<br>
+        <span class="cmt">→ Any deductible-applicable service: patient owes up to $200 individually</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="algo-step">
+    <div class="step-num">6</div>
+    <div class="step-body">
+      <div class="step-title">Check for preventive service overrides</div>
+      <div class="step-desc">
+        Both ACA mandates and plan-specific waivers can eliminate cost sharing entirely. In this E&amp;B, look for: "COST SHARING MAY NOT APPLY FOR PREVENTIVE SERVICES" and "MANDATED BENEFIT WAIVES COST SHARE IN-NETWORK AND OUT-OF-NETWORK." If either phrase appears and the visit is coded as preventive (wellness, screening, etc.) → $0 patient liability regardless of deductible status.
+      </div>
+    </div>
+  </div>
+
+  <div class="algo-step">
+    <div class="step-num">7</div>
+    <div class="step-body">
+      <div class="step-title">Calculate patient liability</div>
+      <div class="step-desc">
+        Combine the findings above into a final patient responsibility estimate. Always use the payer's allowed amount (not billed charges) as the basis.
+      </div>
+      <div class="step-code">
+        <span class="kw">IF</span> deductible_applies == False: patient_owes = copay_amount<br>
+        <span class="kw">ELSE IF</span> deductible_remaining == 0: patient_owes = allowed × coinsurance_pct<br>
+        <span class="kw">ELSE IF</span> allowed &lt;= deductible_remaining: patient_owes = allowed<br>
+        <span class="kw">ELSE</span>: patient_owes = deductible_remaining + (allowed - deductible_remaining) × coinsurance_pct<br>
+        <span class="cmt">Cap final result at individual OOP remaining: $890.00</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FLAGS REFERENCE ===== -->
+<h2>Quick-Scan Flags in E&amp;B Text</h2>
+
+<div class="flags-grid">
+  <div class="flag-card">
+    <div class="flag-label yes">🔴 Deductible APPLIES — look for these strings</div>
+    <div class="flag-item">DEDUCTIBLE APPLIES</div>
+    <div class="flag-item">Subject to deductible</div>
+    <div class="flag-item">20% coinsurance + "DEDUCTIBLE APPLIES"</div>
+    <div class="flag-item">30% coinsurance (OON) + "DEDUCTIBLE APPLIES"</div>
+    <div class="flag-item">Outpatient Hospital POS + coinsurance row</div>
+    <div class="flag-item">PPO tier + inpatient / observation service</div>
+  </div>
+  <div class="flag-card">
+    <div class="flag-label no">🟢 Deductible does NOT apply — look for these</div>
+    <div class="flag-item">Co-Payment $XX.XX (flat copay, no deductible text)</div>
+    <div class="flag-item">Deductible $0.00 Contract</div>
+    <div class="flag-item">Co-Insurance 0% (with no "DEDUCTIBLE APPLIES")</div>
+    <div class="flag-item">COST SHARING MAY NOT APPLY FOR PREVENTIVE SERVICES</div>
+    <div class="flag-item">MANDATED BENEFIT WAIVES COST SHARE</div>
+    <div class="flag-item">Deductible remaining = $0.00 Remaining</div>
+  </div>
+  <div class="flag-card">
+    <div class="flag-label check">🟡 Verify before assuming</div>
+    <div class="flag-item">Multi-option plan → confirm which tier applies</div>
+    <div class="flag-item">Prior auth required (specialty drugs, inpatient)</div>
+    <div class="flag-item">Accumulation info unavailable → call payer</div>
+    <div class="flag-item">Place of service ambiguity (office vs. hospital)</div>
+    <div class="flag-item">Preventive visit with sick complaint added</div>
+    <div class="flag-item">NON-COMPLIANCE PENALTY language present</div>
+  </div>
+  <div class="flag-card">
+    <div class="flag-label check" style="color:var(--blue)">🔵 Special cases in this plan type</div>
+    <div class="flag-item">Emergency: copay only ($150), waived if admitted</div>
+    <div class="flag-item">OON emergency: treated at in-network level</div>
+    <div class="flag-item">Diabetes nutrition (469): $0 at ALL tiers, even OON</div>
+    <div class="flag-item">Copays count toward OOP max but NOT deductible</div>
+    <div class="flag-item">Family ded met when individuals collectively hit $600</div>
+    <div class="flag-item">Out-of-network separate deductible: $500 individual</div>
+  </div>
+</div>
+
+<p class="footnote">
+  <strong>Disclaimer:</strong> This analysis is based on the 270/271 eligibility response dated 05/06/2026. Accumulated amounts and benefit limits may change as additional claims process. Always confirm authorization requirements prior to rendering services requiring prior auth. This document does not constitute a guarantee of payment. For benefit questions, call BCBSA Benefits Hotline: (800) 676-2583.
+</p>
+
+</body>
+</html>
